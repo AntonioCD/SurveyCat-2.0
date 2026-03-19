@@ -1,0 +1,6 @@
+@SurveyCat.Backend_HostAddress = http://localhost:5055
+
+GET {{SurveyCat.Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
