@@ -1,11 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using SurveyCat.Backend.Data;
+using SurveyCat.Backend.Repositories.Implementations;
+using SurveyCat.Backend.Repositories.Interfaces;
+using SurveyCat.Backend.UnitsOfWork.Implementations;
+using SurveyCat.Backend.UnitsOfWork.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name=LocalConnection"));
+
+builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 var app = builder.Build();
 
