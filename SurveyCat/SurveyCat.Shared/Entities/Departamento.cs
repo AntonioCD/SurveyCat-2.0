@@ -12,7 +12,8 @@ public class Departamento
     public int Id { get; set; }
 
     [Display(Name = "Cod. Dpto")]
-    [MaxLength(2, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
+    [StringLength(2, MinimumLength = 4, ErrorMessage = "El campo {0} debe tener exactamente {1} caracteres.")]
+    [RegularExpression(@"^\d{2}$", ErrorMessage = "El código debe contener exactamente 2 dígitos.")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string CodDepto { get; set; } = null!;
 
@@ -21,6 +22,10 @@ public class Departamento
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string Nombre { get; set; } = null!;
 
-    [MaxLength(2, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
+    [Display(Name = "Cod. INIDE")]
+    [StringLength(2, MinimumLength = 2, ErrorMessage = "El campo {0} debe tener exactamente {1} caracteres.")]
+    [RegularExpression(@"^\d{2}$", ErrorMessage = "El código debe contener exactamente 2 dígitos.")]
     public string? CodINIDE { get; set; }
+
+    public ICollection<Municipio>? Municipios { get; set; }
 }

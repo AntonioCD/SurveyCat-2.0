@@ -1,26 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SurveyCat.Backend.Data;
+using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.Entities;
-using System.Threading.Tasks;
 
 namespace SurveyCat.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DepartamentosController : GenericController<Departamento>
+public class MunicipiosController : GenericController<Municipio>
 {
-    private readonly IDepartamentosUnitOfWork _departamentosUnitOfWork;
+    private readonly IMunicipiosUnitOfWork _municipiosUnitOfWork;
 
-    public DepartamentosController(IGenericUnitOfWork<Departamento> unitOfWork, IDepartamentosUnitOfWork departamentosUnitOfWork) : base(unitOfWork)
+    public MunicipiosController(IGenericUnitOfWork<Municipio> unitOfWork, IMunicipiosUnitOfWork municipiosUnitOfWork) : base(unitOfWork)
     {
-        _departamentosUnitOfWork = departamentosUnitOfWork;
+        _municipiosUnitOfWork = municipiosUnitOfWork;
     }
 
     [HttpGet]
     public override async Task<IActionResult> GetAsync()
     {
-        var response = await _departamentosUnitOfWork.GetAsync();
+        var response = await _municipiosUnitOfWork.GetAsync();
         if (response.WasSuccess)
         {
             return Ok(response.Result);
@@ -31,7 +30,7 @@ public class DepartamentosController : GenericController<Departamento>
     [HttpGet("{id}")]
     public override async Task<IActionResult> GetAsync(int id)
     {
-        var response = await _departamentosUnitOfWork.GetAsync(id);
+        var response = await _municipiosUnitOfWork.GetAsync(id);
         if (response.WasSuccess)
         {
             return Ok(response.Result);

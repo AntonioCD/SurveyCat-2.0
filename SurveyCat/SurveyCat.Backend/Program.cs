@@ -4,16 +4,20 @@ using SurveyCat.Backend.Repositories.Implementations;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name=LocalConnection"));
 builder.Services.AddTransient<SeedDb>();
 
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IDepartamentosRepository, DepartamentosRepository>();
+builder.Services.AddScoped<IDepartamentosUnitOfWork, DepartamentosUnitOfWork>();
 
 var app = builder.Build();
 SeedData(app);

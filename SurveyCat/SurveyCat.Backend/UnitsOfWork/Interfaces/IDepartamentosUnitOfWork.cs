@@ -1,0 +1,12 @@
+﻿using SurveyCat.Shared.Entities;
+using SurveyCat.Shared.Responses;
+
+namespace SurveyCat.Backend.UnitsOfWork.Interfaces
+{
+    public interface IDepartamentosUnitOfWork
+    {
+        Task<ActionResponse<Departamento>> GetAsync(int id);
+
+        Task<ActionResponse<IEnumerable<Departamento>>> GetAsync();
+    }
+}
