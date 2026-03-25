@@ -16,8 +16,14 @@ builder.Services.AddTransient<SeedDb>();
 
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+builder.Services.AddScoped<IBarriosComarcasRepository, BarriosComarcasRepository>();
 builder.Services.AddScoped<IDepartamentosRepository, DepartamentosRepository>();
+builder.Services.AddScoped<IMunicipiosRepository, MunicipiosRepository>();
+
+builder.Services.AddScoped<IBarriosComarcasUnitOfWork, BarriosComarcasUnitOfWork>();
 builder.Services.AddScoped<IDepartamentosUnitOfWork, DepartamentosUnitOfWork>();
+builder.Services.AddScoped<IMunicipiosUnitOfWork, MunicipiosUnitOfWork>();
 
 var app = builder.Build();
 SeedData(app);

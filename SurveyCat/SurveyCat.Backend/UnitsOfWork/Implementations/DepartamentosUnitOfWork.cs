@@ -1,5 +1,6 @@
 ﻿using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
+using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Responses;
 
@@ -13,6 +14,8 @@ public class DepartamentosUnitOfWork : GenericUnitOfWork<Departamento>, IDeparta
     {
         _departamentosRepository = departamentosRepository;
     }
+
+    public override async Task<ActionResponse<IEnumerable<Departamento>>> GetAsync(PaginationDTO pagination) => await _departamentosRepository.GetAsync(pagination);
 
     public override async Task<ActionResponse<IEnumerable<Departamento>>> GetAsync() => await _departamentosRepository.GetAsync();
 

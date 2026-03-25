@@ -1,4 +1,5 @@
-﻿using SurveyCat.Shared.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using SurveyCat.Shared.Entities;
 
 namespace SurveyCat.Backend.Data;
 
@@ -14,7 +15,17 @@ public class SeedDb
     public async Task SeedAsync()
     {
         await _context.Database.EnsureCreatedAsync();
-        await CheckDepartamentosAsync();
+        //await CheckDepartamentosAsync();
+        await CheckDepartamentosFullAsync();
+    }
+
+    private async Task CheckDepartamentosFullAsync()
+    {
+        if (!_context.Departamentos.Any())
+        {
+            var countriesSQLScript = File.ReadAllText("Data\\DepartamentosMunicipios.sql");
+            await _context.Database.ExecuteSqlRawAsync(countriesSQLScript);
+        }
     }
 
     private async Task CheckDepartamentosAsync()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
+using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 using System.Threading.Tasks;
 
@@ -15,6 +16,17 @@ public class DepartamentosController : GenericController<Departamento>
     public DepartamentosController(IGenericUnitOfWork<Departamento> unitOfWork, IDepartamentosUnitOfWork departamentosUnitOfWork) : base(unitOfWork)
     {
         _departamentosUnitOfWork = departamentosUnitOfWork;
+    }
+
+    [HttpGet("paginated")]
+    public override async Task<IActionResult> GetAsync(PaginationDTO pagination)
+    {
+        var response = await _departamentosUnitOfWork.GetAsync(pagination);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest();
     }
 
     [HttpGet]

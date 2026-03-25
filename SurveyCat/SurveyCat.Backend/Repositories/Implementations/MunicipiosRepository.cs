@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.Repositories.Interfaces;
+using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Responses;
 
@@ -13,6 +14,36 @@ public class MunicipiosRepository : GenericRepository<Municipio>, IMunicipiosRep
     public MunicipiosRepository(DataContext context) : base(context)
     {
         _context = context;
+    }
+
+    public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Municipios
+            .Where(x => x.Departamento!.Id == pagination.Id)
+            .AsQueryable();
+
+        return new ActionResponse<IEnumerable<Municipio>>
+        {
+            WasSuccess = true,
+            Result = await queryable
+                .OrderBy(x => x.Nombre)
+                .Paginate(pagination)
+                .ToListAsync()
+        };
+    }
+
+    public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Municipios
+            .Where(x => x.Departamento!.Id == pagination.Id)
+            .AsQueryable();
+
+        double count = await queryable.CountAsync();
+        return new ActionResponse<int>
+        {
+            WasSuccess = true,
+            Result = (int)count
+        };
     }
 
     public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync()

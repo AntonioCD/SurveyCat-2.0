@@ -1,6 +1,7 @@
 ﻿using SurveyCat.Backend.Repositories.Implementations;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
+using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Responses;
 
@@ -14,6 +15,10 @@ public class MunicipiosUnitOfWork : GenericUnitOfWork<Municipio>, IMunicipiosUni
     {
         _municipiosRepository = municipiosRepository;
     }
+
+    public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync(PaginationDTO pagination) => await _municipiosRepository.GetAsync(pagination);
+
+    public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _municipiosRepository.GetTotalRecordsAsync(pagination);
 
     public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync() => await _municipiosRepository.GetAsync();
 
