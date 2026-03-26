@@ -1,0 +1,21 @@
+﻿@page "/departamentos"
+
+<h3>Departamentos</h3>
+
+@if (departamentos == null)
+{
+    <Loading />
+} else
+{
+    <table border="1">
+        <tr>
+            <td>Pais</td>
+        </tr>
+        @foreach(var departamento in departamentos)
+        {
+            <tr>
+                <td>@departamento.Nombre</td>
+            </tr>
+        }
+    </table>
+}
