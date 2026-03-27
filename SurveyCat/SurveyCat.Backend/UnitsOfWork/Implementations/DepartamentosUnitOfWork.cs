@@ -17,6 +17,8 @@ public class DepartamentosUnitOfWork : GenericUnitOfWork<Departamento>, IDeparta
 
     public override async Task<ActionResponse<IEnumerable<Departamento>>> GetAsync(PaginationDTO pagination) => await _departamentosRepository.GetAsync(pagination);
 
+    public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _departamentosRepository.GetTotalRecordsAsync(pagination);
+
     public override async Task<ActionResponse<IEnumerable<Departamento>>> GetAsync() => await _departamentosRepository.GetAsync();
 
     public override async Task<ActionResponse<Departamento>> GetAsync(int id) => await _departamentosRepository.GetAsync(id);

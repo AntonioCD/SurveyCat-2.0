@@ -22,6 +22,11 @@ public class BarriosComarcasRepository : GenericRepository<BarrioComarca>, IBarr
             .Where(x => x.Municipio!.Id == pagination.Id)
             .AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.Nombre.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
         return new ActionResponse<IEnumerable<BarrioComarca>>
         {
             WasSuccess = true,
@@ -37,6 +42,11 @@ public class BarriosComarcasRepository : GenericRepository<BarrioComarca>, IBarr
         var queryable = _context.BarriosComarcas
             .Where(x => x.Municipio!.Id == pagination.Id)
             .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.Nombre.ToLower().Contains(pagination.Filter.ToLower()));
+        }
 
         double count = await queryable.CountAsync();
         return new ActionResponse<int>

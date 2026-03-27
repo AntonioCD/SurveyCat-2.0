@@ -1,0 +1,15 @@
+﻿@if (departamento is null)
+{
+    <Loading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <DepartamentoForm Departamento="departamento" OnValidSubmit="EditAsync" ReturnAction="Return" />
+        </DialogContent>
+    </MudDialog>
+}
+
+
+

@@ -1,21 +1,71 @@
 ﻿@page "/departamentos"
 
-<h3>Departamentos</h3>
-
-@if (departamentos == null)
+@if (loading)
 {
     <Loading />
-} else
-{
-    <table border="1">
-        <tr>
-            <td>Pais</td>
-        </tr>
-        @foreach(var departamento in departamentos)
-        {
-            <tr>
-                <td>@departamento.Nombre</td>
-            </tr>
-        }
-    </table>
 }
+else
+{
+    <MudTable Items="@Departamentos"
+              @ref="table"
+              ServerData="LoadListAsync"
+              Dense="true"
+              Hover="true"
+              Striped="true"
+              FixedHeader="true"
+              FixedFooter="true">
+        <ToolBarContent>
+            <div class="d-flex justify-content-between">
+                <MudText Typo="Typo.h6" Class="me-4">Departamentos</MudText>
+                <MudButton Variant="Variant.Outlined"
+                           EndIcon="@Icons.Material.Filled.Add"
+                           Color="Color.Info" OnClick="@(() => ShowModalAsync())">
+                    Nuevo
+                </MudButton>
+            </div>
+            <MudSpacer />
+            <FilterComponent ApplyFilter="SetFilterValue" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Departamento</MudTh>
+            <MudTh Style="width: 20%;">Cod. SILEC</MudTh>
+            <MudTh Style="width: 20%;">Municipios</MudTh>
+            <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd DataLabel="Departamento">@context.Nombre</MudTd>
+            <MudTd DataLabel="Cod. SILEC">@context.CodDepto</MudTd>
+            <MudTd DataLabel="Municipios">@context.MunicipiosNumber</MudTd>
+            <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
+                <div class="d-flex justify-center">
+                    <MudTooltip Text="Editar">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Warning"
+                                       OnClick="@(() => ShowModalAsync(context.Id, true))"
+                                       Size="Size.Medium"
+                                       Class="mr-2" />
+                    </MudTooltip>
+                    <MudTooltip Text="Borrar">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       OnClick="@(() => DeleteAsync(context))"
+                                       Size="Size.Medium" />
+                    </MudTooltip>
+                </div>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>"No hay registros"</MudText>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Número de registros"
+                           PageSizeOptions="pageSizeOptions"
+                           AllItemsText="Todo"
+                           InfoFormat="@infoFormat" />
+        </PagerContent>
+    </MudTable>
+}
+

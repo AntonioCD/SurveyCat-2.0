@@ -12,7 +12,7 @@ public class Departamento
     public int Id { get; set; }
 
     [Display(Name = "Cod. Dpto")]
-    [StringLength(2, MinimumLength = 4, ErrorMessage = "El campo {0} debe tener exactamente {1} caracteres.")]
+    [StringLength(2, MinimumLength = 2, ErrorMessage = "El campo {0} debe tener exactamente {1} caracteres.")]
     [RegularExpression(@"^\d{2}$", ErrorMessage = "El código debe contener exactamente 2 dígitos.")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string CodDepto { get; set; } = null!;
@@ -28,4 +28,6 @@ public class Departamento
     public string? CodINIDE { get; set; }
 
     public ICollection<Municipio>? Municipios { get; set; }
+
+    public int MunicipiosNumber => Municipios == null ? 0 : Municipios.Count;
 }

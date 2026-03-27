@@ -52,7 +52,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("MunicipioId");
 
-                    b.ToTable("BarriosComarcas");
+                    b.ToTable("BarriosComarcas", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Caserio", b =>
@@ -81,7 +81,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("ComarcaId");
 
-                    b.ToTable("Caserios");
+                    b.ToTable("Caserios", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Departamento", b =>
@@ -114,7 +114,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("Nombre")
                         .IsUnique();
 
-                    b.ToTable("Departamentos");
+                    b.ToTable("Departamentos", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Municipio", b =>
@@ -149,7 +149,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("DepartamentoId");
 
-                    b.ToTable("Municipios");
+                    b.ToTable("Municipios", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.BarrioComarca", b =>

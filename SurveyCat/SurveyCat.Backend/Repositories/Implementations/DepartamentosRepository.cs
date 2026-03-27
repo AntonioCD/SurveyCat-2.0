@@ -22,6 +22,11 @@ public class DepartamentosRepository : GenericRepository<Departamento>, IDeparta
             .Include(c => c.Municipios)
             .AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.Nombre.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
         return new ActionResponse<IEnumerable<Departamento>>
         {
             WasSuccess = true,
@@ -32,12 +37,30 @@ public class DepartamentosRepository : GenericRepository<Departamento>, IDeparta
         };
     }
 
+    public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Departamentos.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.Nombre.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
+        double count = await queryable.CountAsync();
+        return new ActionResponse<int>
+        {
+            WasSuccess = true,
+            Result = (int)count
+        };
+    }
+
     public override async Task<ActionResponse<IEnumerable<Departamento>>> GetAsync()
     {
         var departamentos = await _context.Departamentos
             .Include(c => c.Municipios)
             .OrderBy(x => x.Nombre)
             .ToListAsync();
+
         return new ActionResponse<IEnumerable<Departamento>>
         {
             WasSuccess = true,
