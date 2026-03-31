@@ -23,7 +23,7 @@ public class SeedDb
     {
         if (!_context.Departamentos.Any())
         {
-            var countriesSQLScript = File.ReadAllText("Data\\DepartamentosMunicipios.sql");
+            var countriesSQLScript = File.ReadAllText("Data\\Dpt-Mun-Bar-Com-Cas-Sec.sql");
             await _context.Database.ExecuteSqlRawAsync(countriesSQLScript);
         }
     }

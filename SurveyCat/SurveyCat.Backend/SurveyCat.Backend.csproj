@@ -25,6 +25,9 @@
     <None Update="Data\DepartamentosMunicipios.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Dpt-Mun-Bar-Com-Cas-Sec.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

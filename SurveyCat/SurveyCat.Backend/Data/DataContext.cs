@@ -10,12 +10,10 @@ namespace SurveyCat.Backend.Data
         }
 
         public DbSet<BarrioComarca> BarriosComarcas { get; set; }
-
         public DbSet<Caserio> Caserios { get; set; }
-
         public DbSet<Departamento> Departamentos { get; set; }
-
         public DbSet<Municipio> Municipios { get; set; }
+        public DbSet<Sector> Sectores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +23,7 @@ namespace SurveyCat.Backend.Data
             modelBuilder.Entity<Municipio>().HasIndex(x => x.CodMun).IsUnique();
             modelBuilder.Entity<BarrioComarca>().HasIndex(x => x.CodBarrioComarca).IsUnique();
             modelBuilder.Entity<Caserio>().HasIndex(x => x.CodCaserio).IsUnique();
+            modelBuilder.Entity<Sector>().HasIndex(x => new { x.MunicipioId, x.NumeroSector }).IsUnique();
 
             DisableCascadingDelete(modelBuilder);
         }

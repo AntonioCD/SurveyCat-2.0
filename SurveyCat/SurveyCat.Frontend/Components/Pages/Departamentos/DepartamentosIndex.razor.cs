@@ -3,6 +3,7 @@ using MudBlazor;
 using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
+using System.Diagnostics.Metrics;
 using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.Departamentos;
@@ -80,6 +81,11 @@ public partial class DepartamentosIndex
         };
     }
 
+    private void StatesAction(Departamento departamento)
+    {
+        NavigationManager.NavigateTo($"/departamentos/details/{departamento.Id}");
+    }
+
     private async Task SetFilterValue(string value)
     {
         Filter = value;
@@ -119,7 +125,7 @@ public partial class DepartamentosIndex
     {
         var parameters = new DialogParameters
         {
-            { "Message", $"Estas seguro de borrar el país: {departamento.Nombre}" }
+            { "Message", $"Estas seguro de borrar el departamento: {departamento.Nombre}" }
         };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);

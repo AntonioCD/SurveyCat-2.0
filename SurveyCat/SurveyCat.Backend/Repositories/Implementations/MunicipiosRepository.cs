@@ -19,6 +19,7 @@ public class MunicipiosRepository : GenericRepository<Municipio>, IMunicipiosRep
     public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Municipios
+            .Include(c => c.BarriosComarcas)
             .Where(x => x.Departamento!.Id == pagination.Id)
             .AsQueryable();
 

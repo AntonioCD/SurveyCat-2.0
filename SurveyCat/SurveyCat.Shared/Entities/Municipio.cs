@@ -35,6 +35,10 @@ public class Municipio
     [Display(Name = "Barrios/Comarcas")]
     public int BarriosComarcasNumber => BarriosComarcas == null ? 0 : BarriosComarcas.Count;
 
-    //public ICollection<Sector>? Sectores { get; set; }
+    public ICollection<Sector>? Sectores { get; set; }
+
+    [Display(Name = "Sectores")]
+    public int SectoresNumber => Sectores == null ? 0 : Sectores.Count;
+
     //public ICollection<Persona>? Personas { get; set; }
 }

@@ -1,18 +1,18 @@
 ﻿<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
-    <MudTextField Label="Departamento"
-                    @bind-Value="@Departamento.Nombre"
-                    For="@(() => Departamento.Nombre)"
-                    Required="true"
-                    Class="mb-4" />
+    <MudTextField Label="Municipio"
+                  @bind-Value="@Municipio.Nombre"
+                  For="@(() => Municipio.Nombre)"
+                  Required="true"
+                  Class="mb-4" />
     <MudTextField Label="Cod. SILEC"
-                    @bind-Value="@Departamento.CodDepto"
-                    For="@(() => Departamento.CodDepto)"
-                    Required="true"
-                    Class="mb-4" />
+                  @bind-Value="@Municipio.CodMun"
+                  For="@(() => Municipio.CodMun)"
+                  Required="true"
+                  Class="mb-4" />
     <MudTextField Label="Cod. INIDE"
-                  @bind-Value="@Departamento.CodINIDE"
-                  For="@(() => Departamento.CodINIDE)"
+                  @bind-Value="@Municipio.CodINIDE"
+                  For="@(() => Municipio.CodINIDE)"
                   Class="mb-4" />
 
     <MudButton Variant="Variant.Outlined"
