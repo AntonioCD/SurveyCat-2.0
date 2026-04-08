@@ -3,11 +3,11 @@ using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Municipios;
+namespace SurveyCat.Frontend.Components.Pages.Caserios;
 
-public partial class MunicipioEdit
+public partial class CaserioEdit
 {
-    private Municipio? municipio;
+    private Caserio? caserio;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -17,13 +17,13 @@ public partial class MunicipioEdit
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHttp = await Repository.GetAsync<Municipio>($"api/municipios/{Id}");
+        var responseHttp = await Repository.GetAsync<Caserio>($"api/caserios/{Id}");
 
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("municipios");
+                NavigationManager.NavigateTo("caserios");
             }
             else
             {
@@ -33,13 +33,13 @@ public partial class MunicipioEdit
         }
         else
         {
-            municipio = responseHttp.Response;
+            caserio = responseHttp.Response;
         }
     }
 
     private async Task EditAsync()
     {
-        var responseHttp = await Repository.PutAsync("api/municipios", municipio);
+        var responseHttp = await Repository.PutAsync("api/caserios", caserio);
 
         if (responseHttp.Error)
         {
@@ -54,6 +54,6 @@ public partial class MunicipioEdit
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/departamentos/details/{municipio!.DepartamentoId}");
+        NavigationManager.NavigateTo($"/barriosComarcas/details/{caserio!.ComarcaId}");
     }
 }

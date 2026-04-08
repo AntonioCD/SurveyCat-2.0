@@ -22,9 +22,8 @@ public class Departamento
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string Nombre { get; set; } = null!;
 
-    [Display(Name = "Cod. INIDE")]
-    [StringLength(2, MinimumLength = 2, ErrorMessage = "El campo {0} debe tener exactamente {1} caracteres.")]
-    [RegularExpression(@"^\d{2}$", ErrorMessage = "El código debe contener exactamente 2 dígitos.")]
+    [Display(Name = "Código INIDE")]
+    [RegularExpression(@"^(\d{2})?$", ErrorMessage = "El código debe ser de 2 dígitos o estar vacío.")]
     public string? CodINIDE { get; set; }
 
     public ICollection<Municipio>? Municipios { get; set; }

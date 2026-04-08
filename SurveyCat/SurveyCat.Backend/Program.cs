@@ -18,10 +18,12 @@ builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWor
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddScoped<IBarriosComarcasRepository, BarriosComarcasRepository>();
+builder.Services.AddScoped<ICaseriosRepository, CaseriosRepository>();
 builder.Services.AddScoped<IDepartamentosRepository, DepartamentosRepository>();
 builder.Services.AddScoped<IMunicipiosRepository, MunicipiosRepository>();
 
 builder.Services.AddScoped<IBarriosComarcasUnitOfWork, BarriosComarcasUnitOfWork>();
+builder.Services.AddScoped<ICaseriosUnitOfWork, CaseriosUnitOfWork>();
 builder.Services.AddScoped<IDepartamentosUnitOfWork, DepartamentosUnitOfWork>();
 builder.Services.AddScoped<IMunicipiosUnitOfWork, MunicipiosUnitOfWork>();
 

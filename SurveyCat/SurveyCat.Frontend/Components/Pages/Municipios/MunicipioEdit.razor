@@ -1,3 +1,12 @@
-﻿<h3>MunicipioEdit</h3>
-
-
+﻿@if (municipio is null)
+{
+    <Loading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <MunicipioForm Municipio="municipio" OnValidSubmit="EditAsync" ReturnAction="Return" />
+        </DialogContent>
+    </MudDialog>
+}

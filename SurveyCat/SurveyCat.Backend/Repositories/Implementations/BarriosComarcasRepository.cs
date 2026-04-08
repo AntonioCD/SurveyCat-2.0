@@ -19,6 +19,7 @@ public class BarriosComarcasRepository : GenericRepository<BarrioComarca>, IBarr
     public override async Task<ActionResponse<IEnumerable<BarrioComarca>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.BarriosComarcas
+            .Include(c => c.Caserios)
             .Where(x => x.Municipio!.Id == pagination.Id)
             .AsQueryable();
 
@@ -53,6 +54,40 @@ public class BarriosComarcasRepository : GenericRepository<BarrioComarca>, IBarr
         {
             WasSuccess = true,
             Result = (int)count
+        };
+    }
+
+    public override async Task<ActionResponse<IEnumerable<BarrioComarca>>> GetAsync()
+    {
+        var barriosComarcas = await _context.BarriosComarcas
+            .Include(m => m.Caserios)
+            .ToListAsync();
+        return new ActionResponse<IEnumerable<BarrioComarca>>
+        {
+            WasSuccess = true,
+            Result = barriosComarcas
+        };
+    }
+
+    public override async Task<ActionResponse<BarrioComarca>> GetAsync(int id)
+    {
+        var barrioComarca = await _context.BarriosComarcas
+             .Include(m => m.Caserios)
+             .FirstOrDefaultAsync(m => m.Id == id);
+
+        if (barrioComarca == null)
+        {
+            return new ActionResponse<BarrioComarca>
+            {
+                WasSuccess = false,
+                Message = "Barrio/Comarca no existe"
+            };
+        }
+
+        return new ActionResponse<BarrioComarca>
+        {
+            WasSuccess = true,
+            Result = barrioComarca
         };
     }
 }

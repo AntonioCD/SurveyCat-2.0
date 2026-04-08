@@ -21,5 +21,5 @@ public class Caserio
     public int CodCaserio { get; set; }
 
     public int ComarcaId { get; set; }
-    public BarrioComarca Comarca { get; set; } = null!;
+    public BarrioComarca? Comarca { get; set; }
 }

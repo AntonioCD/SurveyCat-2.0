@@ -15,7 +15,7 @@ public class Municipio
     [StringLength(4, MinimumLength = 4, ErrorMessage = "El campo {0} debe tener exactamente {1} caracteres.")]
     [RegularExpression(@"^\d{4}$", ErrorMessage = "El código debe contener exactamente 4 dígitos.")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-    public string CodMun { get; set; } = null!;
+    public string CodMuni { get; set; } = null!;
 
     [Display(Name = "Municipio")]
     [MaxLength(50, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
@@ -23,12 +23,11 @@ public class Municipio
     public string Nombre { get; set; } = null!;
 
     [Display(Name = "Código INIDE")]
-    [StringLength(4, MinimumLength = 4, ErrorMessage = "El campo {0} debe tener exactamente {1} caracteres.")]
-    [RegularExpression(@"^\d{4}$", ErrorMessage = "El código debe contener exactamente 4 dígitos.")]
+    [RegularExpression(@"^(\d{4})?$", ErrorMessage = "El código debe ser de 4 dígitos o estar vacío.")]
     public string? CodINIDE { get; set; }
 
     public int DepartamentoId { get; set; }
-    public Departamento Departamento { get; set; } = null!;
+    public Departamento? Departamento { get; set; } 
 
     public ICollection<BarrioComarca>? BarriosComarcas { get; set; }
 

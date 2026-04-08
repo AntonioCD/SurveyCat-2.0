@@ -6,13 +6,19 @@
                   Required="true"
                   Class="mb-4" />
     <MudTextField Label="Cod. SILEC"
-                  @bind-Value="@Municipio.CodMun"
-                  For="@(() => Municipio.CodMun)"
+                  @bind-Value="@Municipio.CodMuni"
+                  For="@(() => Municipio.CodMuni)"
                   Required="true"
+                  MaxLength="4"
+                  Pattern="[0-9]*"
+                  InputMode="InputMode.numeric"
                   Class="mb-4" />
     <MudTextField Label="Cod. INIDE"
                   @bind-Value="@Municipio.CodINIDE"
                   For="@(() => Municipio.CodINIDE)"
+                  MaxLength="4"
+                  Pattern="[0-9]*"
+                  InputMode="InputMode.numeric"
                   Class="mb-4" />
 
     <MudButton Variant="Variant.Outlined"

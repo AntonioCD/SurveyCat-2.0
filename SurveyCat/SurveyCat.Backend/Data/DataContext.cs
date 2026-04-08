@@ -20,7 +20,7 @@ namespace SurveyCat.Backend.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Departamento>().HasIndex(x => x.CodDepto).IsUnique();
             modelBuilder.Entity<Departamento>().HasIndex(x => x.Nombre).IsUnique();
-            modelBuilder.Entity<Municipio>().HasIndex(x => x.CodMun).IsUnique();
+            modelBuilder.Entity<Municipio>().HasIndex(x => x.CodMuni).IsUnique();
             modelBuilder.Entity<BarrioComarca>().HasIndex(x => x.CodBarrioComarca).IsUnique();
             modelBuilder.Entity<Caserio>().HasIndex(x => x.CodCaserio).IsUnique();
             modelBuilder.Entity<Sector>().HasIndex(x => new { x.MunicipioId, x.NumeroSector }).IsUnique();

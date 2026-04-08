@@ -25,7 +25,7 @@ public class BarrioComarca
     public bool EsBarrio { get; set; } = true;
 
     public int MunicipioId { get; set; }
-    public Municipio Municipio { get; set; } = null!;
+    public Municipio? Municipio { get; set; }
 
     public ICollection<Caserio>? Caserios { get; set; }
 

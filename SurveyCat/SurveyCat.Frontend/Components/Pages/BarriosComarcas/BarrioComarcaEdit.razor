@@ -1,0 +1,14 @@
+﻿@if (barrioComarca is null)
+{
+    <Loading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <BarrioComarcaForm BarrioComarca="barrioComarca" OnValidSubmit="EditAsync" ReturnAction="Return" />
+        </DialogContent>
+    </MudDialog>
+}
+
+
