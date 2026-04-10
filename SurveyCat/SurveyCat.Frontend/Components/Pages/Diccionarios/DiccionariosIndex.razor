@@ -1,4 +1,4 @@
-﻿@page "/departamentos"
+﻿@page "/diccionarios"
 
 @if (loading)
 {
@@ -6,17 +6,18 @@
 }
 else
 {
-    <MudTable Items="@Departamentos"
+    <MudTable Items="@Diccionarios"
               @ref="table"
               ServerData="LoadListAsync"
               Dense="true"
               Hover="true"
               Striped="true"
               FixedHeader="true"
-              FixedFooter="true">
+              FixedFooter="true"
+              @bind-GroupBy="_groupDefinition">
         <ToolBarContent>
             <div class="d-flex justify-content-between">
-                <MudText Typo="Typo.h6" Class="me-4">DEPARTAMENTOS</MudText>
+                <MudText Typo="Typo.h6" Class="me-4">DICCIONARIOS</MudText>
                 <MudButton Variant="Variant.Outlined"
                            EndIcon="@Icons.Material.Filled.Add"
                            Color="Color.Info" OnClick="@(() => ShowModalAsync())">
@@ -27,33 +28,39 @@ else
             <FilterComponent @bind-FilterValue="Filter" ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Departamento</MudTh>
-            <MudTh Style="width: 20%;">Cod. SILEC</MudTh>
-            <MudTh Style="width: 20%;">Municipios</MudTh>
+            <MudTh>Catálogo</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh Style="width: 20%;">Activo</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
 
+        <GroupHeaderTemplate>
+            <MudTh colspan="4">
+                <MudText Typo="Typo.subtitle1">
+                    <b>Catálogo: @context.Key</b> (@context.Items.Count() registros)
+                </MudText>
+            </MudTh>
+        </GroupHeaderTemplate>
+
         <RowTemplate>
-            <MudTd DataLabel="Departamento">@context.Nombre</MudTd>
-            <MudTd DataLabel="Cod. SILEC">@context.CodDepto</MudTd>
-            <MudTd DataLabel="Municipios">
-                <MudTooltip Text="Ver Municipios">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
-                               Size="Size.Medium"
-                               OnClick="@(() => StatesAction(@context))"
-                               Style="width: 70px; min-width: 70px;"
-                               Class="d-flex justify-space-between px-2">
-
-                        <span>@context.MunicipiosNumber</span>
-
-                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
-                                 Size="Size.Small"
-                                 Class="ml-2" />
-                    </MudButton>
-                </MudTooltip>
+            <MudTd DataLabel="Catálogo">@context.Catalogo</MudTd>
+            <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+            <MudTd DataLabel="Activo" Style="text-align: left;">
+                @if (context.Activo)
+                {
+                    <MudChip T="string"
+                             Variant="Variant.Outlined"
+                             Color="Color.Success"
+                             Size="Size.Small">Activo</MudChip>
+                }
+                else
+                {
+                    <MudChip T="string"
+                             Variant="Variant.Outlined"
+                             Color="Color.Error"
+                             Size="Size.Small">Inactivo</MudChip>
+                }
             </MudTd>
-
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">

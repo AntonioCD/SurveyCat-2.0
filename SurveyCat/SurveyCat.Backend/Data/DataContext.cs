@@ -12,6 +12,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<BarrioComarca> BarriosComarcas { get; set; }
         public DbSet<Caserio> Caserios { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
+        public DbSet<Diccionario> Diccionarios { get; set; }
         public DbSet<Municipio> Municipios { get; set; }
         public DbSet<Sector> Sectores { get; set; }
 
@@ -20,6 +21,7 @@ namespace SurveyCat.Backend.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Departamento>().HasIndex(x => x.CodDepto).IsUnique();
             modelBuilder.Entity<Departamento>().HasIndex(x => x.Nombre).IsUnique();
+            modelBuilder.Entity<Diccionario>().HasIndex(x => new { x.Catalogo, x.Nombre }).IsUnique();
             modelBuilder.Entity<Municipio>().HasIndex(x => x.CodMuni).IsUnique();
             modelBuilder.Entity<BarrioComarca>().HasIndex(x => x.CodBarrioComarca).IsUnique();
             modelBuilder.Entity<Caserio>().HasIndex(x => x.CodCaserio).IsUnique();

@@ -33,10 +33,10 @@ else
             <MudTd DataLabel="Cod. SILEC">@context.CodBarrioComarca</MudTd>
             <MudTd DataLabel="Barrio/Comarca">@(!context.EsBarrio ? "Barrio" : "Comarca")</MudTd>
             <MudTd DataLabel="Caserios">
-                @if(context.CaseriosNumber >= 0)
+                @if(context.EsBarrio && context.CaseriosNumber >= 0)
                 {
                     <MudTooltip Text="Ver Caserios">
-                        <MudButton Variant="Variant.Filled"
+                        <MudButton Variant="Variant.Outlined"
                                    Color="Color.Info"
                                    Size="Size.Medium"
                                    OnClick="@(() => StatesAction(@context))"

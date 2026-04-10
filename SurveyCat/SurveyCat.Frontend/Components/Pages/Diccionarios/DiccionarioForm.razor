@@ -1,0 +1,54 @@
+﻿<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <MudGrid Class="align-center mb-4">
+        <MudItem xs="12" sm="4">
+            <MudTextField Label="Catálogo"
+                          @bind-Value="@Diccionario.Catalogo"
+                          For="@(() => Diccionario.Catalogo)"
+                          Required="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudItem>
+        <MudItem xs="12" sm="8" Class="d-flex justify-center">
+            <MudTextField Label="Nombre"
+                          @bind-Value="@Diccionario.Nombre"
+                          For="@(() => Diccionario.Nombre)"
+                          Required="true"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudItem>
+    </MudGrid>
+
+    <MudTextField Label="Descripción"
+                  @bind-Value="@Diccionario.Descripcion"
+                  For="@(() => Diccionario.Descripcion)"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Class="mb-4" />
+
+    <MudGrid Class="align-center mb-4">
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Código"
+                          @bind-Value="@Diccionario.Codigo"
+                          For="@(() => Diccionario.Codigo)"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Class="mb-4" />
+        </MudItem>
+        <MudItem xs="12" sm="6" Class="d-flex justify-center">
+            <MudSwitch @bind-Value="@Diccionario.Activo"
+                       Label="@(Diccionario.Activo ? "Activo" : "Inactivo")"
+                       Color="Color.Primary"
+                       ThumbIcon="@(Diccionario.Activo? @Icons.Material.Filled.ToggleOn : @Icons.Material.Filled.ToggleOff)"
+                       Class="mb-4" />
+        </MudItem>
+    </MudGrid>
+
+    <div class="d-flex justify-end gap-2">
+        <MudButton Variant="Variant.Filled" Color="Color.Default" OnClick="ReturnAction">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+    </div>
+</EditForm>
+
+

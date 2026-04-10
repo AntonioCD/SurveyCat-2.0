@@ -3,11 +3,11 @@ using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Caserios;
+namespace SurveyCat.Frontend.Components.Pages.Diccionarios;
 
-public partial class CaserioCreate
+public partial class DiccionarioCreate
 {
-    private Caserio caserio = new();
+    private Diccionario diccionario = new();
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -17,8 +17,7 @@ public partial class CaserioCreate
 
     private async Task CreateAsync()
     {
-        caserio.ComarcaId = BarrioComarcaId;
-        var responseHttp = await Repository.PostAsync("/api/caserios", caserio);
+        var responseHttp = await Repository.PostAsync("/api/diccionarios", diccionario);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();

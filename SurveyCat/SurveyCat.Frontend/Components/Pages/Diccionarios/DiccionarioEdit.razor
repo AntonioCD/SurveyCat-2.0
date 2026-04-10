@@ -1,0 +1,14 @@
+﻿@if (diccionario is null)
+{
+    <Loading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <DiccionarioForm Diccionario="diccionario" OnValidSubmit="EditAsync" ReturnAction="Return" />
+        </DialogContent>
+    </MudDialog>
+}
+
+
