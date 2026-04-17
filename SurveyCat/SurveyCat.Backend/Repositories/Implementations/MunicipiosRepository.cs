@@ -16,6 +16,14 @@ public class MunicipiosRepository : GenericRepository<Municipio>, IMunicipiosRep
         _context = context;
     }
 
+    public async Task<IEnumerable<Municipio>> GetComboAsync(int departamentoId)
+    {
+        return await _context.Municipios
+            .Where(s => s.DepartamentoId == departamentoId)
+            .OrderBy(s => s.Nombre)
+            .ToListAsync();
+    }
+
     public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Municipios

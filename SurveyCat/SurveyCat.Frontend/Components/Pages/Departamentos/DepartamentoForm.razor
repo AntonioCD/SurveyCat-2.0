@@ -4,6 +4,8 @@
                     @bind-Value="@Departamento.Nombre"
                     For="@(() => Departamento.Nombre)"
                     Required="true"
+                    Variant="Variant.Outlined" 
+                    Margin="Margin.Dense"
                     Class="mb-4" />
     <MudTextField Label="Cod. SILEC"
                   @bind-Value="@Departamento.CodDepto"
@@ -12,6 +14,8 @@
                   MaxLength="2"
                   Pattern="[0-9]*"
                   InputMode="InputMode.numeric"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
                   Class="mb-4" />
     <MudTextField Label="Cod. INIDE"
                   @bind-Value="@Departamento.CodINIDE"
@@ -19,6 +23,8 @@
                   MaxLength="2"
                   Pattern="[0-9]*"
                   InputMode="InputMode.numeric"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
                   Class="mb-4" />
 
     <MudButton Variant="Variant.Outlined"

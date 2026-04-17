@@ -16,6 +16,8 @@ namespace SurveyCat.Backend.UnitsOfWork.Implementations
             _caseriosRepository = caseriosRepository;
         }
 
+        public async Task<IEnumerable<Caserio>> GetComboAsync(int comarcaId) => await _caseriosRepository.GetComboAsync(comarcaId);
+
         public override async Task<ActionResponse<IEnumerable<Caserio>>> GetAsync(PaginationDTO pagination) => await _caseriosRepository.GetAsync(pagination);
 
         public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _caseriosRepository.GetTotalRecordsAsync(pagination);

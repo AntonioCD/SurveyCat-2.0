@@ -16,6 +16,14 @@ public class BarriosComarcasRepository : GenericRepository<BarrioComarca>, IBarr
         _context = context;
     }
 
+    public async Task<IEnumerable<BarrioComarca>> GetComboAsync(int municipioId)
+    {
+        return await _context.BarriosComarcas
+            .Where(s => s.MunicipioId == municipioId)
+            .OrderBy(s => s.Nombre)
+            .ToListAsync();
+    }
+
     public override async Task<ActionResponse<IEnumerable<BarrioComarca>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.BarriosComarcas

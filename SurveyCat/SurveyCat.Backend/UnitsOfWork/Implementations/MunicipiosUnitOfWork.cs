@@ -16,6 +16,8 @@ public class MunicipiosUnitOfWork : GenericUnitOfWork<Municipio>, IMunicipiosUni
         _municipiosRepository = municipiosRepository;
     }
 
+    public async Task<IEnumerable<Municipio>> GetComboAsync(int departamentoId) => await _municipiosRepository.GetComboAsync(departamentoId);
+
     public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync(PaginationDTO pagination) => await _municipiosRepository.GetAsync(pagination);
 
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _municipiosRepository.GetTotalRecordsAsync(pagination);

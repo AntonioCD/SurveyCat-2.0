@@ -16,6 +16,8 @@ public class DiccionariosUnitOfWork : GenericUnitOfWork<Diccionario>, IDiccionar
         _diccionariosRepository = diccionariosRepository;
     }
 
+    public async Task<IEnumerable<Diccionario>> GetComboAsync() => await _diccionariosRepository.GetComboAsync();
+
     public override async Task<ActionResponse<IEnumerable<Diccionario>>> GetAsync(PaginationDTO pagination) => await _diccionariosRepository.GetAsync(pagination);
 
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _diccionariosRepository.GetTotalRecordsAsync(pagination);

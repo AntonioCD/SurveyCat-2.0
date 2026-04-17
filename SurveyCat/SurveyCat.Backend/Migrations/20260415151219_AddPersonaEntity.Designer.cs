@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyCat.Backend.Data;
 
@@ -11,9 +12,11 @@ using SurveyCat.Backend.Data;
 namespace SurveyCat.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260415151219_AddPersonaEntity")]
+    partial class AddPersonaEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("MunicipioId");
 
-                    b.ToTable("BarriosComarcas", (string)null);
+                    b.ToTable("BarriosComarcas");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Caserio", b =>
@@ -82,7 +85,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("ComarcaId");
 
-                    b.ToTable("Caserios", (string)null);
+                    b.ToTable("Caserios");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Departamento", b =>
@@ -114,7 +117,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("Nombre")
                         .IsUnique();
 
-                    b.ToTable("Departamentos", (string)null);
+                    b.ToTable("Departamentos");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Diccionario", b =>
@@ -154,7 +157,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("Catalogo", "Nombre")
                         .IsUnique();
 
-                    b.ToTable("Diccionarios", (string)null);
+                    b.ToTable("Diccionarios");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Municipio", b =>
@@ -188,7 +191,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("DepartamentoId");
 
-                    b.ToTable("Municipios", (string)null);
+                    b.ToTable("Municipios");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Persona", b =>
@@ -299,7 +302,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("TipoPersonaJuridicaId");
 
-                    b.ToTable("Personas", (string)null);
+                    b.ToTable("Personas");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Sector", b =>
@@ -336,7 +339,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("MunicipioId", "NumeroSector")
                         .IsUnique();
 
-                    b.ToTable("Sectores", (string)null);
+                    b.ToTable("Sectores");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.BarrioComarca", b =>

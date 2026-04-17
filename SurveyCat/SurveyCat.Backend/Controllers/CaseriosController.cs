@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -15,6 +16,13 @@ public class CaseriosController : GenericController<Caserio>
     public CaseriosController(IGenericUnitOfWork<Caserio> unitOfWork, ICaseriosUnitOfWork caseriosUnitOfWork) : base(unitOfWork)
     {
         _caseriosUnitOfWork = caseriosUnitOfWork;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("combo/{comarcaId:int}")]
+    public async Task<IActionResult> GetComboAsync(int comarcaId)
+    {
+        return Ok(await _caseriosUnitOfWork.GetComboAsync(comarcaId));
     }
 
     [HttpGet("paginated")]

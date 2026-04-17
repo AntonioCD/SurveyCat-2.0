@@ -14,6 +14,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Diccionario> Diccionarios { get; set; }
         public DbSet<Municipio> Municipios { get; set; }
+        public DbSet<Persona> Personas { get; set; }
         public DbSet<Sector> Sectores { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,7 +53,6 @@ namespace SurveyCat.Backend.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // --- CONFIGURACIÓN DE ÍNDICES (GEOGRAFÍA Y DICCIONARIOS) ---
             modelBuilder.Entity<Departamento>(e =>
             {
                 e.HasIndex(x => x.CodDepto).IsUnique();
@@ -89,8 +89,10 @@ namespace SurveyCat.Backend.Data
             {
                 entity.UsePropertyAccessMode(PropertyAccessMode.Property);
 
-                // Si necesitas índices para Persona (ej. Cédula/DNI), agrégalos aquí
-                // entity.HasIndex(x => x.Identificacion).IsUnique();
+                modelBuilder.Entity<Persona>(e =>
+                {
+                    e.HasIndex(x => x.Identificacion).IsUnique();
+                });
             });
 
             // --- MÉTODOS GLOBALES ---

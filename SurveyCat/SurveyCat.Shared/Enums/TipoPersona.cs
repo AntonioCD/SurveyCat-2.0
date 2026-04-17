@@ -9,6 +9,9 @@ namespace SurveyCat.Shared.Enums;
 
 public enum TipoPersona
 {
+    [Display(Name = "-- Seleccione --")]
+    Seleccione = 0,
+
     [Display(Name = "Persona Natural")]
     Natural = 1,
 

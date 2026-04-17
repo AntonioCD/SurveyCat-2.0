@@ -6,6 +6,8 @@ namespace SurveyCat.Backend.Repositories.Interfaces;
 
 public interface IBarriosComarcasRepository
 {
+    Task<IEnumerable<BarrioComarca>> GetComboAsync(int municipioId);
+
     Task<ActionResponse<IEnumerable<BarrioComarca>>> GetAsync(PaginationDTO pagination);
 
     Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);

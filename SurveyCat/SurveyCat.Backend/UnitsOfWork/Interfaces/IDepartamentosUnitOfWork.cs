@@ -6,6 +6,8 @@ namespace SurveyCat.Backend.UnitsOfWork.Interfaces
 {
     public interface IDepartamentosUnitOfWork
     {
+        Task<IEnumerable<Departamento>> GetComboAsync();
+
         Task<ActionResponse<IEnumerable<Departamento>>> GetAsync(PaginationDTO pagination);
 
         Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);

@@ -16,6 +16,14 @@ public class CaseriosRepository : GenericRepository<Caserio>, ICaseriosRepositor
         _context = context;
     }
 
+    public async Task<IEnumerable<Caserio>> GetComboAsync(int comarcaId)
+    {
+        return await _context.Caserios
+            .Where(c => c.ComarcaId == comarcaId)
+            .OrderBy(c => c.Nombre)
+            .ToListAsync();
+    }
+
     public override async Task<ActionResponse<IEnumerable<Caserio>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Caserios

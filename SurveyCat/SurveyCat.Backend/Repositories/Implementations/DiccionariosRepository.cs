@@ -16,6 +16,15 @@ public class DiccionariosRepository : GenericRepository<Diccionario>, IDiccionar
         _context = context;
     }
 
+    public async Task<IEnumerable<Diccionario>> GetComboAsync()
+    {
+        return await _context.Diccionarios
+            .OrderBy(c => c.Catalogo)
+            .ThenBy(c => c.Nombre)
+            .ToListAsync();
+    }
+
+
     public override async Task<ActionResponse<IEnumerable<Diccionario>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Diccionarios

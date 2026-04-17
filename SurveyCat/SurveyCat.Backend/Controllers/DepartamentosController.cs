@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -16,6 +17,13 @@ public class DepartamentosController : GenericController<Departamento>
     public DepartamentosController(IGenericUnitOfWork<Departamento> unitOfWork, IDepartamentosUnitOfWork departamentosUnitOfWork) : base(unitOfWork)
     {
         _departamentosUnitOfWork = departamentosUnitOfWork;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("combo")]
+    public async Task<IActionResult> GetComboAsync()
+    {
+        return Ok(await _departamentosUnitOfWork.GetComboAsync());
     }
 
     [HttpGet("paginated")]

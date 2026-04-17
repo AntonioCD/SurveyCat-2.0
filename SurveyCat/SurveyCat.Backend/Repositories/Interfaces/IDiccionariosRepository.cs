@@ -6,6 +6,8 @@ namespace SurveyCat.Backend.Repositories.Interfaces;
 
 public interface IDiccionariosRepository
 {
+    Task<IEnumerable<Diccionario>> GetComboAsync();
+
     Task<ActionResponse<IEnumerable<Diccionario>>> GetAsync(PaginationDTO pagination);
 
     Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -15,6 +16,13 @@ public class DiccionariosController : GenericController<Diccionario>
     public DiccionariosController(IGenericUnitOfWork<Diccionario> unitOfWork, IDiccionariosUnitOfWork diccionariosUnitOfWork) : base(unitOfWork)
     {
         _diccionariosUnitOfWork = diccionariosUnitOfWork;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("combo")]
+    public async Task<IActionResult> GetComboAsync()
+    {
+        return Ok(await _diccionariosUnitOfWork.GetComboAsync());
     }
 
     [HttpGet("paginated")]

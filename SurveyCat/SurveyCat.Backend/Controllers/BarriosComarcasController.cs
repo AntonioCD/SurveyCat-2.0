@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -15,6 +16,13 @@ public class BarriosComarcasController : GenericController<BarrioComarca>
     public BarriosComarcasController(IGenericUnitOfWork<BarrioComarca> unitOfWork, IBarriosComarcasUnitOfWork barriosComarcasUnitOfWork) : base(unitOfWork)
     {
         _barriosComarcasUnitOfWork = barriosComarcasUnitOfWork;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("combo/{municipioId:int}")]
+    public async Task<IActionResult> GetComboAsync(int municipioId)
+    {
+        return Ok(await _barriosComarcasUnitOfWork.GetComboAsync(municipioId));
     }
 
     [HttpGet("paginated")]
