@@ -38,5 +38,16 @@ namespace SurveyCat.Backend.Controllers
             }
             return BadRequest();
         }
+
+        [HttpGet("{id:long}")]
+        public async Task<IActionResult> GetAsync(long id)
+        {
+            var response = await _personasUnitOfWork.GetAsync(id);
+            if (response.WasSuccess)
+            {
+                return Ok(response.Result);
+            }
+            return NotFound(response.Message);
+        }
     }
 }

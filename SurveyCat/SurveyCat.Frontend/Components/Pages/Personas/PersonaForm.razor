@@ -84,7 +84,9 @@
         <MudItem xs="12">
             <MudTextField Label="@(Persona.TipoPersona != TipoPersona.Juridica ? "Nombre Completo" : "Razón Social")"
                           @bind-Value="Persona.NombreCompleto"
+                          @bind-Value:after="() => Persona.NombreCompleto = Persona.NombreCompleto.ToUpper()"
                           For="@(() => Persona.NombreCompleto)"
+                          Immediate="true"
                           ReadOnly="@(Persona.TipoPersona != TipoPersona.Juridica)"
                           Variant="@(Persona.TipoPersona != TipoPersona.Juridica ? Variant.Filled : Variant.Outlined)"
                           Margin="Margin.Dense" />
@@ -240,8 +242,12 @@
 
             <MudItem xs="12" sm="6">
                 <MudDatePicker Label="Fecha de Registro"
-                               @bind-Value="Persona.FechaRegistro"
-                               For="@(() => Persona.FechaRegistro)" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                               @bind-Date="Persona.FechaRegistro"
+                               For="@(() => Persona.FechaRegistro)"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Editable="true"
+                               ImmediateText="true" />
             </MudItem>
         }
 

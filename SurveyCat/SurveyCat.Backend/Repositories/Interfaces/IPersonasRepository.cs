@@ -9,5 +9,7 @@ namespace SurveyCat.Backend.Repositories.Interfaces
         Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PaginationDTO pagination);
 
         Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
+
+        Task<ActionResponse<Persona>> GetAsync(long id);
     }
 }

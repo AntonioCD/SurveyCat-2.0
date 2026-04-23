@@ -22,14 +22,14 @@ public partial class PersonaForm
     private List<BarrioComarca>? barriosComarcas;
     private List<Caserio>? caserios;
 
-    private Diccionario selectedTipoIdentificacion = new();
-    private Diccionario selectedEstadoCivil = new();
-    private Diccionario selectedProfesion = new();
-    private Diccionario selectedTipoPersonaJuridica = new();
-    private Departamento selectedDepartamento = new();
-    private Municipio selectedMunicipio = new();
-    private BarrioComarca selectedBarrioComarca = new();
-    private Caserio selectedCaserio = new();
+    private Diccionario? selectedTipoIdentificacion = new();
+    private Diccionario? selectedEstadoCivil = new();
+    private Diccionario? selectedProfesion = new();
+    private Diccionario? selectedTipoPersonaJuridica = new();
+    private Departamento? selectedDepartamento = new();
+    private Municipio? selectedMunicipio = new();
+    private BarrioComarca? selectedBarrioComarca = new();
+    private Caserio? selectedCaserio = new();
 
     public IMask maskIdentificacion = new RegexMask(@"^[a-zA-Z0-9]*$");
 
@@ -43,8 +43,42 @@ public partial class PersonaForm
     protected override async Task OnInitializedAsync()
     {
         editContext = new(Persona);
+
+        // Cargamos lo básico que siempre debe estar (Catálogos y Deptos)
         await LoadDiccionariosAsync();
         await LoadDepartamentosAsync();
+
+        if (Persona.Id != 0)
+        {
+            // 1. Cargas en cascada condicionales
+            if (Persona.MunicipioId.HasValue)
+            {
+                await LoadMunicipiosAsync(Persona.MunicipioId.Value);
+                selectedMunicipio = Persona.Municipio;
+
+                // Cargamos el depto desde el municipio si existe
+                selectedDepartamento = Persona.Municipio?.Departamento;
+            }
+
+            if (Persona.BarrioComarcaId.HasValue)
+            {
+                await LoadBarriosComarcasAsync(Persona.BarrioComarcaId.Value);
+                selectedBarrioComarca = Persona.BarrioComarca;
+            }
+
+            if (Persona.CaserioId.HasValue)
+            {
+                await LoadCaseriosAsync(Persona.CaserioId.Value);
+                selectedCaserio = Persona.Caserio;
+            }
+
+            // 2. Asignación segura de objetos de diccionario
+            // Usamos el operador ?. para que si es null, la variable selected también sea null
+            selectedTipoIdentificacion = Persona.TipoIdentificacion;
+            selectedEstadoCivil = Persona.EstadoCivil;
+            selectedProfesion = Persona.Profesion;
+            selectedTipoPersonaJuridica = Persona.TipoPersonaJuridica;
+        }
     }
 
     private async Task LoadDiccionariosAsync()
@@ -156,6 +190,7 @@ public partial class PersonaForm
     private async Task MunicipioChangedAsync(Municipio municipio)
     {
         selectedMunicipio = municipio;
+        Persona.MunicipioId = municipio.Id;
         selectedBarrioComarca = new BarrioComarca();
         selectedCaserio = new Caserio();
         barriosComarcas = null;
@@ -166,6 +201,7 @@ public partial class PersonaForm
     private async Task BarrioComarcaChangedAsync(BarrioComarca barrioComarca)
     {
         selectedBarrioComarca = barrioComarca;
+        Persona.BarrioComarcaId = barrioComarca.Id;
         selectedCaserio = new Caserio();
         caserios = null!;
         await LoadCaseriosAsync(barrioComarca.Id);

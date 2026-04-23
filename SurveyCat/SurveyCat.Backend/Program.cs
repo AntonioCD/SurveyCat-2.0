@@ -31,6 +31,9 @@ builder.Services.AddScoped<IDiccionariosUnitOfWork, DiccionariosUnitOfWork>();
 builder.Services.AddScoped<IMunicipiosUnitOfWork, MunicipiosUnitOfWork>();
 builder.Services.AddScoped<IPersonasUnitOfWork, PersonasUnitOfWork>();
 
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+builder.Logging.AddConsole();
+
 var app = builder.Build();
 SeedData(app);
 

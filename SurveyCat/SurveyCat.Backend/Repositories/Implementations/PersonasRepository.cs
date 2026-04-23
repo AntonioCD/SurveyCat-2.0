@@ -53,5 +53,33 @@ namespace SurveyCat.Backend.Repositories.Implementations
                 Result = (int)count
             };
         }
+
+        public async Task<ActionResponse<Persona>> GetAsync(long id)
+        {
+            var persona = await _context.Personas
+                 .Include(p => p.Municipio).ThenInclude(m => m!.Departamento)
+                 .Include(m => m.BarrioComarca)
+                 .Include(c => c.Caserio!)
+                 .Include(p => p.TipoIdentificacion)
+                 .Include(p => p.EstadoCivil)
+                 .Include(p => p.Profesion)
+                 .Include(p => p.TipoPersonaJuridica)
+                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (persona == null)
+            {
+                return new ActionResponse<Persona>
+                {
+                    WasSuccess = false,
+                    Message = "Persona no existe"
+                };
+            }
+
+            return new ActionResponse<Persona>
+            {
+                WasSuccess = true,
+                Result = persona
+            };
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace SurveyCat.Frontend.Components.Pages.Personas
         [Inject] private NavigationManager NavigationManager { get; set; } = null!;
         [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
-        [Parameter] public int BarrioComarcaId { get; set; }
+        //[Parameter] public int BarrioComarcaId { get; set; }
 
         private async Task CreateAsync()
         {
