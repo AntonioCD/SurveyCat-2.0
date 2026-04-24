@@ -13,7 +13,7 @@ namespace SurveyCat.Shared.Entities
         public int Id { get; set; }
 
         [Display(Name = "Persona")]
-        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione una Persona.")]
         public long PersonaId { get; set; }
 
         public Persona? Persona { get; set; }
@@ -21,6 +21,8 @@ namespace SurveyCat.Shared.Entities
         [Display(Name = "Usuario")]
         [MaxLength(450, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
         public string? UserId { get; set; }
+
+        public User? User { get; set; }
 
         [Display(Name = "Código")]
         [MaxLength(10, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
@@ -33,7 +35,7 @@ namespace SurveyCat.Shared.Entities
         public string Brigada { get; set; } = null!;
 
         [Display(Name = "Rol")]
-        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione el Tipo de Rol.")]
         public TipoRol TipoRol { get; set; }
     }
 }

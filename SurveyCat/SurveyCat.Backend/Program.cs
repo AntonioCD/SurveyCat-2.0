@@ -22,6 +22,7 @@ builder.Services.AddScoped<ICaseriosRepository, CaseriosRepository>();
 builder.Services.AddScoped<IDepartamentosRepository, DepartamentosRepository>();
 builder.Services.AddScoped<IDiccionariosRepository, DiccionariosRepository>();
 builder.Services.AddScoped<IMunicipiosRepository, MunicipiosRepository>();
+builder.Services.AddScoped<IPersonalEncuestasRepository, PersonalEncuestasRepository>();
 builder.Services.AddScoped<IPersonasRepository, PersonasRepository>();
 
 builder.Services.AddScoped<IBarriosComarcasUnitOfWork, BarriosComarcasUnitOfWork>();
@@ -29,6 +30,7 @@ builder.Services.AddScoped<ICaseriosUnitOfWork, CaseriosUnitOfWork>();
 builder.Services.AddScoped<IDepartamentosUnitOfWork, DepartamentosUnitOfWork>();
 builder.Services.AddScoped<IDiccionariosUnitOfWork, DiccionariosUnitOfWork>();
 builder.Services.AddScoped<IMunicipiosUnitOfWork, MunicipiosUnitOfWork>();
+builder.Services.AddScoped<IPersonalEncuestasUnitOfWork, PersonalEncuestasUnitOfWork>();
 builder.Services.AddScoped<IPersonasUnitOfWork, PersonasUnitOfWork>();
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);

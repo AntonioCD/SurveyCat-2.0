@@ -16,6 +16,8 @@ namespace SurveyCat.Backend.UnitsOfWork.Implementations
             _personasRepository = personasRepository;
         }
 
+        public async Task<IEnumerable<Persona>> GetComboAsync() => await _personasRepository.GetComboAsync();
+
         public override async Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PaginationDTO pagination) => await _personasRepository.GetAsync(pagination);
 
         public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _personasRepository.GetTotalRecordsAsync(pagination);

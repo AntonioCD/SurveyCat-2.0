@@ -4,14 +4,12 @@ using SurveyCat.Shared.Responses;
 
 namespace SurveyCat.Backend.UnitsOfWork.Interfaces
 {
-    public interface IPersonasUnitOfWork
+    public interface IPersonalEncuestasUnitOfWork
     {
-        Task<IEnumerable<Persona>> GetComboAsync();
-
-        Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PaginationDTO pagination);
+        Task<ActionResponse<IEnumerable<PersonalEncuesta>>> GetAsync(PaginationDTO pagination);
 
         Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
 
-        Task<ActionResponse<Persona>> GetAsync(long id);
+        Task<ActionResponse<PersonalEncuesta>> GetAsync(int id);
     }
 }

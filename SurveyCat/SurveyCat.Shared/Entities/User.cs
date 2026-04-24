@@ -11,9 +11,5 @@ namespace SurveyCat.Shared.Entities;
 
 public class User : IdentityUser
 {
-    [Display(Name = "Tipo de Usuario")]
-    [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un {0}.")]
-    public UserType UserType { get; set; }
-
     public bool Activo { get; set; } = true;
 }

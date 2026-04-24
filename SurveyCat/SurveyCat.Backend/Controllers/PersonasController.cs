@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -15,6 +16,13 @@ namespace SurveyCat.Backend.Controllers
         public PersonasController(IGenericUnitOfWork<Persona> unitOfWork, IPersonasUnitOfWork personasUnitOfWork) : base(unitOfWork)
         {
             _personasUnitOfWork = personasUnitOfWork;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("combo")]
+        public async Task<IActionResult> GetComboAsync()
+        {
+            return Ok(await _personasUnitOfWork.GetComboAsync());
         }
 
         [HttpGet("paginated")]

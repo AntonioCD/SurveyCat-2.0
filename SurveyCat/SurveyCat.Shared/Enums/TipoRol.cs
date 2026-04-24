@@ -9,6 +9,9 @@ namespace SurveyCat.Shared.Enums
 {
     public enum TipoRol
     {
+        [Display(Name = "-- Seleccione --")]
+        Seleccione = 0,
+
         [Display(Name = "Encuestador")]
         Encuestador = 1,
 

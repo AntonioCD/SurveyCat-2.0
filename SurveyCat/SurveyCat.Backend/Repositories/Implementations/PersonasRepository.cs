@@ -5,81 +5,87 @@ using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Responses;
 
-namespace SurveyCat.Backend.Repositories.Implementations
+namespace SurveyCat.Backend.Repositories.Implementations;
+
+public class PersonasRepository : GenericRepository<Persona>, IPersonasRepository
 {
-    public class PersonasRepository : GenericRepository<Persona>, IPersonasRepository
+    private readonly DataContext _context;
+
+    public PersonasRepository(DataContext context) : base(context)
     {
-        private readonly DataContext _context;
+        _context = context;
+    }
 
-        public PersonasRepository(DataContext context) : base(context)
+    public async Task<IEnumerable<Persona>> GetComboAsync()
+    {
+        return await _context.Personas
+            .OrderBy(c => c.NombreCompleto)
+            .ToListAsync();
+    }
+
+    public override async Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Personas
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
-            _context = context;
+            queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
-        public override async Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PaginationDTO pagination)
+        return new ActionResponse<IEnumerable<Persona>>
         {
-            var queryable = _context.Personas
-                .AsQueryable();
+            WasSuccess = true,
+            Result = await queryable
+                .OrderBy(x => x.NombreCompleto)
+                .Paginate(pagination)
+                .ToListAsync()
+        };
+    }
 
-            if (!string.IsNullOrWhiteSpace(pagination.Filter))
-            {
-                queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
-            }
+    public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Personas
+            .AsQueryable();
 
-            return new ActionResponse<IEnumerable<Persona>>
-            {
-                WasSuccess = true,
-                Result = await queryable
-                    .OrderBy(x => x.NombreCompleto)
-                    .Paginate(pagination)
-                    .ToListAsync()
-            };
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
-        public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+        double count = await queryable.CountAsync();
+        return new ActionResponse<int>
         {
-            var queryable = _context.Personas
-                .AsQueryable();
+            WasSuccess = true,
+            Result = (int)count
+        };
+    }
 
-            if (!string.IsNullOrWhiteSpace(pagination.Filter))
-            {
-                queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
-            }
+    public async Task<ActionResponse<Persona>> GetAsync(long id)
+    {
+        var persona = await _context.Personas
+             .Include(p => p.Municipio).ThenInclude(m => m!.Departamento)
+             .Include(m => m.BarrioComarca)
+             .Include(c => c.Caserio!)
+             .Include(p => p.TipoIdentificacion)
+             .Include(p => p.EstadoCivil)
+             .Include(p => p.Profesion)
+             .Include(p => p.TipoPersonaJuridica)
+             .FirstOrDefaultAsync(m => m.Id == id);
 
-            double count = await queryable.CountAsync();
-            return new ActionResponse<int>
-            {
-                WasSuccess = true,
-                Result = (int)count
-            };
-        }
-
-        public async Task<ActionResponse<Persona>> GetAsync(long id)
+        if (persona == null)
         {
-            var persona = await _context.Personas
-                 .Include(p => p.Municipio).ThenInclude(m => m!.Departamento)
-                 .Include(m => m.BarrioComarca)
-                 .Include(c => c.Caserio!)
-                 .Include(p => p.TipoIdentificacion)
-                 .Include(p => p.EstadoCivil)
-                 .Include(p => p.Profesion)
-                 .Include(p => p.TipoPersonaJuridica)
-                 .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (persona == null)
-            {
-                return new ActionResponse<Persona>
-                {
-                    WasSuccess = false,
-                    Message = "Persona no existe"
-                };
-            }
-
             return new ActionResponse<Persona>
             {
-                WasSuccess = true,
-                Result = persona
+                WasSuccess = false,
+                Message = "Persona no existe"
             };
         }
+
+        return new ActionResponse<Persona>
+        {
+            WasSuccess = true,
+            Result = persona
+        };
     }
 }
