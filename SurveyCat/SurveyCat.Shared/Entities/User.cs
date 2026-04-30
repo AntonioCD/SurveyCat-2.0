@@ -11,5 +11,7 @@ namespace SurveyCat.Shared.Entities;
 
 public class User : IdentityUser
 {
+    public PersonalEncuesta? PersonalEncuesta { get; set; }
+
     public bool Activo { get; set; } = true;
 }

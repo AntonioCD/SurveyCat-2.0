@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.Repositories.Implementations;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
+using SurveyCat.Shared.Entities;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,7 @@ builder.Services.AddScoped<IDiccionariosRepository, DiccionariosRepository>();
 builder.Services.AddScoped<IMunicipiosRepository, MunicipiosRepository>();
 builder.Services.AddScoped<IPersonalEncuestasRepository, PersonalEncuestasRepository>();
 builder.Services.AddScoped<IPersonasRepository, PersonasRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
 builder.Services.AddScoped<IBarriosComarcasUnitOfWork, BarriosComarcasUnitOfWork>();
 builder.Services.AddScoped<ICaseriosUnitOfWork, CaseriosUnitOfWork>();
@@ -32,6 +35,19 @@ builder.Services.AddScoped<IDiccionariosUnitOfWork, DiccionariosUnitOfWork>();
 builder.Services.AddScoped<IMunicipiosUnitOfWork, MunicipiosUnitOfWork>();
 builder.Services.AddScoped<IPersonalEncuestasUnitOfWork, PersonalEncuestasUnitOfWork>();
 builder.Services.AddScoped<IPersonasUnitOfWork, PersonasUnitOfWork>();
+builder.Services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();
+
+builder.Services.AddIdentity<User, IdentityRole>(x =>
+{
+    x.User.RequireUniqueEmail = true;
+    x.Password.RequireDigit = false;
+    x.Password.RequiredUniqueChars = 0;
+    x.Password.RequireLowercase = false;
+    x.Password.RequireNonAlphanumeric = false;
+    x.Password.RequireUppercase = false;
+})
+    .AddEntityFrameworkStores<DataContext>()
+    .AddDefaultTokenProviders();
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 builder.Logging.AddConsole();
