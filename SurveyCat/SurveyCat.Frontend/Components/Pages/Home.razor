@@ -2,4 +2,13 @@
 
 <PageTitle>Inicio</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <MudText Typo="Typo.h3" Class="m-2" GutterBottom="true">Estas autenticado y autorizado, @context.User.Identity?.Name</MudText>
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h3" Class="m-2" GutterBottom="true">No estas autenticado</MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+<MudText Class="m-2">SurveyCat - Pruebas</MudText>

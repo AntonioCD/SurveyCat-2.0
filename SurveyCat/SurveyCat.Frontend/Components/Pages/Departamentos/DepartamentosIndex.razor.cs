@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Shared;
@@ -8,6 +9,7 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.Departamentos;
 
+[Authorize(Roles = "Admin")]
 public partial class DepartamentosIndex
 {
     private List<Departamento>? Departamentos { get; set; }
