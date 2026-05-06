@@ -12,13 +12,13 @@ public class AuthenticationProviderTest : AuthenticationStateProvider
         var anonimous = new ClaimsIdentity();
         var admin = new ClaimsIdentity(
         [
-            new("FirstName", "Juan"),
-            new("LastName", "Zulu"),
-            new(ClaimTypes.Name, "zulu@yopmail.com")
+            new("FirstName", "Oscar"),
+            new("LastName", "Castellon"),
+            new(ClaimTypes.Name, "0011404850007U"),
+            new(ClaimTypes.Role, "Administrador")
         ],
         authenticationType: "test");
 
         return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(admin)));
-
     }
 }

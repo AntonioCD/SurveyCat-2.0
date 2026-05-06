@@ -6,6 +6,8 @@ namespace SurveyCat.Backend.Repositories.Interfaces;
 
 public interface IPersonalEncuestasRepository
 {
+    Task<IEnumerable<PersonalEncuesta>> GetComboAsync();
+
     Task<ActionResponse<IEnumerable<PersonalEncuesta>>> GetAsync(PaginationDTO pagination);
 
     Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);

@@ -3,6 +3,7 @@ using SurveyCat.Backend.Data;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
+using SurveyCat.Shared.Enums;
 using SurveyCat.Shared.Responses;
 
 namespace SurveyCat.Backend.Repositories.Implementations;
@@ -19,7 +20,8 @@ public class PersonasRepository : GenericRepository<Persona>, IPersonasRepositor
     public async Task<IEnumerable<Persona>> GetComboAsync()
     {
         return await _context.Personas
-            .OrderBy(c => c.NombreCompleto)
+            .Where(p => p.TipoPersona == TipoPersona.Natural && !String.IsNullOrEmpty(p.Identificacion))
+            .OrderBy(p => p.NombreCompleto)
             .ToListAsync();
     }
 

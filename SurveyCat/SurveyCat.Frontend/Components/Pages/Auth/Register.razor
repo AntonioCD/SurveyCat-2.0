@@ -1,0 +1,59 @@
+﻿@page "/Register"
+@using SurveyCat.Shared.Entities
+
+@if (loading)
+{
+    <Loading />
+}
+else
+{
+    <EditForm Model="userDTO"
+              OnValidSubmit="CreateUserAsync"
+              OnInvalidSubmit="InvalidForm"
+              FormName="RegisterForm">
+        <DataAnnotationsValidator />
+        <MudGrid>
+            <MudItem xs="12">
+                <MudCardContent>
+                    <MudAutocomplete T="PersonalEncuesta"
+                                     Label="Personal"
+                                     Placeholder="--Seleccione un Personal--"
+                                     SearchFunc="SearchPersonalEncuestas"
+                                     Value="selectedPersonalEncuesta"
+                                     ValueChanged="PersonalEncuestaChanged"
+                                     ToStringFunc="@(e=> e.Persona==null ? null : $"{e.Persona!.NombreCompleto}")">
+                        <ItemTemplate Context="itemContext">
+                            @itemContext.Persona!.NombreCompleto
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudCardContent>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudCardContent>
+                    <MudTextField Label="Contraseña"
+                                  InputType="InputType.Password"
+                                  @bind-Value="userDTO.Password"
+                                  For="@(() => userDTO.Password)" />
+                   
+                </MudCardContent>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudCardContent>
+                    <MudTextField Label="Confirmar Contraseña"
+                                  InputType="InputType.Password"
+                                  @bind-Value="userDTO.PasswordConfirm"
+                                  For="@(() => userDTO.PasswordConfirm)" />
+                </MudCardContent>
+            </MudItem>
+            
+            <MudItem xs="12" Class="d-flex justify-center mt-2">
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" OnClick="ReturnAction" Class="ms-2 me-2 mb-2">
+                    Regresar
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Check" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mb-2">
+                    Guardar
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+}

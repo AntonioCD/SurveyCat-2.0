@@ -102,6 +102,11 @@ namespace SurveyCat.Backend.Data
                 });
             });
 
+            modelBuilder.Entity<User>(e =>
+            {
+                e.HasIndex(x => new { x.UserName }).IsUnique();
+            });
+
             // --- MÉTODOS GLOBALES ---
             DisableCascadingDelete(modelBuilder);
         }

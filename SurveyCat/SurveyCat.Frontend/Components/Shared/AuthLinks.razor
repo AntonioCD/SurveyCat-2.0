@@ -1,0 +1,32 @@
+﻿<AuthorizeView>
+    <Authorized>
+        @{
+            var nombreCompleto = context.User.FindFirst("PrimerNombre")?.Value
+            ?? context.User.Identity?.Name;
+        }
+        <div class="pa-4">
+            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Align="Align.Center">
+                ¡Hola, @nombreCompleto!
+            </MudText>
+        </div>
+        <MudDivider />
+
+        <MudMenuItem OnClick="EditAction" Icon="@Icons.Material.Filled.Person">
+            Editar Perfil
+        </MudMenuItem>
+
+        <MudMenuItem OnClick="ShowModalLogOut" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Error">
+            Cerrar Sesión
+        </MudMenuItem>
+    </Authorized>
+
+    <NotAuthorized>
+        <MudMenuItem OnClick="ShowModalRegister" Icon="@Icons.Material.Filled.HowToReg">
+            Nuevo Registro
+        </MudMenuItem>
+
+        <MudMenuItem OnClick="ShowModalLogIn" Icon="@Icons.Material.Filled.Login">
+            Iniciar Sesión
+        </MudMenuItem>
+    </NotAuthorized>
+</AuthorizeView>

@@ -29,8 +29,7 @@ public class SeedDb
         await CheckRolesAsync();
 
         // 3. Crear Usuario, Perfil (PersonalEncuesta) y Persona
-        // Usamos la identificación que mencionaste en tu código original
-        await CheckUserAsync("0012005850003D", "CARLOS", "JOSE", "PEREZ", "DELGADO", TipoRol.Encuestador);
+        await CheckUserAsync("0011404850007U", "OSCAR", "ANTONIO", "CASTELLÓN", "DELGADO", TipoRol.Administrador);
     }
 
     private async Task CheckDepartamentosFullAsync()
@@ -97,8 +96,8 @@ public class SeedDb
             personalEncuesta = new PersonalEncuesta
             {
                 PersonaId = persona.Id,
-                Codigo = "001",
-                Brigada = "123",
+                Codigo = "000",
+                Brigada = "000",
                 TipoRol = tipoRol,
                 UserId = null // Se mantiene null inicialmente
             };
@@ -112,13 +111,12 @@ public class SeedDb
             user = new User
             {
                 UserName = identificacion,
-                Email = $"{identificacion}@system.com",
                 Activo = true
             };
 
             // Se usa el UnitOfWork para manejar la creación y el password hash
-            await _usersUnitOfWork.AddUserAsync(user, "123456");
-            await _usersUnitOfWork.AddUserToRoleAsync(user, tipoRol.ToString());
+            await _usersUnitOfWork.AddUserAsync(user, "123456", personalEncuesta.Id);
+            await _usersUnitOfWork.AddUserToRoleAsync(user, user.PersonalEncuesta!.TipoRol.ToString());
         }
 
         // 5. Vincular PersonalEncuesta con el User recién creado (o existente)

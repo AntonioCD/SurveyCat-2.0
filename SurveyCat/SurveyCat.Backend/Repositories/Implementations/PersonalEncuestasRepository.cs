@@ -16,6 +16,14 @@ public class PersonalEncuestasRepository : GenericRepository<PersonalEncuesta>, 
         _context = context;
     }
 
+    public async Task<IEnumerable<PersonalEncuesta>> GetComboAsync()
+    {
+        return await _context.PersonalEncuestas
+            .Include(m => m.Persona)
+            .OrderBy(c => c.Persona!.NombreCompleto)
+            .ToListAsync();
+    }
+
     public override async Task<ActionResponse<IEnumerable<PersonalEncuesta>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.PersonalEncuestas

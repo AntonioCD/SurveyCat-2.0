@@ -35,7 +35,7 @@ namespace SurveyCat.Shared.Entities
         public string Brigada { get; set; } = null!;
 
         [Display(Name = "Rol")]
-        [Range(1, int.MaxValue, ErrorMessage = "Seleccione el Tipo de Rol.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Seleccione el Tipo de Rol.")]
         public TipoRol TipoRol { get; set; }
     }
 }

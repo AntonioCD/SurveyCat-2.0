@@ -9,7 +9,7 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.Departamentos;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Administrador")]
 public partial class DepartamentosIndex
 {
     private List<Departamento>? Departamentos { get; set; }

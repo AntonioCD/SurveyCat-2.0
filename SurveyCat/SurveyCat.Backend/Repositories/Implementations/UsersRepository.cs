@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.Repositories.Interfaces;
+using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 
 namespace SurveyCat.Backend.Repositories.Implementations;
@@ -11,17 +12,48 @@ public class UsersRepository : IUsersRepository
     private readonly DataContext _context;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly SignInManager<User> _signInManager;
 
-    public UsersRepository(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+    public UsersRepository(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, SignInManager<User> signInManager)
     {
         _context = context;
         _userManager = userManager;
         _roleManager = roleManager;
+        _signInManager = signInManager;
     }
 
-    public async Task<IdentityResult> AddUserAsync(User user, string password)
+    public async Task<SignInResult> LoginAsync(LoginDTO model)
     {
-        return await _userManager.CreateAsync(user, password);
+        return await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
+    }
+
+    public async Task LogoutAsync()
+    {
+        await _signInManager.SignOutAsync();
+    }
+
+    public async Task<IdentityResult> AddUserAsync(User user, string password, int personalEncuestaId)
+    {
+        user.PersonalEncuesta = null;
+
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (result.Succeeded)
+        {
+            var perfil = await _context.PersonalEncuestas
+                .Include(p => p.Persona)
+                .FirstOrDefaultAsync(p => p.Id == personalEncuestaId);
+
+            if (perfil != null)
+            {
+                perfil.UserId = user.Id;
+                user.PersonalEncuesta = perfil;
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        return result;
     }
 
     public async Task AddUserToRoleAsync(User user, string roleName)
@@ -41,12 +73,12 @@ public class UsersRepository : IUsersRepository
         }
     }
 
-    public async Task<User> GetUserAsync(string identificacion)
+    public async Task<User> GetUserAsync(string username)
     {
         var user = await _context.Users
             .Include(u => u.PersonalEncuesta!)
-            .ThenInclude(c => c.Persona!)
-            .FirstOrDefaultAsync(x => x.UserName == identificacion);
+            .ThenInclude(p => p.Persona)
+            .FirstOrDefaultAsync(x => x.UserName == username);
         return user!;
     }
 

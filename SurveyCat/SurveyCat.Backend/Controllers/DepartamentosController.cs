@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 namespace SurveyCat.Backend.Controllers;
 
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Route("api/[controller]")]
 public class DepartamentosController : GenericController<Departamento>
 {

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -7,6 +9,7 @@ using SurveyCat.Shared.Entities;
 namespace SurveyCat.Backend.Controllers;
 
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Route("api/[controller]")]
 public class PersonalEncuestasController : GenericController<PersonalEncuesta>
 {
@@ -15,6 +18,13 @@ public class PersonalEncuestasController : GenericController<PersonalEncuesta>
     public PersonalEncuestasController(IGenericUnitOfWork<PersonalEncuesta> unitOfWork, IPersonalEncuestasUnitOfWork personalEncuestasUnitOfWork) : base(unitOfWork)
     {
         _personalEncuestasUnitOfWork = personalEncuestasUnitOfWork;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("combo")]
+    public async Task<IActionResult> GetComboAsync()
+    {
+        return Ok(await _personalEncuestasUnitOfWork.GetComboAsync());
     }
 
     [HttpGet("paginated")]

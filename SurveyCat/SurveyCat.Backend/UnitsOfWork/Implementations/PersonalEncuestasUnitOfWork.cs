@@ -16,6 +16,8 @@ public class PersonalEncuestasUnitOfWork : GenericUnitOfWork<PersonalEncuesta>, 
         _personalEncuestasRepository = personalEncuestasRepository;
     }
 
+    public async Task<IEnumerable<PersonalEncuesta>> GetComboAsync() => await _personalEncuestasRepository.GetComboAsync();
+
     public override async Task<ActionResponse<IEnumerable<PersonalEncuesta>>> GetAsync(PaginationDTO pagination) => await _personalEncuestasRepository.GetAsync(pagination);
 
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _personalEncuestasRepository.GetTotalRecordsAsync(pagination);

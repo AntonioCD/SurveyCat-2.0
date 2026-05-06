@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 
 namespace SurveyCat.Backend.UnitsOfWork.Interfaces;
 
 public interface IUsersUnitOfWork
 {
-    Task<User> GetUserAsync(string identificacion);
+    Task<SignInResult> LoginAsync(LoginDTO model);
 
-    Task<IdentityResult> AddUserAsync(User user, string password);
+    Task LogoutAsync();
+
+    Task<User> GetUserAsync(string username);
+
+    Task<IdentityResult> AddUserAsync(User user, string password, int personalEncuestaId);
 
     Task CheckRoleAsync(string roleName);
 
