@@ -1,12 +1,44 @@
 ﻿<MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.h5">¿Estás seguro que deseas cerrar sesión?</MudText>
-        <MudText Typo="Typo.body2">Si cierras sesión, tendrás que volver a iniciar sesión para acceder a tu cuenta.</MudText>
+        @* La clase d-flex flex-column align-center centra todo horizontalmente *@
+        <div class="d-flex flex-column align-center justify-center pa-4">
+
+            <MudIcon Icon="@Icons.Material.Filled.Logout"
+                     Color="Color.Error"
+                     Size="Size.Large"
+                     Class="mb-4"
+                     Style="font-size: 3rem;" />
+
+            <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-3">
+                ¿Estás seguro que deseas cerrar sesión?
+            </MudText>
+
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                Si cierras sesión, tendrás que volver a iniciar sesión para acceder a tu cuenta.
+            </MudText>
+        </div>
     </DialogContent>
+
     <DialogActions>
-        <MudButton Variant="Variant.Outlined" Color="Color.Tertiary" OnClick="CancelAction">Cancelar</MudButton>
-        <MudSpacer />
-        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="LogoutActionAsync">Cerrar sesión</MudButton>
+        @* Eliminamos MudSpacer y usamos justify-center para los botones *@
+        <div class="d-flex justify-center gap-4 w-100 pb-6">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Default"
+                       OnClick="CancelAction"
+                       Size="Size.Large"
+                       Style="min-width: 150px;">
+                Cancelar
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Error"
+                       OnClick="LogoutActionAsync"
+                       Size="Size.Large"
+                       Style="min-width: 150px;"
+                       DropShadow="false">
+                Cerrar sesión
+            </MudButton>
+        </div>
     </DialogActions>
 </MudDialog>
 

@@ -1,0 +1,90 @@
+﻿@page "/EditUser"
+@using SurveyCat.Shared.Entities
+
+@if (loading)
+{
+    <Loading />
+}
+else
+{
+    @* Contenedor principal centrado vertical y horizontalmente *@
+    <MudContainer MaxWidth="MaxWidth.Small" Class="mt-10">
+        <MudPaper Elevation="4" Class="pa-8">
+
+            @* Encabezado centrado *@
+            <div class="d-flex flex-column align-center mb-6">
+                <MudIcon Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Large" />
+                <MudText Typo="Typo.h5" Class="mt-2">Editar Usuario</MudText>
+            </div>
+
+            <EditForm Model="user" OnValidSubmit="SaveUserAsync">
+                <DataAnnotationsValidator />
+
+                <MudGrid Spacing="3">
+                    @* Campo de Nombre - Ocupa todo el ancho en móvil, se ve mejor centrado *@
+                    <MudItem xs="12">
+                        <MudTextField Label="Nombre Completo"
+                                      Variant="Variant.Outlined"
+                                      @bind-Value="user!.PersonalEncuesta!.Persona!.NombreCompleto"
+                                      ReadOnly="true"
+                                      HelperText="Datos provenientes del registro de Persona" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField Label="Código"
+                                      Variant="Variant.Outlined"
+                                      @bind-Value="user!.PersonalEncuesta!.Codigo"
+                                      ReadOnly="true"
+                                      HelperText="Datos provenientes de Personal" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField Label="Brigada"
+                                      Variant="Variant.Outlined"
+                                      @bind-Value="user!.PersonalEncuesta!.Brigada"
+                                      ReadOnly="true"
+                                      HelperText="Datos provenientes de Personal" />
+                    </MudItem>
+
+                    @* Checkbox centrado o alineado con el texto *@
+                    <MudItem xs="12" Class="d-flex justify-center">
+                        <MudCheckBox Label="Usuario Activo"
+                                     @bind-Value="user!.Activo"
+                                     Color="Color.Primary"
+                                     For="@(() => user!.Activo)" />
+                    </MudItem>
+
+                    @* Botones de Acción - Organizados y centrados *@
+                    <MudItem xs="12" Class="d-flex flex-column gap-3 mt-4">
+                        <MudButton Variant="Variant.Filled"
+                                   StartIcon="@Icons.Material.Filled.Save"
+                                   Color="Color.Primary"
+                                   FullWidth="true"
+                                   Size="Size.Large"
+                                   ButtonType="ButtonType.Submit">
+                            Guardar Cambios
+                        </MudButton>
+
+                        <div class="d-flex gap-2">
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="@Icons.Material.Filled.LockReset"
+                                       Color="Color.Secondary"
+                                       FullWidth="true"
+                                       OnClick="ShowModal">
+                                Contraseña
+                            </MudButton>
+
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="@Icons.Material.Filled.ArrowBack"
+                                       Color="Color.Default"
+                                       FullWidth="true"
+                                       OnClick="ReturnAction">
+                                Regresar
+                            </MudButton>
+                        </div>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
+        </MudPaper>
+    </MudContainer>
+}
