@@ -1,8 +1,6 @@
 ﻿<MudDialog>
     <DialogContent>
-        @* La clase d-flex flex-column align-center centra todo horizontalmente *@
         <div class="d-flex flex-column align-center justify-center pa-4">
-
             <MudIcon Icon="@Icons.Material.Filled.Logout"
                      Color="Color.Error"
                      Size="Size.Large"
@@ -20,8 +18,8 @@
     </DialogContent>
 
     <DialogActions>
-        @* Eliminamos MudSpacer y usamos justify-center para los botones *@
-        <div class="d-flex justify-center gap-4 w-100 pb-6">
+        @* La clave es 'justify-center' y 'mud-width-full' *@
+        <div class="d-flex justify-center mud-width-full gap-4 pb-6">
             <MudButton Variant="Variant.Filled"
                        Color="Color.Default"
                        OnClick="CancelAction"
@@ -41,4 +39,3 @@
         </div>
     </DialogActions>
 </MudDialog>
-

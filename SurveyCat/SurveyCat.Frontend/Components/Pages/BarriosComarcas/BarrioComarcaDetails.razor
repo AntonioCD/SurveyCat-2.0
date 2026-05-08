@@ -33,7 +33,7 @@ else
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Variant="Variant.Filled"
+                                       Variant="Variant.Outlined"
                                        Color="Color.Warning"
                                        OnClick="@(() => ShowModalAsync(context.Id, true))"
                                        Size="Size.Medium"
@@ -41,7 +41,7 @@ else
                     </MudTooltip>
                     <MudTooltip Text="Borrar">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Variant="Variant.Filled"
+                                       Variant="Variant.Outlined"
                                        Color="Color.Error"
                                        OnClick="@(() => DeleteAsync(context))"
                                        Size="Size.Medium" />

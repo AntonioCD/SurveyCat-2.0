@@ -26,13 +26,13 @@ public partial class AuthLinks
     private void ShowModalLogIn()
     {
         var closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        DialogService.ShowAsync<Login>("Inicio de Sesion", closeOnEscapeKey);
+        DialogService.ShowAsync<Login>("Inicio de Sesión", closeOnEscapeKey);
     }
 
     private void ShowModalLogOut()
     {
         var closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        DialogService.ShowAsync<Logout>("Cerrar Sesion", closeOnEscapeKey);
+        DialogService.ShowAsync<Logout>("Cerrar Sesión", closeOnEscapeKey);
     }
 
     private void ShowModalRegister()

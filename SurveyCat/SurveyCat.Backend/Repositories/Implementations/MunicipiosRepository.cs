@@ -27,7 +27,8 @@ public class MunicipiosRepository : GenericRepository<Municipio>, IMunicipiosRep
     public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Municipios
-            .Include(c => c.BarriosComarcas)
+            .Include(m => m.Sectores)
+            .Include(m => m.BarriosComarcas)
             .Where(x => x.Departamento!.Id == pagination.Id)
             .AsQueryable();
 
@@ -68,6 +69,7 @@ public class MunicipiosRepository : GenericRepository<Municipio>, IMunicipiosRep
     public override async Task<ActionResponse<IEnumerable<Municipio>>> GetAsync()
     {
         var municipios = await _context.Municipios
+            .Include(m => m.Sectores)
             .Include(m => m.BarriosComarcas)
             .ToListAsync();
         return new ActionResponse<IEnumerable<Municipio>>
@@ -80,6 +82,7 @@ public class MunicipiosRepository : GenericRepository<Municipio>, IMunicipiosRep
     public override async Task<ActionResponse<Municipio>> GetAsync(int id)
     {
         var municipio = await _context.Municipios
+             .Include(m => m.Sectores)
              .Include(m => m.BarriosComarcas!)
              .ThenInclude(c => c.Caserios!)
              .FirstOrDefaultAsync(m => m.Id == id);

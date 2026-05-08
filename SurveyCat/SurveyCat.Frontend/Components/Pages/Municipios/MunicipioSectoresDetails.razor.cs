@@ -1,27 +1,26 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SurveyCat.Frontend.Components.Pages.Municipios;
+using SurveyCat.Frontend.Components.Pages.Sectores;
 using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
-using System.Diagnostics.Metrics;
 using System.Net;
 
-namespace SurveyCat.Frontend.Components.Pages.Departamentos;
+namespace SurveyCat.Frontend.Components.Pages.Municipios;
 
-public partial class DepartamentoDetails
+public partial class MunicipioSectoresDetails
 {
-    private Departamento? departamento;
-    private List<Municipio>? municipios;
+    private Municipio? municipio;
+    private List<Sector>? sectores;
 
-    private MudTable<Municipio> table = new();
+    private MudTable<Sector> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, 5, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/municipios";
+    private const string baseUrl = "api/sectores";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
-    [Parameter] public int DepartamentoId { get; set; }
+    [Parameter] public int MunicipioId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -40,14 +39,14 @@ public partial class DepartamentoDetails
         await LoadTotalRecordsAsync();
     }
 
-    private async Task<bool> LoadDepartamentoAsync()
+    private async Task<bool> LoadMunicipioAsync()
     {
-        var responseHttp = await Repository.GetAsync<Departamento>($"/api/departamentos/{DepartamentoId}");
+        var responseHttp = await Repository.GetAsync<Municipio>($"/api/municipios/{MunicipioId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("/departamentos");
+                NavigationManager.NavigateTo($"/departamentos/details/{municipio!.DepartamentoId}");
                 return false;
             }
 
@@ -55,24 +54,24 @@ public partial class DepartamentoDetails
             Snackbar.Add(message!, Severity.Error);
             return false;
         }
-        departamento = responseHttp.Response;
+        municipio = responseHttp.Response;
         return true;
     }
 
     private async Task<bool> LoadTotalRecordsAsync()
     {
         loading = true;
-        if (departamento is null)
+        if (municipio is null)
         {
-            var ok = await LoadDepartamentoAsync();
+            var ok = await LoadMunicipioAsync();
             if (!ok)
             {
-                NoDepartamento();
+                NoMunicipio();
                 return false;
             }
         }
 
-        var url = $"{baseUrl}/totalRecords?id={DepartamentoId}";
+        var url = $"{baseUrl}/totalRecords?id={MunicipioId}";
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
@@ -89,43 +88,38 @@ public partial class DepartamentoDetails
         return true;
     }
 
-    private async Task<TableData<Municipio>> LoadListAsync(TableState municipio, CancellationToken cancellationToken)
+    private async Task<TableData<Sector>> LoadListAsync(TableState sector, CancellationToken cancellationToken)
     {
-        int page = municipio.Page + 1;
-        int pageSize = municipio.PageSize;
-        var url = $"{baseUrl}/paginated?id={DepartamentoId}&page={page}&recordsnumber={pageSize}";
+        int page = sector.Page + 1;
+        int pageSize = sector.PageSize;
+        var url = $"{baseUrl}/paginated?id={MunicipioId}&page={page}&recordsnumber={pageSize}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<Municipio>>(url);
+        var responseHttp = await Repository.GetAsync<List<Sector>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<Municipio> { Items = [], TotalItems = 0 };
+            return new TableData<Sector> { Items = [], TotalItems = 0 };
         }
         if (responseHttp.Response == null)
         {
-            return new TableData<Municipio> { Items = [], TotalItems = 0 };
+            return new TableData<Sector> { Items = [], TotalItems = 0 };
         }
-        return new TableData<Municipio>
+        return new TableData<Sector>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
         };
     }
 
-    private void StatesAction(Municipio municipio)
+    private void StatesAction(Sector sector)
     {
-        NavigationManager.NavigateTo($"/municipios/details/{municipio.Id}");
-    }
-
-    private void SectoresAction(Municipio municipio)
-    {
-        NavigationManager.NavigateTo($"/municipios/sectores/details/{municipio.Id}");
+        NavigationManager.NavigateTo($"/sectores/details/{sector.Id}");
     }
 
     private async Task SetFilterValue(string value)
@@ -137,7 +131,7 @@ public partial class DepartamentoDetails
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo("/departamentos");
+        NavigationManager.NavigateTo($"/departamentos/details/{municipio!.DepartamentoId}");
     }
 
     private async Task ShowModalAsync(int id = 0, bool isEdit = false)
@@ -153,15 +147,15 @@ public partial class DepartamentoDetails
             var parameters = new DialogParameters
             {
                 { "Id", id }
-            }; dialog = await DialogService.ShowAsync<MunicipioEdit>("Editar Municipio", parameters, options);
+            }; dialog = await DialogService.ShowAsync<SectorEdit>("Editar Sector", parameters, options);
         }
         else
         {
             var parameters = new DialogParameters
                 {
-                    { "DepartamentoId", DepartamentoId }
+                    { "MunicipioId", MunicipioId }
                 };
-            dialog = await DialogService.ShowAsync<MunicipioCreate>("Nuevo Municipio", parameters, options);
+            dialog = await DialogService.ShowAsync<SectorCreate>("Nuevo Sector", parameters, options);
         }
 
         var result = await dialog.Result;
@@ -172,21 +166,21 @@ public partial class DepartamentoDetails
         }
     }
 
-    private void BarriosComarcasAction(Municipio municipio)
+    private void CaseriosAction(Sector sector)
     {
-        NavigationManager.NavigateTo($"/municipios/details/{municipio.Id}");
+        NavigationManager.NavigateTo($"/sectores/details/{sector.Id}");
     }
 
-    private void NoDepartamento()
+    private void NoMunicipio()
     {
-        NavigationManager.NavigateTo("/departamentos");
+        NavigationManager.NavigateTo("/sectores");
     }
 
-    private async Task DeleteAsync(Municipio municipio)
+    private async Task DeleteAsync(Sector sector)
     {
         var parameters = new DialogParameters
             {
-                { "Message", $"¿Estás seguro de que quieres eliminar el Municipio {municipio.Nombre}?" }
+                { "Message", $"¿Estás seguro de que quieres eliminar el Sector {sector.NumeroSector}?" }
             };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
@@ -196,7 +190,7 @@ public partial class DepartamentoDetails
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"api/municipios/{municipio.Id}");
+        var responseHttp = await Repository.DeleteAsync($"api/sectores/{sector.Id}");
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -205,6 +199,6 @@ public partial class DepartamentoDetails
         }
         await LoadAsync();
         await table.ReloadServerData();
-        Snackbar.Add("Municipio eliminado.", Severity.Success);
+        Snackbar.Add("Sector eliminado.", Severity.Success);
     }
 }

@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace SurveyCat.Shared.Enums;
 
-public enum TipoSector
+public enum TipoEncuesta
 {
     [Display(Name = "-- Seleccione --")]
     Seleccione = 0,
 
-    [Display(Name = "Sector Urbano")]
-    Urbano = 1,
+    [Display(Name = "Parcela Unificada")]
+    Unificada = 1,
 
-    [Display(Name = "Sector Rural")]
-    Rural = 2
+    [Display(Name = "Parcela Horizontal")]
+    Horizontal = 2
 }

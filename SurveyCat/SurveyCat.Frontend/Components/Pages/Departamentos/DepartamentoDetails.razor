@@ -25,6 +25,7 @@ else
             <MudTh>Municipio</MudTh>
             <MudTh Style="width: 20%;">Cod. SILEC</MudTh>
             <MudTh Style="width: 20%;">Barrios/Comarcas</MudTh>
+            <MudTh Style="width: 20%;">Sectores</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -33,7 +34,7 @@ else
             <MudTd DataLabel="Barrios/Comarcas">
                 <MudTooltip Text="Ver Barrios/Comarcas">
                     <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
+                               Color="Color.Primary"
                                Size="Size.Medium"
                                OnClick="@(() => StatesAction(@context))"
                                Style="width: 70px; min-width: 70px;"
@@ -47,11 +48,28 @@ else
                     </MudButton>
                 </MudTooltip>
             </MudTd>
+            <MudTd DataLabel="Sectores">
+                <MudTooltip Text="Ver Sectores">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Size="Size.Medium"
+                               OnClick="@(() => SectoresAction(@context))"
+                               Style="width: 70px; min-width: 70px;"
+                               Class="d-flex justify-space-between px-2">
+
+                        <span>@context.SectoresNumber</span>
+
+                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
+                                 Size="Size.Small"
+                                 Class="ml-2" />
+                    </MudButton>
+                </MudTooltip>
+            </MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Variant="Variant.Filled"
+                                       Variant="Variant.Outlined"
                                        Color="Color.Warning"
                                        OnClick="@(() => ShowModalAsync(context.Id, true))"
                                        Size="Size.Medium"
@@ -59,7 +77,7 @@ else
                     </MudTooltip>
                     <MudTooltip Text="Borrar">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Variant="Variant.Filled"
+                                       Variant="Variant.Outlined"
                                        Color="Color.Error"
                                        OnClick="@(() => DeleteAsync(context))"
                                        Size="Size.Medium" />

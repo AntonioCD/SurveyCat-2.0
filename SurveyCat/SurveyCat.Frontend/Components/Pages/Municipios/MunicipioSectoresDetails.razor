@@ -1,4 +1,4 @@
-﻿@page "/departamentos"
+﻿@page "/municipios/sectores/details/{MunicipioId:int}"
 
 @if (loading)
 {
@@ -6,7 +6,7 @@
 }
 else
 {
-    <MudTable Items="@Departamentos"
+    <MudTable Items="@sectores"
               @ref="table"
               ServerData="LoadListAsync"
               Dense="true"
@@ -15,45 +15,25 @@ else
               FixedHeader="true"
               FixedFooter="true">
         <ToolBarContent>
-            <div class="d-flex justify-content-between">
-                <MudText Typo="Typo.h6" Class="me-4">DEPARTAMENTOS</MudText>
-                <MudButton Variant="Variant.Outlined"
-                           EndIcon="@Icons.Material.Filled.Add"
-                           Color="Color.Info" OnClick="@(() => ShowModalAsync())">
-                    Nuevo
-                </MudButton>
-            </div>
+            <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @municipio?.Nombre</MudText>
+            <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
+            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => ShowModalAsync())">Crear</MudButton>
             <MudSpacer />
-            <FilterComponent @bind-FilterValue="Filter" ApplyFilter="SetFilterValue" />
+            <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Departamento</MudTh>
-            <MudTh Style="width: 20%;">Cod. SILEC</MudTh>
-            <MudTh Style="width: 20%;">Municipios</MudTh>
+            <MudTh>Tipo de Sector</MudTh>
+            <MudTh Style="width: 20%;">Número de Sector</MudTh>
+            <MudTh Style="width: 20%;">Cod. Sector-Dpto</MudTh>
+            <MudTh Style="width: 20%;">Cod. Sector-Muni</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
-
         <RowTemplate>
-            <MudTd DataLabel="Departamento">@context.Nombre</MudTd>
-            <MudTd DataLabel="Cod. SILEC">@context.CodDepto</MudTd>
-            <MudTd DataLabel="Municipios">
-                <MudTooltip Text="Ver Municipios">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               Size="Size.Medium"
-                               OnClick="@(() => StatesAction(@context))"
-                               Style="width: 70px; min-width: 70px;"
-                               Class="d-flex justify-space-between px-2">
-
-                        <span>@context.MunicipiosNumber</span>
-
-                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
-                                 Size="Size.Small"
-                                 Class="ml-2" />
-                    </MudButton>
-                </MudTooltip>
-            </MudTd>
-
+            <MudTd DataLabel="Tipo de Sector">@context.TipoSector</MudTd>
+            <MudTd DataLabel="Número de Sector">@context.NumeroSector</MudTd>
+            <MudTd DataLabel="Cod. Sector-Dpto">@context.SectorDepto</MudTd>
+            <MudTd DataLabel="Cod. Sector-Muni">@context.SectorMuni</MudTd>
+           
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">
@@ -75,12 +55,12 @@ else
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
-            <MudText>"No hay registros"</MudText>
+            <MudText>No se encontraron registros.</MudText>
         </NoRecordsContent>
         <PagerContent>
-            <MudTablePager RowsPerPageString="Número de registros"
+            <MudTablePager RowsPerPageString="Numero de Registros:"
                            PageSizeOptions="pageSizeOptions"
-                           AllItemsText="Todo"
+                           AllItemsText="Todos"
                            InfoFormat="@infoFormat" />
         </PagerContent>
     </MudTable>

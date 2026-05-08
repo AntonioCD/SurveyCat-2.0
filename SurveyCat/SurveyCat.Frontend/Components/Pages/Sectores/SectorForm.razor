@@ -1,0 +1,45 @@
+﻿@using SurveyCat.Shared.Enums;
+
+<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <MudSelect T="TipoSector" Label="Tipo de Sector"
+               @bind-Value="Sector.TipoSector"
+               For="@(() => Sector.TipoSector)"
+               Variant="Variant.Outlined" Margin="Margin.Dense"
+               AnchorOrigin="Origin.BottomCenter">
+        @foreach (TipoSector item in Enum.GetValues(typeof(TipoSector)))
+        {
+            <MudSelectItem Value="@item">@item.ToString()</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudTextField Label="Número de Sector"
+                  @bind-Value="@Sector.NumeroSector"
+                  For="@(() => Sector.NumeroSector)"
+                  Required="true"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Class="mb-4" />
+
+    <MudTextField Label="Cod. Sector-Departamento"
+                  @bind-Value="@Sector.SectorDepto"
+                  For="@(() => Sector.SectorDepto)"
+                  Required="true"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Class="mb-4" />
+
+    <MudTextField Label="Cod. Sector-Municipio"
+                  @bind-Value="@Sector.SectorMuni"
+                  For="@(() => Sector.SectorMuni)"
+                  Required="true"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Class="mb-4" />
+
+    <div class="d-flex justify-end gap-2">
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+    </div>
+</EditForm>
