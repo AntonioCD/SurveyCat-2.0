@@ -1,21 +1,20 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SurveyCat.Frontend.Components.Pages.Personas;
 using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 using System.Net;
 
-namespace SurveyCat.Frontend.Components.Pages.Personas;
+namespace SurveyCat.Frontend.Components.Pages.Auth;
 
-public partial class PersonasIndex
+public partial class UsersIndex
 {
-    private List<Persona>? Personas { get; set; }
-    private MudTable<Persona> table = new();
+    private List<User>? Users { get; set; }
+    private MudTable<User> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/personas";
+    private const string baseUrl = "api/accounts";
     private string infoFormat = "{first_item}-{last_item} => {all_items}";
 
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -52,7 +51,7 @@ public partial class PersonasIndex
         loading = false;
     }
 
-    private async Task<TableData<Persona>> LoadListAsync(TableState state, CancellationToken cancellationToken)
+    private async Task<TableData<User>> LoadListAsync(TableState state, CancellationToken cancellationToken)
     {
         int page = state.Page + 1;
         int pageSize = state.PageSize;
@@ -63,27 +62,22 @@ public partial class PersonasIndex
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<Persona>>(url);
+        var responseHttp = await Repository.GetAsync<List<User>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<Persona> { Items = [], TotalItems = 0 };
+            return new TableData<User> { Items = [], TotalItems = 0 };
         }
         if (responseHttp.Response == null)
         {
-            return new TableData<Persona> { Items = [], TotalItems = 0 };
+            return new TableData<User> { Items = [], TotalItems = 0 };
         }
-        return new TableData<Persona>
+        return new TableData<User>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
         };
-    }
-
-    private void StatesAction(Persona persona)
-    {
-        NavigationManager.NavigateTo($"/personas/details/{persona.Id}");
     }
 
     private async Task SetFilterValue(string value)
@@ -93,26 +87,26 @@ public partial class PersonasIndex
         await table.ReloadServerData();
     }
 
-    private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    private async Task ShowModalAsync(string id = "", bool isEdit = false)
     {
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
-            MaxWidth = MaxWidth.Medium,
+            MaxWidth = MaxWidth.Small,
             FullWidth = true
         };
         IDialogReference? dialog;
         if (isEdit)
         {
             var parameters = new DialogParameters
-        {
-            { "Id", id }
-        }; dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
+            {
+                { "UserId", Guid.Parse(id) }
+            }; dialog = await DialogService.ShowAsync<EditUser>("Editar Usuario", parameters, options);
         }
         else
         {
-            dialog = await DialogService.ShowAsync<PersonaCreate>("Nueva Persona", options);
+            dialog = await DialogService.ShowAsync<Register>("Nuevo Usuario", options);
         }
 
         var result = await dialog.Result;
@@ -123,36 +117,36 @@ public partial class PersonasIndex
         }
     }
 
-    private async Task DeleteAsync(Persona persona)
+    private async Task DeleteAsync(User user)
     {
-        var parameters = new DialogParameters
-    {
-        { "Message", $"Estas seguro de borrar el persona: {persona.NombreCompleto}" }
-    };
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
-        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
-        var result = await dialog.Result;
-        if (result!.Canceled)
-        {
-            return;
-        }
+        //    var parameters = new DialogParameters
+        //    {
+        //        { "Message", $"Estas seguro de borrar el Personal de Encuesta: {personalEncuesta.Persona!.NombreCompleto}" }
+        //    };
+        //    var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
+        //    var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
+        //    var result = await dialog.Result;
+        //    if (result!.Canceled)
+        //    {
+        //        return;
+        //    }
 
-        var responseHttp = await Repository.DeleteAsync($"{baseUrl}/{persona.Id}");
-        if (responseHttp.Error)
-        {
-            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-            {
-                NavigationManager.NavigateTo("/personas");
-            }
-            else
-            {
-                var message = await responseHttp.GetErrorMessageAsync();
-                Snackbar.Add(message!, Severity.Error);
-            }
-            return;
-        }
-        await LoadTotalRecordsAsync();
-        await table.ReloadServerData();
-        Snackbar.Add("Registro borrado", Severity.Success);
+        //    var responseHttp = await Repository.DeleteAsync($"{baseUrl}/{personalEncuesta.Id}");
+        //    if (responseHttp.Error)
+        //    {
+        //        if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+        //        {
+        //            NavigationManager.NavigateTo("/personalEncuestas");
+        //        }
+        //        else
+        //        {
+        //            var message = await responseHttp.GetErrorMessageAsync();
+        //            Snackbar.Add(message!, Severity.Error);
+        //        }
+        //        return;
+        //    }
+        //    await LoadTotalRecordsAsync();
+        //    await table.ReloadServerData();
+        //    Snackbar.Add("Registro borrado", Severity.Success);
     }
 }

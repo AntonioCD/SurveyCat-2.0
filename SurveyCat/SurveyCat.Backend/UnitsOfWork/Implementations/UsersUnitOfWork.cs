@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SurveyCat.Backend.Repositories.Implementations;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
+using SurveyCat.Shared.Responses;
 
 namespace SurveyCat.Backend.UnitsOfWork.Implementations;
 
@@ -14,6 +16,10 @@ public class UsersUnitOfWork : IUsersUnitOfWork
     {
         _usersRepository = usersRepository;
     }
+
+    public async Task<ActionResponse<IEnumerable<User>>> GetAsync(PaginationDTO pagination) => await _usersRepository.GetAsync(pagination);
+
+    public async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _usersRepository.GetTotalRecordsAsync(pagination);
 
     public async Task<User> GetUserAsync(Guid userId) => await _usersRepository.GetUserAsync(userId);
 

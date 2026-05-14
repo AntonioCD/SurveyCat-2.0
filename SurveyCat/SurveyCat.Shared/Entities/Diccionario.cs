@@ -33,6 +33,5 @@ public class Diccionario
     [Display(Name = "Activo")]
     public bool Activo { get; set; } = true;
 
-    // CLAVE PARA SINCRONIZACIÓN
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

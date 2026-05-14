@@ -34,6 +34,6 @@ namespace SurveyCat.Shared.Entities
 
         public Municipio? Municipio { get; set; } = null!;
 
-        //public ICollection<Ficha> Fichas { get; set; } = new List<Ficha>();
+        public ICollection<Ficha>? Fichas { get; set; }
     }
 }

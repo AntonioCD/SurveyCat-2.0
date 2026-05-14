@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,5 +38,9 @@ namespace SurveyCat.Shared.Entities
         [Display(Name = "Rol")]
         [Range(0, int.MaxValue, ErrorMessage = "Seleccione el Tipo de Rol.")]
         public TipoRol TipoRol { get; set; }
+
+        public ICollection<Ficha>? FichasEncuestador { get; set; }
+        public ICollection<Ficha>? FichasCoordinador { get; set; }
+        public ICollection<Ficha>? FichasTecnicoCatastral { get; set; }
     }
 }

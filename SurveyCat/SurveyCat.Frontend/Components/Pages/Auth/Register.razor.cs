@@ -69,7 +69,7 @@ public partial class Register
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/users");
     }
 
     private void InvalidForm()

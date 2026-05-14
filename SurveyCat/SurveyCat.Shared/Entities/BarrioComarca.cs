@@ -29,6 +29,8 @@ public class BarrioComarca
 
     public ICollection<Caserio>? Caserios { get; set; }
 
+    public ICollection<Ficha>? Fichas { get; set; }
+
     [Display(Name = "Caserios")]
     public int CaseriosNumber => Caserios == null ? 0 : Caserios.Count;
 }

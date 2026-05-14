@@ -26,18 +26,22 @@ public class Municipio
     [RegularExpression(@"^(\d{4})?$", ErrorMessage = "El código debe ser de 4 dígitos o estar vacío.")]
     public string? CodINIDE { get; set; }
 
+    [Display(Name = "Departamento")]
     public int DepartamentoId { get; set; }
-    public Departamento? Departamento { get; set; } 
 
-    public ICollection<BarrioComarca>? BarriosComarcas { get; set; }
+    public Departamento? Departamento { get; set; }
 
     [Display(Name = "Barrios/Comarcas")]
     public int BarriosComarcasNumber => BarriosComarcas == null ? 0 : BarriosComarcas.Count;
 
-    public ICollection<Sector>? Sectores { get; set; }
-
     [Display(Name = "Sectores")]
     public int SectoresNumber => Sectores == null ? 0 : Sectores.Count;
 
-    //public ICollection<Persona>? Personas { get; set; }
+    public ICollection<BarrioComarca>? BarriosComarcas { get; set; }
+
+    public ICollection<Sector>? Sectores { get; set; }
+
+    public ICollection<Persona>? Personas { get; set; }
+
+    public ICollection<Ficha>? Fichas { get; set; }
 }

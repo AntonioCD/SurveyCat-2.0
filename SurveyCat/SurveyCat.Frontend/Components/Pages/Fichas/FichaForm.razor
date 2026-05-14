@@ -1,0 +1,262 @@
+﻿@using SurveyCat.Shared.Enums;
+@using SurveyCat.Shared.Entities
+
+<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6" Class="deep-purple-text"><b>DATOS GENERALES</b></MudText>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Departamento"
+                             Label="Departamento"
+                             Placeholder="-- Seleccione un Departamento --"
+                             SearchFunc="SearchDepartamento"
+                             Value="selectedDepartamento"
+                             ValueChanged="DepartamentoChangedAsync"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Municipio"
+                             Label="Municipio"
+                             Placeholder="-- Seleccione un Municipio --"
+                             SearchFunc="SearchMunicipio"
+                             Value="selectedMunicipio"
+                             ValueChanged="MunicipioChangedAsync"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Sector"
+                             Label="Sector"
+                             Placeholder="-- Seleccione un Sector --"
+                             SearchFunc="SearchSector"
+                             Value="selectedSector"
+                             ValueChanged="SectorChanged"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.NumeroSector}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.NumeroSector
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Código de Encuesta"
+                          @bind-Value="Ficha.CodEncuesta"
+                          @bind-Value:after="() => Ficha.CodEncuesta = Ficha.CodEncuesta.ToUpper()"
+                          Immediate="true"
+                          For="@(() => Ficha.CodEncuesta)" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6" Class="deep-purple-text"><b>DATOS DEL INMUEBLE</b></MudText>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudSelect T="TipoEncuesta" Label="Tipo de Encuesta"
+                       @bind-Value="Ficha.TipoEncuesta"
+                       For="@(() => Ficha.TipoEncuesta)"
+                       Variant="Variant.Outlined" Margin="Margin.Dense"
+                       AnchorOrigin="Origin.BottomCenter">
+                @foreach (TipoEncuesta item in Enum.GetValues(typeof(TipoEncuesta)))
+                {
+                    <MudSelectItem Value="@item">@item.ToString()</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Nombre de la Finca"
+                          @bind-Value="Ficha.NombreFinca"
+                          OnBlur="@(() => Ficha.NombreFinca = Ficha.NombreFinca?.ToUpper())"
+                          Immediate="true"
+                          For="@(() => Ficha.NombreFinca)"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="BarrioComarca"
+                             Label="Barrio/Comarca"
+                             Placeholder="-- Seleccione un Barrio/Comarca --"
+                             SearchFunc="SearchBarrioComarca"
+                             Value="selectedBarrioComarca"
+                             ValueChanged="BarrioComarcaChangedAsync"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Caserio"
+                             Label="Caserio"
+                             Placeholder="-- Seleccione un Caserio --"
+                             SearchFunc="SearchCaserio"
+                             Value="selectedCaserio"
+                             ValueChanged="CaserioChanged"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Manzana"
+                          @bind-Value="Ficha.Manzana"
+                          OnBlur="@(() => Ficha.Manzana = Ficha.Manzana?.ToUpper())"
+                          Immediate="true"
+                          For="@(() => Ficha.Manzana)"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Lote"
+                          @bind-Value="Ficha.Lote"
+                          OnBlur="@(() => Ficha.Lote = Ficha.Lote?.ToUpper())"
+                          Immediate="true"
+                          For="@(() => Ficha.Lote)"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudTextField Label="Dirección" @bind-Value="Ficha.Direccion"
+                          Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudSelect T="TipoUsoParcela?" Label="Tipo de Uso"
+                       @bind-Value="Ficha.TipoUso"
+                       Variant="Variant.Outlined" Margin="Margin.Dense"
+                       Clearable="true" Placeholder="Seleccione">
+                @foreach (TipoUsoParcela item in Enum.GetValues(typeof(TipoUsoParcela)))
+                {
+                    <MudSelectItem Value="@((TipoUsoParcela?)item)">@item.ToString()</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Descripción"
+                          @bind-Value="Ficha.DescripcionTipoUso"
+                          OnBlur="@(() => Ficha.DescripcionTipoUso = Ficha.DescripcionTipoUso?.ToUpper())"
+                          Immediate="true"
+                          For="@(() => Ficha.DescripcionTipoUso)"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudNumericField Label="Area Estimada" @bind-Value="Ficha.AreaEstimada"
+                             Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Diccionario"
+                             Label="Unidad de Medida"
+                             Placeholder="-- Seleccione una UDM --"
+                             SearchFunc="SearchUnidadMedida"
+                             Value="selectedUnidadMedida"
+                             ValueChanged="UnidadMedidaChanged"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudAutocomplete T="Diccionario"
+                             Label="Origen de la Tierra"
+                             Placeholder="-- Seleccione el Origen --"
+                             SearchFunc="SearchOrigenTierra"
+                             Value="selectedOrigenTierra"
+                             ValueChanged="OrigenTierraChanged"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+
+        <MudItem xs="12" sm="6" Class="d-flex justify-left">
+            <MudCheckBox Label="¿Posee Servidumbre?"
+                         @bind-Value="Ficha.Servidumbre"
+                         Color="Color.Primary"
+                         For="@(() => Ficha.Servidumbre)" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Diccionario"
+                             Label="Servidumbre de Agua"
+                             Placeholder="-- Seleccione un tipo --"
+                             SearchFunc="SearchServidumbreAgua"
+                             Value="selectedServidumbreAgua"
+                             ValueChanged="ServidumbreAguaChanged"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Diccionario"
+                             Label="Servidumbre de Pase"
+                             Placeholder="-- Seleccione un tipo --"
+                             SearchFunc="SearchServidumbrePase"
+                             Value="selectedServidumbrePase"
+                             ValueChanged="ServidumbrePaseChanged"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="Diccionario"
+                             Label="Servidumbre (Otra)"
+                             Placeholder="-- Seleccione un tipo --"
+                             SearchFunc="SearchServidumbreOtra"
+                             Value="selectedServidumbreOtra"
+                             ValueChanged="ServidumbreOtraChanged"
+                             Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" class="d-flex justify-end gap-2 mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+        </MudItem>
+    </MudGrid>
+</EditForm>

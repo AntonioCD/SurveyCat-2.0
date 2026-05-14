@@ -15,13 +15,14 @@ public partial class EditUser
 {
     private User? user;
     private bool loading = true;
-    private string? imageUrl;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private ILoginService LoginService { get; set; } = null!;
+
+    [Parameter] public Guid UserId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,7 +38,7 @@ public partial class EditUser
 
     private async Task LoadUserAsync()
     {
-        var responseHttp = await Repository.GetAsync<User>($"/api/accounts");
+        var responseHttp = await Repository.GetAsync<User>($"/api/accounts/{UserId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
@@ -70,7 +71,7 @@ public partial class EditUser
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/users");
     }
 
     private void InvalidForm()

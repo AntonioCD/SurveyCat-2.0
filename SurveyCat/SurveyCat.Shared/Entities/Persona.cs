@@ -138,6 +138,8 @@ public class Persona
     [MaxLength(450, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
     public string? UpdaterUserId { get; set; }
 
+    public ICollection<Ficha>? Fichas { get; set; }
+
     // --- LÓGICA DE APOYO ---
 
     private void ActualizarNombreCompleto()

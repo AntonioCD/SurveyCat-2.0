@@ -4,6 +4,7 @@ using SurveyCat.Backend.Data;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
+using SurveyCat.Shared.Responses;
 
 namespace SurveyCat.Backend.Repositories.Implementations;
 
@@ -20,6 +21,48 @@ public class UsersRepository : IUsersRepository
         _userManager = userManager;
         _roleManager = roleManager;
         _signInManager = signInManager;
+    }
+
+    public async Task<ActionResponse<IEnumerable<User>>> GetAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Users
+            .Include(m => m.PersonalEncuesta)
+            .ThenInclude(p => p.Persona)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.PersonalEncuesta!.Persona!.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
+        return new ActionResponse<IEnumerable<User>>
+        {
+            WasSuccess = true,
+            Result = await queryable
+                .OrderBy(x => x.PersonalEncuesta!.Persona!.NombreCompleto)
+                .Paginate(pagination)
+                .ToListAsync()
+        };
+    }
+
+    public async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+    {
+        var queryable = _context.Users
+            .Include(m => m.PersonalEncuesta)
+            .ThenInclude(p => p.Persona)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        {
+            queryable = queryable.Where(x => x.PersonalEncuesta!.Persona!.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
+        double count = await queryable.CountAsync();
+        return new ActionResponse<int>
+        {
+            WasSuccess = true,
+            Result = (int)count
+        };
     }
 
     public async Task<User> GetUserAsync(Guid userId)

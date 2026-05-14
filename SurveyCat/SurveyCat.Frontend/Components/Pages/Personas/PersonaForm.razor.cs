@@ -5,7 +5,6 @@ using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Constants;
 using SurveyCat.Shared.Entities;
 using System.Diagnostics.Metrics;
-using static MudBlazor.Colors;
 
 namespace SurveyCat.Frontend.Components.Pages.Personas;
 

@@ -22,4 +22,6 @@ public class Caserio
 
     public int ComarcaId { get; set; }
     public BarrioComarca? Comarca { get; set; }
+
+    public ICollection<Ficha>? Fichas { get; set; }
 }

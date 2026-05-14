@@ -11,26 +11,19 @@ namespace SurveyCat.Backend.Controllers;
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Route("api/[controller]")]
-public class PersonasController : GenericController<Persona>
+public class FichasController : GenericController<Ficha>
 {
-    private readonly IPersonasUnitOfWork _personasUnitOfWork;
+    private readonly IFichasUnitOfWork _fichasUnitOfWork;
 
-    public PersonasController(IGenericUnitOfWork<Persona> unitOfWork, IPersonasUnitOfWork personasUnitOfWork) : base(unitOfWork)
+    public FichasController(IGenericUnitOfWork<Ficha> unitOfWork, IFichasUnitOfWork fichasUnitOfWork) : base(unitOfWork)
     {
-        _personasUnitOfWork = personasUnitOfWork;
-    }
-
-    [AllowAnonymous]
-    [HttpGet("combo")]
-    public async Task<IActionResult> GetComboAsync()
-    {
-        return Ok(await _personasUnitOfWork.GetComboAsync());
+        _fichasUnitOfWork = fichasUnitOfWork;
     }
 
     [HttpGet("paginated")]
     public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
     {
-        var response = await _personasUnitOfWork.GetAsync(pagination);
+        var response = await _fichasUnitOfWork.GetAsync(pagination);
         if (response.WasSuccess)
         {
             return Ok(response.Result);
@@ -41,7 +34,7 @@ public class PersonasController : GenericController<Persona>
     [HttpGet("totalRecords")]
     public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
     {
-        var action = await _personasUnitOfWork.GetTotalRecordsAsync(pagination);
+        var action = await _fichasUnitOfWork.GetTotalRecordsAsync(pagination);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
@@ -52,7 +45,7 @@ public class PersonasController : GenericController<Persona>
     [HttpGet("{id:long}")]
     public async Task<IActionResult> GetAsync(long id)
     {
-        var response = await _personasUnitOfWork.GetAsync(id);
+        var response = await _fichasUnitOfWork.GetAsync(id);
         if (response.WasSuccess)
         {
             return Ok(response.Result);

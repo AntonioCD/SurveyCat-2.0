@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
@@ -23,6 +24,28 @@ public class AccountsController : ControllerBase
     {
         _usersUnitOfWork = usersUnitOfWork;
         _configuration = configuration;
+    }
+
+    [HttpGet("paginated")]
+    public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+    {
+        var response = await _usersUnitOfWork.GetAsync(pagination);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest();
+    }
+
+    [HttpGet("totalRecords")]
+    public async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+    {
+        var action = await _usersUnitOfWork.GetTotalRecordsAsync(pagination);
+        if (action.WasSuccess)
+        {
+            return Ok(action.Result);
+        }
+        return BadRequest();
     }
 
     [HttpPost("changePassword")]
@@ -82,6 +105,12 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> GetAsync()
     {
         return Ok(await _usersUnitOfWork.GetUserAsync(User.Identity!.Name!));
+    }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetAsync(Guid userId)
+    {
+        return Ok(await _usersUnitOfWork.GetUserAsync(userId));
     }
 
     [HttpPost("CreateUser")]

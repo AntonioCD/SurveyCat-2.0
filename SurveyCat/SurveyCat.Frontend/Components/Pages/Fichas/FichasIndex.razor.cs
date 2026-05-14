@@ -1,21 +1,21 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SurveyCat.Frontend.Components.Pages.Personas;
+using SurveyCat.Frontend.Components.Pages.Fichas;
 using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 using System.Net;
 
-namespace SurveyCat.Frontend.Components.Pages.Personas;
+namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
-public partial class PersonasIndex
+public partial class FichasIndex
 {
-    private List<Persona>? Personas { get; set; }
-    private MudTable<Persona> table = new();
+    private List<Ficha>? Fichas { get; set; }
+    private MudTable<Ficha> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/personas";
+    private const string baseUrl = "api/fichas";
     private string infoFormat = "{first_item}-{last_item} => {all_items}";
 
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -52,7 +52,7 @@ public partial class PersonasIndex
         loading = false;
     }
 
-    private async Task<TableData<Persona>> LoadListAsync(TableState state, CancellationToken cancellationToken)
+    private async Task<TableData<Ficha>> LoadListAsync(TableState state, CancellationToken cancellationToken)
     {
         int page = state.Page + 1;
         int pageSize = state.PageSize;
@@ -63,27 +63,27 @@ public partial class PersonasIndex
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<Persona>>(url);
+        var responseHttp = await Repository.GetAsync<List<Ficha>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<Persona> { Items = [], TotalItems = 0 };
+            return new TableData<Ficha> { Items = [], TotalItems = 0 };
         }
         if (responseHttp.Response == null)
         {
-            return new TableData<Persona> { Items = [], TotalItems = 0 };
+            return new TableData<Ficha> { Items = [], TotalItems = 0 };
         }
-        return new TableData<Persona>
+        return new TableData<Ficha>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
         };
     }
 
-    private void StatesAction(Persona persona)
+    private void StatesAction(Ficha ficha)
     {
-        NavigationManager.NavigateTo($"/personas/details/{persona.Id}");
+        NavigationManager.NavigateTo($"/fichas/details/{ficha.Id}");
     }
 
     private async Task SetFilterValue(string value)
@@ -106,13 +106,13 @@ public partial class PersonasIndex
         if (isEdit)
         {
             var parameters = new DialogParameters
-        {
-            { "Id", id }
-        }; dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
+            {
+                { "Id", id }
+            }; dialog = await DialogService.ShowAsync<FichaEdit>("Editar Ficha", parameters, options);
         }
         else
         {
-            dialog = await DialogService.ShowAsync<PersonaCreate>("Nueva Persona", options);
+            dialog = await DialogService.ShowAsync<FichaCreate>("Nueva Ficha", options);
         }
 
         var result = await dialog.Result;
@@ -123,12 +123,12 @@ public partial class PersonasIndex
         }
     }
 
-    private async Task DeleteAsync(Persona persona)
+    private async Task DeleteAsync(Ficha ficha)
     {
         var parameters = new DialogParameters
-    {
-        { "Message", $"Estas seguro de borrar el persona: {persona.NombreCompleto}" }
-    };
+        {
+            { "Message", $"Estas seguro de borrar la ficha: {ficha.CodEncuesta}" }
+        };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
         var result = await dialog.Result;
@@ -137,12 +137,12 @@ public partial class PersonasIndex
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"{baseUrl}/{persona.Id}");
+        var responseHttp = await Repository.DeleteAsync($"{baseUrl}/{ficha.Id}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("/personas");
+                NavigationManager.NavigateTo("/fichas");
             }
             else
             {
