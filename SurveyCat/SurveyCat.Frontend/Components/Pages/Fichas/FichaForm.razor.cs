@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
+using SurveyCat.Frontend.Components.Pages.Personas;
+using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Constants;
 using SurveyCat.Shared.Entities;
+using SurveyCat.Shared.Enums;
+using System.Buffers.Text;
 
 namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
@@ -22,6 +26,12 @@ public partial class FichaForm
     private List<Sector>? sectores;
     private List<BarrioComarca>? barriosComarcas;
     private List<Caserio>? caserios;
+    private List<PersonalEncuesta>? personalEncuestas;
+    private List<PersonalEncuesta>? listaEncuestadores;
+    private List<PersonalEncuesta>? listaTecnicosCatastrales;
+    private List<PersonalEncuesta>? listaSupervisores;
+
+    private Persona? informante = new();
 
     private Diccionario? selectedUnidadMedida = new();
     private Diccionario? selectedEstado = new();
@@ -36,9 +46,13 @@ public partial class FichaForm
     private Sector? selectedSector = new();
     private BarrioComarca? selectedBarrioComarca = new();
     private Caserio? selectedCaserio = new();
+    private PersonalEncuesta selectedEncuestador = new();
+    private PersonalEncuesta selectedTecnicoCatastral = new();
+    private PersonalEncuesta selectedSupervisor = new();
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     [EditorRequired, Parameter] public Ficha Ficha { get; set; } = null!;
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
@@ -50,6 +64,7 @@ public partial class FichaForm
 
         // Cargamos lo básico que siempre debe estar (Catálogos y Deptos)
         await LoadDiccionariosAsync();
+        await LoadPersonalEncuestaAsync();
         await LoadDepartamentosAsync();
 
         if (Ficha.Id != 0)
@@ -91,6 +106,28 @@ public partial class FichaForm
             selectedServidumbreAgua = Ficha.ServidumbreAgua;
             selectedServidumbrePase = Ficha.ServidumbrePase;
             selectedServidumbreOtra = Ficha.ServidumbreOtra;
+        }
+    }
+
+    private async Task LoadPersonalEncuestaAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<PersonalEncuesta>>("/api/personalEncuestas/combo");
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+
+        personalEncuestas = responseHttp.Response;
+
+        if (personalEncuestas != null)
+        {
+
+            listaEncuestadores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Encuestador).ToList();
+            listaTecnicosCatastrales = personalEncuestas.Where(x => x.TipoRol == TipoRol.TécnicoCatastral).ToList();
+            listaSupervisores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Supervisor).ToList();
         }
     }
 
@@ -176,6 +213,24 @@ public partial class FichaForm
             return;
         }
         caserios = responseHttp.Response;
+    }
+
+    private void EncuestadorChanged(PersonalEncuesta encuestador)
+    {
+        selectedEncuestador = encuestador;
+        Ficha.EncuestadorId = encuestador.Id;
+    }
+
+    private void TecnicoCatastralChanged(PersonalEncuesta tecnicoCatastral)
+    {
+        selectedTecnicoCatastral = tecnicoCatastral;
+        Ficha.TecnicoCatastralId = tecnicoCatastral.Id;
+    }
+
+    private void SupervisorChanged(PersonalEncuesta supervisor)
+    {
+        selectedSupervisor = supervisor;
+        Ficha.CoordinadorId = supervisor.Id;
     }
 
     private void UnidadMedidaChanged(Diccionario unidadMedida)
@@ -270,6 +325,45 @@ public partial class FichaForm
     {
         selectedCaserio = caserio;
         Ficha.CaserioId = caserio.Id;
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchEncuestador(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return listaEncuestadores!;
+        }
+
+        return listaEncuestadores!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchTecnicoCatastral(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return listaTecnicosCatastrales!;
+        }
+
+        return listaTecnicosCatastrales!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchSupervisor(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return listaSupervisores!;
+        }
+
+        return listaSupervisores!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
     }
 
     private async Task<IEnumerable<Diccionario>> SearchUnidadMedida(string searchText, CancellationToken token)
@@ -439,5 +533,26 @@ public partial class FichaForm
         return caserios!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
             .ToList();
+    }
+
+    private async Task ShowModalPersonaSearchAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true
+        };
+        IDialogReference? dialog;
+
+        dialog = await DialogService.ShowAsync<PersonaSearch>();
+
+        var result = await dialog.Result;
+        if (result!.Canceled!)
+        {
+            //await LoadTotalRecordsAsync();
+            //await table.ReloadServerData();
+        }
     }
 }

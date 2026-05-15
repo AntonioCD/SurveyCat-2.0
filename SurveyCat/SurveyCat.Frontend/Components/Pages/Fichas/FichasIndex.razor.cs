@@ -112,15 +112,17 @@ public partial class FichasIndex
         }
         else
         {
-            dialog = await DialogService.ShowAsync<FichaCreate>("Nueva Ficha", options);
+            NavigationManager.NavigateTo($"/fichas/create");
+
+            //dialog = await DialogService.ShowAsync<FichaCreate>("Nueva Ficha", options);
         }
 
-        var result = await dialog.Result;
-        if (result!.Canceled!)
-        {
-            await LoadTotalRecordsAsync();
-            await table.ReloadServerData();
-        }
+        //var result = await dialog.Result;
+        //if (result!.Canceled!)
+        //{
+        //    await LoadTotalRecordsAsync();
+        //    await table.ReloadServerData();
+        //}
     }
 
     private async Task DeleteAsync(Ficha ficha)
