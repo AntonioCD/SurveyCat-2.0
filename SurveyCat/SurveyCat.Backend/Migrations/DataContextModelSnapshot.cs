@@ -186,7 +186,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("MunicipioId");
 
-                    b.ToTable("BarriosComarcas");
+                    b.ToTable("BarriosComarcas", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Caserio", b =>
@@ -215,7 +215,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("ComarcaId");
 
-                    b.ToTable("Caserios");
+                    b.ToTable("Caserios", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Departamento", b =>
@@ -247,7 +247,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("Nombre")
                         .IsUnique();
 
-                    b.ToTable("Departamentos");
+                    b.ToTable("Departamentos", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Diccionario", b =>
@@ -287,7 +287,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("Catalogo", "Nombre")
                         .IsUnique();
 
-                    b.ToTable("Diccionarios");
+                    b.ToTable("Diccionarios", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Ficha", b =>
@@ -455,7 +455,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Fichas");
+                    b.ToTable("Fichas", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Municipio", b =>
@@ -489,7 +489,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("DepartamentoId");
 
-                    b.ToTable("Municipios");
+                    b.ToTable("Municipios", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Persona", b =>
@@ -600,7 +600,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("TipoPersonaJuridicaId");
 
-                    b.ToTable("Personas");
+                    b.ToTable("Personas", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.PersonalEncuesta", b =>
@@ -640,7 +640,7 @@ namespace SurveyCat.Backend.Migrations
                         .IsUnique()
                         .HasFilter("[UserId] IS NOT NULL");
 
-                    b.ToTable("PersonalEncuestas");
+                    b.ToTable("PersonalEncuestas", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Sector", b =>
@@ -677,7 +677,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("MunicipioId", "NumeroSector")
                         .IsUnique();
 
-                    b.ToTable("Sectores");
+                    b.ToTable("Sectores", (string)null);
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.User", b =>

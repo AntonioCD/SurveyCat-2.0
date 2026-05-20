@@ -56,7 +56,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
 
     public async Task<ActionResponse<Ficha>> GetAsync(long id)
     {
-        var persona = await _context.Fichas
+        var ficha = await _context.Fichas
              .Include(p => p.Municipio).ThenInclude(m => m!.Departamento)
              .Include(p => p.Sector)
              .Include(m => m.BarrioComarca)
@@ -74,7 +74,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
              .Include(p => p.ServidumbreOtra)
              .FirstOrDefaultAsync(m => m.Id == id);
 
-        if (persona == null)
+        if (ficha == null)
         {
             return new ActionResponse<Ficha>
             {
@@ -86,7 +86,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
         return new ActionResponse<Ficha>
         {
             WasSuccess = true,
-            Result = persona
+            Result = ficha
         };
     }
 }

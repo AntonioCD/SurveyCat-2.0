@@ -1,53 +1,54 @@
 ﻿<MudDialog>
     <DialogContent>
-        <MudTable Items="@Personas"
-                  @ref="tablePersonas"
+        <MudTable @ref="tablePersonas"
                   ServerData="LoadListPersonasAsync"
                   Dense="true"
                   Hover="true"
                   Striped="true"
                   FixedHeader="true"
-                  FixedFooter="true">
+                  FixedFooter="true"
+                  Elevation="0">
             <ToolBarContent>
-                <div class="d-flex justify-content-between">
-                    <MudText Typo="Typo.h6" Class="me-4">DEPARTAMENTOS</MudText>
+                <div class="d-flex align-center">
+                    <MudText Typo="Typo.h6" Class="me-4">BUSCAR PERSONA</MudText>
                     <MudButton Variant="Variant.Outlined"
                                EndIcon="@Icons.Material.Filled.Add"
-                               Color="Color.Info">
-    
+                               Color="Color.Info"
+                               Size="Size.Small">
                         Nuevo
                     </MudButton>
                 </div>
                 <MudSpacer />
                 <FilterComponent @bind-FilterValue="Filter" ApplyFilter="SetFilterValuePersonas" />
             </ToolBarContent>
+
             <HeaderContent>
                 <MudTh>Identificación</MudTh>
-                <MudTh Style="width: 20%;">Nombre Completo | RUC</MudTh>
-                <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
+                <MudTh Style="width: 70%;">Nombre Completo | RUC</MudTh>
+                <MudTh Style="width: 10%; text-align: center;">Acción</MudTh>
             </HeaderContent>
 
             <RowTemplate Context="persona">
                 <MudTd DataLabel="Identificación">@persona.Identificacion</MudTd>
                 <MudTd DataLabel="Nombre Completo">@persona.NombreCompleto</MudTd>
-                <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
-                    <div class="d-flex justify-center">
-                        <MudTooltip Text="Seleccionar">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                           Variant="Variant.Outlined"
-                                           Color="Color.Warning"
-                                           Size="Size.Medium"
-                                           Class="mr-2" />
-                        </MudTooltip>
-                    </div>
+                <MudTd DataLabel="Acción" Style="text-align: center; white-space: nowrap;">
+                    <MudTooltip Text="Seleccionar Persona">
+                        @* Cambiamos el botón para que ejecute la selección *@
+                        <MudIconButton Icon="@Icons.Material.Filled.CheckCircle"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       Size="Size.Small"
+                                       OnClick="@(() => SeleccionarPersona(persona))" />
+                    </MudTooltip>
                 </MudTd>
             </RowTemplate>
 
             <NoRecordsContent>
-                <MudText>"No hay registros"</MudText>
+                <MudText Class="pa-4" Align="Align.Center">No se encontraron registros</MudText>
             </NoRecordsContent>
+
             <PagerContent>
-                <MudTablePager RowsPerPageString="Número de registros"
+                <MudTablePager RowsPerPageString="Registros por página:"
                                PageSizeOptions="pageSizeOptions"
                                AllItemsText="Todo"
                                InfoFormat="@infoFormat" />

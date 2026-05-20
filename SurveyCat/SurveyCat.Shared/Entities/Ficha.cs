@@ -60,7 +60,7 @@ public class Ficha
     public string? CodParcela { get; set; }
 
     [Display(Name = "Código de Encuesta")]
-    [Required]
+    [Required(ErrorMessage = "El código de encuesta no ha sido generado.")]
     [MaxLength(20)]
     public string CodEncuesta { get; set; } = null!;
 
@@ -135,7 +135,7 @@ public class Ficha
     // =========================================
 
     [Display(Name = "¿Tiene Servidumbre?")]
-    public bool Servidumbre { get; set; }
+    public bool Servidumbre { get; set; } = false;
 
     [Display(Name = "Tipo Servidumbre Agua")]
     public int? ServidumbreAguaId { get; set; }
@@ -160,7 +160,7 @@ public class Ficha
     // =========================================
 
     [Display(Name = "¿Presenta Conflicto?")]
-    public bool PresentaConflicto { get; set; }
+    public bool PresentaConflicto { get; set; } = false;
 
     // =========================================
     // CONTROL
@@ -171,7 +171,7 @@ public class Ficha
     public DateTime FechaEncuesta { get; set; } = DateTime.UtcNow;
 
     [Display(Name = "¿Verificada por el Coordinador?")]
-    public bool VerificadoCoordinador { get; set; }
+    public bool VerificadoCoordinador { get; set; } = false;
 
     [Display(Name = "Estado")]
     [Range(1, int.MaxValue, ErrorMessage = "Seleccione un Estado.")]
@@ -224,6 +224,13 @@ public class Ficha
     [Display(Name = "Actualizado Por")]
     [MaxLength(450)]
     public string? UpdaterUserId { get; set; }
+
+    // =========================================
+    // NOT MAPPED
+    // =========================================
+    [NotMapped]
+    [Display(Name = "Consecutivo")]
+    public string? Consecutivo { get; set; }
 
     // =========================================
     // COLECCIONES

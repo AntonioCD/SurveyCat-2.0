@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Pages.Personas;
 using SurveyCat.Frontend.Components.Shared;
@@ -8,6 +9,8 @@ using SurveyCat.Shared.Constants;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Enums;
 using System.Buffers.Text;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
@@ -106,6 +109,12 @@ public partial class FichaForm
             selectedServidumbreAgua = Ficha.ServidumbreAgua;
             selectedServidumbrePase = Ficha.ServidumbrePase;
             selectedServidumbreOtra = Ficha.ServidumbreOtra;
+        } else
+        {
+            Ficha.EstadoId = listaEstado
+                .Where(e => e.Nombre.Contains("Digitado"))
+                .Select(e => e.Id)
+                .FirstOrDefault();
         }
     }
 
@@ -124,7 +133,6 @@ public partial class FichaForm
 
         if (personalEncuestas != null)
         {
-
             listaEncuestadores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Encuestador).ToList();
             listaTecnicosCatastrales = personalEncuestas.Where(x => x.TipoRol == TipoRol.TécnicoCatastral).ToList();
             listaSupervisores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Supervisor).ToList();
@@ -225,6 +233,8 @@ public partial class FichaForm
     {
         selectedTecnicoCatastral = tecnicoCatastral;
         Ficha.TecnicoCatastralId = tecnicoCatastral.Id;
+
+        GenerarCodigoEncuesta();
     }
 
     private void SupervisorChanged(PersonalEncuesta supervisor)
@@ -283,6 +293,9 @@ public partial class FichaForm
 
     private async Task DepartamentoChangedAsync(Departamento departamento)
     {
+        if (departamento == null)
+            return;
+
         selectedDepartamento = departamento;
         selectedMunicipio = new Municipio();
         selectedBarrioComarca = new BarrioComarca();
@@ -295,25 +308,36 @@ public partial class FichaForm
 
     private async Task MunicipioChangedAsync(Municipio municipio)
     {
-        selectedMunicipio = municipio;
-        Ficha.MunicipioId = municipio.Id;
-        selectedSector = new Sector();
-        selectedBarrioComarca = new BarrioComarca();
-        selectedCaserio = new Caserio();
-        barriosComarcas = null;
-        caserios = null!;
-        await LoadSectoresAsync(municipio.Id);
-        await LoadBarriosComarcasAsync(municipio.Id);
+        if (municipio == null)
+            return;
+
+            selectedMunicipio = municipio;
+            Ficha.MunicipioId = municipio.Id;
+            selectedSector = new Sector();
+            selectedBarrioComarca = new BarrioComarca();
+            selectedCaserio = new Caserio();
+            barriosComarcas = null;
+            caserios = null!;
+            await LoadSectoresAsync(municipio.Id);
+            await LoadBarriosComarcasAsync(municipio.Id);
+            GenerarCodigoEncuesta(); 
     }
 
     private void SectorChanged(Sector sector)
     {
+        if (sector == null)
+            return;
+
         selectedSector = sector;
-        Ficha.SectorId = sector.Id;
+        Ficha.SectorId = sector!.Id;
+        GenerarCodigoEncuesta();
     }
 
     private async Task BarrioComarcaChangedAsync(BarrioComarca barrioComarca)
     {
+        if (barrioComarca == null)
+            return;
+
         selectedBarrioComarca = barrioComarca;
         Ficha.BarrioComarcaId = barrioComarca.Id;
         selectedCaserio = new Caserio();
@@ -323,6 +347,9 @@ public partial class FichaForm
 
     private void CaserioChanged(Caserio caserio)
     {
+        if (caserio == null)
+            return;
+
         selectedCaserio = caserio;
         Ficha.CaserioId = caserio.Id;
     }
@@ -544,15 +571,87 @@ public partial class FichaForm
             MaxWidth = MaxWidth.Large,
             FullWidth = true
         };
-        IDialogReference? dialog;
 
-        dialog = await DialogService.ShowAsync<PersonaSearch>();
-
+        var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", options);
         var result = await dialog.Result;
-        if (result!.Canceled!)
+
+        // Verificamos si el usuario seleccionó un registro en el modal
+        if (!result.Canceled && result.Data is Persona personaSeleccionada)
         {
-            //await LoadTotalRecordsAsync();
-            //await table.ReloadServerData();
+            // 1. LLAMADO ASÍNCRONO: Esperamos a que la API traiga los detalles completos
+            var informanteResult = await GetPersonaDetails(personaSeleccionada.Id);
+
+            // 2. VALIDACIÓN: Evaluamos si devolvió a la persona o si falló (null)
+            if (informanteResult != null)
+            {
+                // Asignamos el resultado a la variable que maneja tu formulario
+                informante = informanteResult;
+                Ficha.InformanteId = informante.Id;
+
+                // Si necesitas refrescar cascadas asociadas al informante (municipios, depto, etc.), este es el lugar:
+                // await CargarCascadasDelInformanteAsync(informante);
+
+                Snackbar.Add("Datos del entrevistado cargados con éxito.", Severity.Success);
+            }
+            else
+            {
+                // Opcional: Lógica en caso de que no se haya podido recuperar la data completa
+                Snackbar.Add("No se pudieron cargar los datos del entrevistado.", Severity.Warning);
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task<Persona?> GetPersonaDetails(long personaId)
+    {
+        var responseHttp = await Repository.GetAsync<Persona>($"api/personas/{personaId}");
+
+        if (responseHttp.Error)
+        {
+            var messageError = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(messageError!, Severity.Error);
+            return null; // Retorna null en caso de error
+        }
+
+        if (responseHttp.Response == null)
+        {
+            Snackbar.Add("No se encontraron los detalles de la persona.", Severity.Warning);
+            return null; // Retorna null si la API respondió vacío
+        }
+
+        return responseHttp.Response; // Retorna la Persona encontrada con éxito
+    }
+
+    private void GenerarCodigoEncuesta()
+    {
+        // 1. Validar que tengamos las selecciones y el consecutivo relleno con texto válido
+        if (selectedTecnicoCatastral.Id != 0 &&
+            selectedMunicipio!.Id != 0 &&
+            selectedSector!.Id != 0 &&
+            (!string.IsNullOrWhiteSpace(Ficha.Consecutivo) && Ficha.Consecutivo.Length == 4))
+        {
+            // Extraemos la inicial de forma segura
+            string inicial = selectedSector?.NumeroSector?.Substring(0, 1).ToUpper() ?? "";
+
+            // Evaluamos con un switch expression moderno
+            string sector = inicial switch
+            {
+                "R" => "RUR",
+                "U" => "URB",
+                _ => "000"
+            };
+            string codMuni = selectedMunicipio.CodMuni;
+            string codTecnico = selectedTecnicoCatastral.Codigo;
+            string consecutivo = Ficha.Consecutivo;
+
+            // 2. Asignar el valor final combinado
+            Ficha.CodEncuesta = $"{sector}{codMuni}{codTecnico}{codTecnico}{consecutivo}";
+        }
+        else
+        {
+            // Si el usuario limpia un campo o no ha terminado, el código superior permanece vacío
+            Ficha.CodEncuesta = string.Empty;
         }
     }
 }

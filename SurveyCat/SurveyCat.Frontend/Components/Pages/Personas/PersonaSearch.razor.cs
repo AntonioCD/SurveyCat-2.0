@@ -7,6 +7,9 @@ namespace SurveyCat.Frontend.Components.Pages.Personas;
 
 public partial class PersonaSearch
 {
+    [CascadingParameter]
+    public IMudDialogInstance MudDialog { get; set; } = null!;
+
     private List<Persona>? Personas { get; set; }
     private MudTable<Persona> tablePersonas = new();
     private int personasTotalRecords = 0;
@@ -23,6 +26,16 @@ public partial class PersonaSearch
     protected override async Task OnInitializedAsync()
     {
         await LoadTotalRecordsPersonasAsync();
+    }
+
+    private void SeleccionarPersona(Persona persona)
+    {
+        MudDialog.Close(DialogResult.Ok(persona));
+    }
+
+    private void Cancelar()
+    {
+        MudDialog.Cancel();
     }
 
     private async Task LoadTotalRecordsPersonasAsync()
@@ -82,4 +95,16 @@ public partial class PersonaSearch
         await LoadTotalRecordsPersonasAsync();
         await tablePersonas.ReloadServerData();
     }
+
+    //// Este método se encargará de mandar la persona seleccionada de vuelta a Ficha
+    //private void SeleccionarPersona(Persona persona)
+    //{
+    //    // Cerramos el diálogo enviando un Ok y el objeto completo
+    //    MudDialog.CloseAsync(DialogResult.Ok(persona));
+    //}
+
+    //private void Cancelar()
+    //{
+    //    MudDialog.CloseAsync();
+    //}
 }

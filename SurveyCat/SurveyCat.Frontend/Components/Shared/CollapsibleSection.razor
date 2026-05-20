@@ -1,0 +1,17 @@
+﻿<MudItem xs="12">
+    <MudPaper Class="pa-4" Elevation="0" Outlined="true" Style="border-radius: 8px; border-color: #c9c9c9; border-width: 2px;">
+        <div @onclick="ToggleSection"
+             Style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+            <MudText Typo="Typo.h6" Color="Color.Primary" Style="display: flex; align-items: center;">
+                <MudIcon Icon="@Icon" Size="Size.Small" Class="mr-1" Style="display: inline-flex; align-items: center;" />
+                @Title
+            </MudText>
+            <MudIcon Icon="@(IsCollapsed? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ExpandLess)"
+                     Size="Size.Medium" Color="Color.Primary" />
+        </div>
+
+        <MudCollapse Collapsed="@IsCollapsed">
+            @ChildContent
+        </MudCollapse>
+    </MudPaper>
+</MudItem>
