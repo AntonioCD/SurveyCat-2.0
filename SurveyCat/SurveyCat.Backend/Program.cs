@@ -30,6 +30,7 @@ builder.Services.AddScoped<IFichasRepository, FichasRepository>();
 builder.Services.AddScoped<IMunicipiosRepository, MunicipiosRepository>();
 builder.Services.AddScoped<IPersonalEncuestasRepository, PersonalEncuestasRepository>();
 builder.Services.AddScoped<IPersonasRepository, PersonasRepository>();
+builder.Services.AddScoped<IPropietariosRepository, PropietariosRepository>();
 builder.Services.AddScoped<ISectoresRepository, SectoresRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IDiccionariosUnitOfWork, DiccionariosUnitOfWork>();
 builder.Services.AddScoped<IFichasUnitOfWork, FichasUnitOfWork>();
 builder.Services.AddScoped<IMunicipiosUnitOfWork, MunicipiosUnitOfWork>();
 builder.Services.AddScoped<IPersonalEncuestasUnitOfWork, PersonalEncuestasUnitOfWork>();
+builder.Services.AddScoped<IPropietariosUnitOfWork, PropietariosUnitOfWork>();
 builder.Services.AddScoped<IPersonasUnitOfWork, PersonasUnitOfWork>();
 builder.Services.AddScoped<ISectoresUnitOfWork, SectoresUnitOfWork>();
 builder.Services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();

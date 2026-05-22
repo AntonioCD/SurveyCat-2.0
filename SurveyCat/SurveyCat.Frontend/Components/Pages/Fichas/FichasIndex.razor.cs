@@ -83,7 +83,7 @@ public partial class FichasIndex
 
     private void StatesAction(Ficha ficha)
     {
-        NavigationManager.NavigateTo($"/fichas/details/{ficha.Id}");
+        NavigationManager.NavigateTo($"/fichas/propietarios/details/{ficha.Id}");
     }
 
     private async Task SetFilterValue(string value)

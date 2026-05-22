@@ -18,6 +18,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<Municipio> Municipios { get; set; }
         public DbSet<Persona> Personas { get; set; }
         public DbSet<PersonalEncuesta> PersonalEncuestas { get; set; }
+        public DbSet<Propietario> Propietarios { get; set; }
         public DbSet<Sector> Sectores { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -85,6 +86,11 @@ namespace SurveyCat.Backend.Data
             modelBuilder.Entity<PersonalEncuesta>(e =>
             {
                 e.HasIndex(x => x.PersonaId).IsUnique();
+            });
+
+            modelBuilder.Entity<Propietario>(e =>
+            {
+                e.HasIndex(x => new { x.FichaId, x.PersonaId }).IsUnique();
             });
 
             modelBuilder.Entity<Sector>(e =>

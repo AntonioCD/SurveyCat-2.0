@@ -236,7 +236,7 @@ public class Ficha
     // COLECCIONES
     // =========================================
 
-    //public ICollection<Propietario> Propietarios { get; set; } = new List<Propietario>();
+    public ICollection<Propietario>? Propietarios { get; set; }
 
     //public ICollection<Familia> Familias { get; set; } = new List<Familia>();
 
@@ -245,4 +245,10 @@ public class Ficha
     //public ICollection<DocumentoAnexo> DocumentosAnexos { get; set; } = new List<DocumentoAnexo>();
 
     //public ICollection<Conflicto> Conflictos { get; set; } = new List<Conflicto>();
+
+    // =========================================
+    // CONTADORES
+    // =========================================
+
+    public int PropietariosNumber => Propietarios == null ? 0 : Propietarios.Count;
 }

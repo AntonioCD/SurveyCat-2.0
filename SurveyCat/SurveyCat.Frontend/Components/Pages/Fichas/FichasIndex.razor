@@ -28,10 +28,10 @@ else
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="width: 20%;">Municipio</MudTh>
-            <MudTh Style="width: 10%;">Sector</MudTh>
-            <MudTh>CodEnc</MudTh>
-            <MudTh Style="width: 20%;">Encuestador</MudTh>
+            <MudTh Style="width: 20%;">Sector</MudTh>
+            <MudTh Style="width: 20%;">CodEnc</MudTh>
             <MudTh Style="width: 20%;">Estado</MudTh>
+            <MudTh Style="width: 20%;">Propietarios</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
 
@@ -39,8 +39,24 @@ else
             <MudTd DataLabel="Municipio">@(context.Municipio?.Nombre ?? "SD")</MudTd>
             <MudTd DataLabel="Sector">@(context.Sector?.NumeroSector ?? "SD")</MudTd>
             <MudTd DataLabel="CodEnc">@context.CodEncuesta</MudTd>
-            <MudTd DataLabel="Encuestador">@(context.Encuestador?.Persona?.NombreCompleto ?? "SD")</MudTd>
             <MudTd DataLabel="Estado">@(context.Estado?.Nombre ?? "SD")</MudTd>
+            <MudTd DataLabel="Propietarios">
+                <MudTooltip Text="Ver Propietarios">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Info"
+                               Size="Size.Medium"
+                               OnClick="@(() => StatesAction(@context))"
+                               Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
+                               Class="d-flex justify-space-between px-2">
+
+                        <span>@context.PropietariosNumber</span>
+
+                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
+                                 Size="Size.Small"
+                                 Class="ml-2" />
+                    </MudButton>
+                </MudTooltip>
+            </MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">

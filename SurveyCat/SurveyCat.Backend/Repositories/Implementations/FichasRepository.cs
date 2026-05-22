@@ -19,6 +19,10 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
     public override async Task<ActionResponse<IEnumerable<Ficha>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Fichas
+            .Include(f => f.Municipio)
+            .Include(f => f.Sector)
+            .Include(f => f.Propietarios)
+            .Include(f => f.Estado)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -72,6 +76,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
              .Include(p => p.ServidumbreAgua)
              .Include(p => p.ServidumbrePase)
              .Include(p => p.ServidumbreOtra)
+             .Include(p => p.Propietarios)
              .FirstOrDefaultAsync(m => m.Id == id);
 
         if (ficha == null)

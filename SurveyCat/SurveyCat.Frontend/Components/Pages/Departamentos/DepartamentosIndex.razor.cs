@@ -85,7 +85,7 @@ public partial class DepartamentosIndex
 
     private void StatesAction(Departamento departamento)
     {
-        NavigationManager.NavigateTo($"/departamentos/details/{departamento.Id}");
+        NavigationManager.NavigateTo($"/departamento/details/{departamento.Id}");
     }
 
     private async Task SetFilterValue(string value)
