@@ -7,20 +7,20 @@ using SurveyCat.Shared.Responses;
 
 namespace SurveyCat.Backend.Repositories.Implementations;
 
-public class PropietariosRepository : GenericRepository<Propietario>, IPropietariosRepository
+public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepository
 {
     private readonly DataContext _context;
 
-    public PropietariosRepository(DataContext context) : base(context)
+    public FamiliasRepository(DataContext context) : base(context)
     {
         _context = context;
     }
 
-    public override async Task<ActionResponse<IEnumerable<Propietario>>> GetAsync(PaginationDTO pagination)
+    public override async Task<ActionResponse<IEnumerable<Familia>>> GetAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Propietarios
-            .Include(p => p.Persona!)
-            .ThenInclude(p => p.TipoIdentificacion)
+        var queryable = _context.Familias
+            .Include(p => p.Persona)
+            .Include(p => p.Parentesco)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -28,7 +28,7 @@ public class PropietariosRepository : GenericRepository<Propietario>, IPropietar
             queryable = queryable.Where(x => x.Persona!.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
-        return new ActionResponse<IEnumerable<Propietario>>
+        return new ActionResponse<IEnumerable<Familia>>
         {
             WasSuccess = true,
             Result = await queryable
@@ -40,9 +40,9 @@ public class PropietariosRepository : GenericRepository<Propietario>, IPropietar
 
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Propietarios
+        var queryable = _context.Familias
             .Include(p => p.Persona)
-            .ThenInclude(p => p.TipoIdentificacion)
+            .Include(p => p.Parentesco)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -58,57 +58,57 @@ public class PropietariosRepository : GenericRepository<Propietario>, IPropietar
         };
     }
 
-    public async Task<ActionResponse<Propietario>> GetAsync(long id)
+    public async Task<ActionResponse<Familia>> GetAsync(long id)
     {
-        var propietario = await _context.Propietarios
+        var familia = await _context.Familias
             .Include(p => p.Persona)
-            .ThenInclude(p => p.TipoIdentificacion)
             .Include(p => p.Ficha)
+            .Include(p => p.Parentesco)
             .FirstOrDefaultAsync(m => m.Id == id);
 
-        if (propietario == null)
+        if (familia == null)
         {
-            return new ActionResponse<Propietario>
+            return new ActionResponse<Familia>
             {
                 WasSuccess = false,
-                Message = "Propietario no existe"
+                Message = "Familia no existe"
             };
         }
 
-        return new ActionResponse<Propietario>
+        return new ActionResponse<Familia>
         {
             WasSuccess = true,
-            Result = propietario
+            Result = familia
         };
     }
 
-    public async Task<ActionResponse<Propietario>> DeleteByLongAsync(long id)
+    public async Task<ActionResponse<Familia>> DeleteByLongAsync(long id)
     {
-        var propietario = await _context.Propietarios     
+        var familia = await _context.Familias
             .FirstOrDefaultAsync(m => m.Id == id);
 
-        if (propietario == null)
+        if (familia == null)
         {
-            return new ActionResponse<Propietario>
+            return new ActionResponse<Familia>
             {
                 WasSuccess = false,
-                Message = "Propietario no encontrado"
+                Message = "Familia no encontrada"
             };
         }
 
         try
         {
-            _context.Propietarios.Remove(propietario);
+            _context.Familias.Remove(familia);
             await _context.SaveChangesAsync();
 
-            return new ActionResponse<Propietario>
+            return new ActionResponse<Familia>
             {
                 WasSuccess = true,
             };
         }
         catch
         {
-            return new ActionResponse<Propietario>
+            return new ActionResponse<Familia>
             {
                 WasSuccess = false,
                 Message = "No se puede borrar, porque tiene registros relacionados"

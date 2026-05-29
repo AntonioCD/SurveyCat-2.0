@@ -1,23 +1,24 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Personas;
+namespace SurveyCat.Frontend.Components.Pages.Familias;
 
-public partial class PersonaCreate
+public partial class FamiliaCreate
 {
-    private Persona persona = new();
-
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
+    private Familia familia = new();
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
+    [Parameter] public int FichaId { get; set; }
+
     private async Task CreateAsync()
     {
-        var responseHttp = await Repository.PostAsync("/api/personas", persona);
+        familia.FichaId = FichaId;
+        var responseHttp = await Repository.PostAsync("/api/familias", familia);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -25,15 +26,12 @@ public partial class PersonaCreate
             return;
         }
 
-        //Return();
+        Return();
         Snackbar.Add("Registro creado", Severity.Success);
-
-        MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private void Cancelar()
+    private void Return()
     {
-        // Esto cierra el modal e iguala el comportamiento de la 'X' o la tecla Escape
-        MudDialog.Cancel();
+        NavigationManager.NavigateTo($"/fichas/familias/details/{FichaId}");
     }
 }

@@ -1,5 +1,3 @@
-﻿<h3>PropietarioEdit</h3>
+﻿@page "/propietarios/edit/{Id:int}/{FichaId:int}"
 
-@code {
-
-}
+<PropietarioForm Propietario="propietario" OnValidSubmit="EditAsync" ReturnAction="Return" />

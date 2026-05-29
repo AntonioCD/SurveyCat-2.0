@@ -26,6 +26,8 @@ public class Persona
     [Display(Name = "Tipo de Identificación")]
     public int? TipoIdentificacionId { get; set; }
 
+    public Diccionario? TipoIdentificacion { get; set; }
+
     [Display(Name = "No. Identificación")]
     [MaxLength(20, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
     public string? Identificacion
@@ -33,8 +35,6 @@ public class Persona
         get => _identificacion;
         set => _identificacion = value?.ToUpper();
     }
-
-    public Diccionario? TipoIdentificacion { get; set; }
 
     [Display(Name = "Primer Nombre")]
     [MaxLength(50, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]

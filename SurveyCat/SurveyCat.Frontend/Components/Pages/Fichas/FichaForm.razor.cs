@@ -61,9 +61,20 @@ public partial class FichaForm
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
     [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        editContext = new(Ficha);
+        if (Ficha == null)
+        {
+            Ficha = new Ficha();
+        }
+
+        // Recrear el EditContext si el modelo cambió
+        if (editContext == null || editContext.Model != Ficha)
+        {
+            editContext = new EditContext(Ficha);
+        }
+
+        //editContext = new(Ficha);
 
         // Cargamos lo básico que siempre debe estar (Catálogos y Deptos)
         await LoadDiccionariosAsync();
@@ -100,16 +111,26 @@ public partial class FichaForm
                 selectedCaserio = Ficha.Caserio;
             }
 
-            // 2. Asignación segura de objetos de diccionario
-            // Usamos el operador ?. para que si es null, la variable selected también sea null
-            selectedEstado = Ficha.Estado;
+            Ficha.Consecutivo = Ficha.CodEncuesta.Substring(Ficha.CodEncuesta.Length - 4);
+
+            selectedEncuestador = Ficha.Encuestador!;
+            selectedTecnicoCatastral = Ficha.TecnicoCatastral!;
+            selectedSupervisor = Ficha.Coordinador!;
+            selectedUnidadMedida = Ficha.UnidadMedida;
             selectedOrigenTierra = Ficha.OrigenTierra;
-            selectedRelacionInformanteParcela = Ficha.RelacionInformanteParcela;
-            selectedRelacionInformantePropietario = Ficha.RelacionInformantePropietario;
             selectedServidumbreAgua = Ficha.ServidumbreAgua;
             selectedServidumbrePase = Ficha.ServidumbrePase;
             selectedServidumbreOtra = Ficha.ServidumbreOtra;
-        } else
+            selectedEstado = Ficha.Estado;
+            selectedRelacionInformanteParcela = Ficha.RelacionInformanteParcela;
+            selectedRelacionInformantePropietario = Ficha.RelacionInformantePropietario;
+
+            if (informante == null || informante.Id != Ficha.InformanteId)
+            {
+                informante = await GetPersonaDetails(Ficha.InformanteId);
+            }
+        }
+        else
         {
             Ficha.EstadoId = listaEstado
                 .Where(e => e.Nombre.Contains("Digitado"))
@@ -311,16 +332,16 @@ public partial class FichaForm
         if (municipio == null)
             return;
 
-            selectedMunicipio = municipio;
-            Ficha.MunicipioId = municipio.Id;
-            selectedSector = new Sector();
-            selectedBarrioComarca = new BarrioComarca();
-            selectedCaserio = new Caserio();
-            barriosComarcas = null;
-            caserios = null!;
-            await LoadSectoresAsync(municipio.Id);
-            await LoadBarriosComarcasAsync(municipio.Id);
-            GenerarCodigoEncuesta(); 
+        selectedMunicipio = municipio;
+        Ficha.MunicipioId = municipio.Id;
+        selectedSector = new Sector();
+        selectedBarrioComarca = new BarrioComarca();
+        selectedCaserio = new Caserio();
+        barriosComarcas = null;
+        caserios = null!;
+        await LoadSectoresAsync(municipio.Id);
+        await LoadBarriosComarcasAsync(municipio.Id);
+        GenerarCodigoEncuesta();
     }
 
     private void SectorChanged(Sector sector)

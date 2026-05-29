@@ -11,5 +11,7 @@ namespace SurveyCat.Backend.UnitsOfWork.Interfaces
         Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
 
         Task<ActionResponse<Propietario>> GetAsync(long id);
+
+        Task<ActionResponse<Propietario>> DeleteByLongAsync(long id);
     }
 }

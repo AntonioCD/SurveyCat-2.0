@@ -1,4 +1,4 @@
-﻿@page "/fichas/propietarios/details/{FichaId:int}"
+﻿@page "/fichas/familias/details/{FichaId:int}"
 
 @if (loading)
 {
@@ -6,7 +6,7 @@
 }
 else
 {
-    <MudTable Items="@propietarios"
+    <MudTable Items="@familias"
               @ref="table"
               ServerData="LoadListAsync"
               Dense="true"
@@ -17,33 +17,29 @@ else
         <ToolBarContent>
             <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @ficha?.CodEncuesta</MudText>
             <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToPropietarioForm())">Crear</MudButton>
+            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToFamiliarForm())">Crear</MudButton>
             <MudSpacer />
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="width: 20%;">Nombre / Razon Social</MudTh>
-            <MudTh Style="width: 20%;">Tipo de Derecho</MudTh>
+            <MudTh Style="width: 20%;">Parentesco</MudTh>
+            <MudTh Style="width: 20%;">Nombre Completo</MudTh>
             <MudTh Style="width: 20%;">Identificación</MudTh>
-            <MudTh Style="width: 20%;">Tipo Identificación</MudTh>      
-            <MudTh Style="width: 20%;">¿Presenta Documento?</MudTh>
+            <MudTh Style="width: 20%;">Tipo Identificación</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Nombre o Razón Social">@context.Persona?.NombreCompleto</MudTd>
-            <MudTd DataLabel="Tipo de Derecho">@context.TipoDerecho</MudTd>
+            <MudTd DataLabel="Parentesco">@context.Parentesco?.Nombre</MudTd>
+            <MudTd DataLabel="Nombre Completo">@context.Persona?.NombreCompleto</MudTd>
             <MudTd DataLabel="Identificación">@context.Persona?.Identificacion</MudTd>
             <MudTd DataLabel="Tipo Identificación">@context.Persona?.TipoIdentificacion?.Nombre</MudTd>
-            <MudTd DataLabel="¿Presenta Documento?">
-                @(context.PresentaDocumento ? "Sí" : "No")
-            </MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Variant="Variant.Outlined"
                                        Color="Color.Warning"
-                                       OnClick="@(() => RedirectToPropietarioForm(context.Id, true))"
+                                       OnClick="@(() => RedirectToFamiliarForm(context.Id, true))"
                                        Size="Size.Medium"
                                        Class="mr-2" />
                     </MudTooltip>
@@ -68,4 +64,3 @@ else
         </PagerContent>
     </MudTable>
 }
-

@@ -21,5 +21,7 @@ namespace SurveyCat.Backend.UnitsOfWork.Implementations
         public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _fichasRepository.GetTotalRecordsAsync(pagination);
 
         public async Task<ActionResponse<Ficha>> GetAsync(long id) => await _fichasRepository.GetAsync(id);
+
+        public async Task<ActionResponse<Ficha>> DeleteByLongAsync(long id) => await _fichasRepository.DeleteByLongAsync(id);
     }
 }

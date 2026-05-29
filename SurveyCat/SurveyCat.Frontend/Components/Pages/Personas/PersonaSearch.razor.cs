@@ -20,6 +20,7 @@ public partial class PersonaSearch
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
 
@@ -96,15 +97,34 @@ public partial class PersonaSearch
         await tablePersonas.ReloadServerData();
     }
 
-    //// Este método se encargará de mandar la persona seleccionada de vuelta a Ficha
-    //private void SeleccionarPersona(Persona persona)
-    //{
-    //    // Cerramos el diálogo enviando un Ok y el objeto completo
-    //    MudDialog.CloseAsync(DialogResult.Ok(persona));
-    //}
+    private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+        IDialogReference? dialog;
+        if (isEdit)
+        {
+            var parameters = new DialogParameters
+        {
+            { "Id", id }
+        }; dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
+        }
+        else
+        {
+            dialog = await DialogService.ShowAsync<PersonaCreate>("Nueva Persona", options);
+        }
 
-    //private void Cancelar()
-    //{
-    //    MudDialog.CloseAsync();
-    //}
+        var result = await dialog.Result;
+        if (result!.Canceled!)
+        {
+            await LoadTotalRecordsPersonasAsync();
+
+            await tablePersonas.ReloadServerData();
+        }
+    }
 }

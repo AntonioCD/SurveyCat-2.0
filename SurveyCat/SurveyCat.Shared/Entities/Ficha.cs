@@ -238,7 +238,7 @@ public class Ficha
 
     public ICollection<Propietario>? Propietarios { get; set; }
 
-    //public ICollection<Familia> Familias { get; set; } = new List<Familia>();
+    public ICollection<Familia>? Familias { get; set; }
 
     //public ICollection<Colindante> Colindantes { get; set; } = new List<Colindante>();
 
@@ -251,4 +251,6 @@ public class Ficha
     // =========================================
 
     public int PropietariosNumber => Propietarios == null ? 0 : Propietarios.Count;
+
+    public int FamiliasNumber => Familias == null ? 0 : Familias.Count;
 }

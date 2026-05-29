@@ -14,6 +14,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<Caserio> Caserios { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Diccionario> Diccionarios { get; set; }
+        public DbSet<Familia> Familias { get; set; }
         public DbSet<Ficha> Fichas { get; set; }
         public DbSet<Municipio> Municipios { get; set; }
         public DbSet<Persona> Personas { get; set; }
@@ -76,6 +77,11 @@ namespace SurveyCat.Backend.Data
             modelBuilder.Entity<Caserio>(e =>
             {
                 e.HasIndex(x => x.CodCaserio).IsUnique();
+            });
+
+            modelBuilder.Entity<Familia>(e =>
+            {
+                e.HasIndex(x => new { x.FichaId, x.PersonaId }).IsUnique();
             });
 
             modelBuilder.Entity<Ficha>(e =>

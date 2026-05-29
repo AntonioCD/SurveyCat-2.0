@@ -1,5 +1,3 @@
-﻿<h3>PropietarioCreate</h3>
+﻿@page "/propietarios/create/{FichaId:int}"
 
-@code {
-
-}
+<PropietarioForm Propietario="propietario" OnValidSubmit="CreateAsync" ReturnAction="Return" />

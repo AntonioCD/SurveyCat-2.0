@@ -116,7 +116,7 @@ public partial class PersonasIndex
         }
 
         var result = await dialog.Result;
-        if (result!.Canceled!)
+        if (!result!.Canceled!)
         {
             await LoadTotalRecordsAsync();
             await table.ReloadServerData();

@@ -52,4 +52,15 @@ public class PropietariosController : GenericController<Propietario>
         }
         return NotFound(response.Message);
     }
+
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> DeleteByLongAsync(long id)
+    {
+        var action = await _propietariosUnitOfWork.DeleteByLongAsync(id);
+        if (action.WasSuccess)
+        {
+            return NoContent();
+        }
+        return BadRequest(action.Message);
+    }
 }

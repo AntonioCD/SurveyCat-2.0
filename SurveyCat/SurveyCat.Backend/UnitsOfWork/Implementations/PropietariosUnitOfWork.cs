@@ -21,4 +21,6 @@ public class PropietariosUnitOfWork : GenericUnitOfWork<Propietario>, IPropietar
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _propietariosRepository.GetTotalRecordsAsync(pagination);
 
     public async Task<ActionResponse<Propietario>> GetAsync(long id) => await _propietariosRepository.GetAsync(id);
+
+    public async Task<ActionResponse<Propietario>> DeleteByLongAsync(long id) => await _propietariosRepository.DeleteByLongAsync(id);
 }

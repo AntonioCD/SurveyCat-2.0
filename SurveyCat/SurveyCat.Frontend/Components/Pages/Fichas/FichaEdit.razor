@@ -1,5 +1,3 @@
-﻿<h3>FichaEdit</h3>
+﻿@page "/fichas/edit/{Id:int}"
 
-@code {
-
-}
+<FichaForm Ficha="ficha" OnValidSubmit="EditAsync" ReturnAction="Return" />

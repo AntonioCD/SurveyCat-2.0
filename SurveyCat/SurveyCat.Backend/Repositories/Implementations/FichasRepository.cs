@@ -66,10 +66,14 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
              .Include(m => m.BarrioComarca)
              .Include(c => c.Caserio!)
              .Include(p => p.Informante)
-             .Include(p => p.Encuestador)
-             .Include(p => p.Coordinador)
-             .Include(p => p.TecnicoCatastral)
+             .Include(p => p.Encuestador!)
+             .ThenInclude(e => e.Persona)
+             .Include(p => p.Coordinador!)
+             .ThenInclude(e => e.Persona)
+             .Include(p => p.TecnicoCatastral!)
+             .ThenInclude(e => e.Persona)
              .Include(p => p.Estado)
+             .Include(p => p.UnidadMedida)
              .Include(p => p.OrigenTierra)
              .Include(p => p.RelacionInformanteParcela)
              .Include(p => p.RelacionInformantePropietario)
@@ -77,6 +81,8 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
              .Include(p => p.ServidumbrePase)
              .Include(p => p.ServidumbreOtra)
              .Include(p => p.Propietarios)
+             //.ThenInclude(p => p.Persona!)
+             //.ThenInclude(p => p.TipoIdentificacion)
              .FirstOrDefaultAsync(m => m.Id == id);
 
         if (ficha == null)
@@ -93,5 +99,39 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
             WasSuccess = true,
             Result = ficha
         };
+    }
+
+    public async Task<ActionResponse<Ficha>> DeleteByLongAsync(long id)
+    {
+        var ficha = await _context.Fichas
+            .FirstOrDefaultAsync(m => m.Id == id);
+
+        if (ficha == null)
+        {
+            return new ActionResponse<Ficha>
+            {
+                WasSuccess = false,
+                Message = "Ficha no encontrada"
+            };
+        }
+
+        try
+        {
+            _context.Fichas.Remove(ficha);
+            await _context.SaveChangesAsync();
+
+            return new ActionResponse<Ficha>
+            {
+                WasSuccess = true,
+            };
+        }
+        catch
+        {
+            return new ActionResponse<Ficha>
+            {
+                WasSuccess = false,
+                Message = "No se puede borrar, porque tiene registros relacionados"
+            };
+        }
     }
 }

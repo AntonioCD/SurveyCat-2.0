@@ -56,7 +56,7 @@ public class Propietario
     // =========================================
 
     [Display(Name = "Tipo de Derecho")]
-    [Required(ErrorMessage = "El tipo de derecho es obligatorio.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Seleccione un Tipo de Derecho.")]
     public TipoDerecho TipoDerecho { get; set; }
 
     // =========================================

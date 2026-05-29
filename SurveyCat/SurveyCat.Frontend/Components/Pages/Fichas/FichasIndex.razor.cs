@@ -81,9 +81,14 @@ public partial class FichasIndex
         };
     }
 
-    private void StatesAction(Ficha ficha)
+    private void PropietariosAction(Ficha ficha)
     {
         NavigationManager.NavigateTo($"/fichas/propietarios/details/{ficha.Id}");
+    }
+
+    private void NucleoFamiliarAction(Ficha ficha)
+    {
+        NavigationManager.NavigateTo($"/fichas/familias/details/{ficha.Id}");
     }
 
     private async Task SetFilterValue(string value)
@@ -93,36 +98,16 @@ public partial class FichasIndex
         await table.ReloadServerData();
     }
 
-    private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    private void RedirectToFichaForm(long id = 0, bool isEdit = false)
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            CloseButton = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true
-        };
-        IDialogReference? dialog;
         if (isEdit)
         {
-            var parameters = new DialogParameters
-            {
-                { "Id", id }
-            }; dialog = await DialogService.ShowAsync<FichaEdit>("Editar Ficha", parameters, options);
+            NavigationManager.NavigateTo($"/fichas/edit/{id}");
         }
         else
         {
             NavigationManager.NavigateTo($"/fichas/create");
-
-            //dialog = await DialogService.ShowAsync<FichaCreate>("Nueva Ficha", options);
         }
-
-        //var result = await dialog.Result;
-        //if (result!.Canceled!)
-        //{
-        //    await LoadTotalRecordsAsync();
-        //    await table.ReloadServerData();
-        //}
     }
 
     private async Task DeleteAsync(Ficha ficha)

@@ -11,4 +11,6 @@ public interface IPropietariosRepository
     Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
 
     Task<ActionResponse<Propietario>> GetAsync(long id);
+
+    Task<ActionResponse<Propietario>> DeleteByLongAsync(long id);
 }

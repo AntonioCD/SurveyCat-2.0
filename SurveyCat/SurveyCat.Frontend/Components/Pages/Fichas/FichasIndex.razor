@@ -19,7 +19,7 @@ else
                 <MudText Typo="Typo.h6" Class="me-4">FICHAS</MudText>
                 <MudButton Variant="Variant.Outlined"
                            EndIcon="@Icons.Material.Filled.Add"
-                           Color="Color.Info" OnClick="@(() => ShowModalAsync())">
+                           Color="Color.Info" OnClick="@(() => RedirectToFichaForm())">
                     Nuevo
                 </MudButton>
             </div>
@@ -28,10 +28,11 @@ else
         </ToolBarContent>
         <HeaderContent>
             <MudTh Style="width: 20%;">Municipio</MudTh>
-            <MudTh Style="width: 20%;">Sector</MudTh>
-            <MudTh Style="width: 20%;">CodEnc</MudTh>
-            <MudTh Style="width: 20%;">Estado</MudTh>
-            <MudTh Style="width: 20%;">Propietarios</MudTh>
+            <MudTh Style="width: 16%;">Sector</MudTh>
+            <MudTh Style="width: 16%;">CodEnc</MudTh>
+            <MudTh Style="width: 16%;">Estado</MudTh>
+            <MudTh Style="width: 16%;">Propietarios</MudTh>
+            <MudTh Style="width: 16%;">N. Familiar</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
 
@@ -45,11 +46,28 @@ else
                     <MudButton Variant="Variant.Outlined"
                                Color="Color.Info"
                                Size="Size.Medium"
-                               OnClick="@(() => StatesAction(@context))"
+                               OnClick="@(() => PropietariosAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
                                Class="d-flex justify-space-between px-2">
 
                         <span>@context.PropietariosNumber</span>
+
+                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
+                                 Size="Size.Small"
+                                 Class="ml-2" />
+                    </MudButton>
+                </MudTooltip>
+            </MudTd>
+            <MudTd DataLabel="Nucleo Familiar">
+                <MudTooltip Text="Ver Nucleo Familiar">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Info"
+                               Size="Size.Medium"
+                               OnClick="@(() => NucleoFamiliarAction(@context))"
+                               Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
+                               Class="d-flex justify-space-between px-2">
+
+                        <span>@context.FamiliasNumber</span>
 
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"
@@ -63,7 +81,7 @@ else
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Variant="Variant.Outlined"
                                        Color="Color.Warning"
-                                       OnClick="@(() => ShowModalAsync(context.Id, true))"
+                                       OnClick="@(() => RedirectToFichaForm(context.Id, true))"
                                        Size="Size.Medium"
                                        Class="mr-2" />
                     </MudTooltip>

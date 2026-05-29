@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SurveyCat.Frontend.Components.Pages.Propietarios;
-using SurveyCat.Frontend.Components.Pages.Sectores;
 using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
@@ -9,16 +7,16 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
-public partial class FichaPropietariosDetails
+public partial class FichaFamiliasDetails
 {
     private Ficha? ficha;
-    private List<Propietario>? propietarios;
+    private List<Familia>? familias;
 
-    private MudTable<Propietario> table = new();
+    private MudTable<Familia> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, 5, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/propietarios";
+    private const string baseUrl = "api/familias";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
     [Parameter] public int FichaId { get; set; }
@@ -89,10 +87,10 @@ public partial class FichaPropietariosDetails
         return true;
     }
 
-    private async Task<TableData<Propietario>> LoadListAsync(TableState propietario, CancellationToken cancellationToken)
+    private async Task<TableData<Familia>> LoadListAsync(TableState familia, CancellationToken cancellationToken)
     {
-        int page = propietario.Page + 1;
-        int pageSize = propietario.PageSize;
+        int page = familia.Page + 1;
+        int pageSize = familia.PageSize;
         var url = $"{baseUrl}/paginated?id={FichaId}&page={page}&recordsnumber={pageSize}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
@@ -100,27 +98,27 @@ public partial class FichaPropietariosDetails
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<Propietario>>(url);
+        var responseHttp = await Repository.GetAsync<List<Familia>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<Propietario> { Items = [], TotalItems = 0 };
+            return new TableData<Familia> { Items = [], TotalItems = 0 };
         }
         if (responseHttp.Response == null)
         {
-            return new TableData<Propietario> { Items = [], TotalItems = 0 };
+            return new TableData<Familia> { Items = [], TotalItems = 0 };
         }
-        return new TableData<Propietario>
+        return new TableData<Familia>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
         };
     }
 
-    private void StatesAction(Propietario propietario)
+    private void StatesAction(Familia familia)
     {
-        NavigationManager.NavigateTo($"/propietarios/details/{propietario.Id}");
+        NavigationManager.NavigateTo($"/familias/details/{familia.Id}");
     }
 
     private async Task SetFilterValue(string value)
@@ -135,21 +133,21 @@ public partial class FichaPropietariosDetails
         NavigationManager.NavigateTo($"/fichas");
     }
 
-    private void RedirectToPropietarioForm(long id = 0, bool isEdit = false)
+    private void RedirectToFamiliarForm(long id = 0, bool isEdit = false)
     {
         if (isEdit)
         {
-            NavigationManager.NavigateTo($"/propietarios/edit/{id}/{FichaId}");
+            NavigationManager.NavigateTo($"/familias/edit/{id}/{FichaId}");
         }
         else
         {
-            NavigationManager.NavigateTo($"/propietarios/create/{FichaId}");
+            NavigationManager.NavigateTo($"/familias/create/{FichaId}");
         }
     }
 
-    private void CaseriosAction(Propietario propietario)
+    private void CaseriosAction(Familia familia)
     {
-        NavigationManager.NavigateTo($"/propietarios/details/{propietario.Id}");
+        NavigationManager.NavigateTo($"/familias/details/{familia.Id}");
     }
 
     private void NoFicha()
@@ -157,11 +155,11 @@ public partial class FichaPropietariosDetails
         NavigationManager.NavigateTo("/fichas");
     }
 
-    private async Task DeleteAsync(Propietario propietario)
+    private async Task DeleteAsync(Familia familia)
     {
         var parameters = new DialogParameters
             {
-                { "Message", $"¿Estás seguro de que quieres eliminar el Propietario {propietario.Persona?.NombreCompleto}?" }
+                { "Message", $"¿Estás seguro de que quieres eliminar el Familia {familia.Persona?.NombreCompleto}?" }
             };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
@@ -171,7 +169,7 @@ public partial class FichaPropietariosDetails
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"api/propietarios/{propietario.Id}");
+        var responseHttp = await Repository.DeleteAsync($"api/familias/{familia.Id}");
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -180,6 +178,6 @@ public partial class FichaPropietariosDetails
         }
         await LoadAsync();
         await table.ReloadServerData();
-        Snackbar.Add("Propietario eliminado.", Severity.Success);
+        Snackbar.Add("Familia eliminado.", Severity.Success);
     }
 }

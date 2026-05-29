@@ -17,7 +17,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder" Color="Color.Primary" Size="Size.Large" />
                     <div class="d-flex flex-column">
                         <MudText Typo="Typo.h5" Color="Color.Primary">
-                            <b>Nueva Ficha</b>
+                            <b>@(Ficha?.Id != 0 ? "Editar Ficha" : "Nueva Ficha")</b>
                         </MudText>
                         <MudText Typo="Typo.caption" Color="Color.Secondary">
                             Complete los datos requeridos para registrar una nueva encuesta catastral.
