@@ -20,6 +20,7 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
     {
         var queryable = _context.Familias
             .Include(p => p.Persona)
+            .ThenInclude(p => p.TipoIdentificacion)
             .Include(p => p.Parentesco)
             .AsQueryable();
 
@@ -32,7 +33,7 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
         {
             WasSuccess = true,
             Result = await queryable
-                .OrderBy(x => x.Persona!.NombreCompleto)
+                .OrderBy(x => x.Item)
                 .Paginate(pagination)
                 .ToListAsync()
         };
@@ -42,7 +43,6 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
     {
         var queryable = _context.Familias
             .Include(p => p.Persona)
-            .Include(p => p.Parentesco)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -82,12 +82,102 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
         };
     }
 
+    public override async Task<ActionResponse<Familia>> AddAsync(Familia familia)
+    {
+        try
+        {
+            // 1. Buscamos cuál es el número de Item más alto asignado actualmente en esta Ficha.
+            //    Usamos (int?) para evitar que falle si la ficha aún no tiene ningún miembro registrado.
+            int maxItem = await _context.Set<Familia>()
+                .Where(f => f.FichaId == familia.FichaId)
+                .MaxAsync(f => (int?)f.Item) ?? 0;
+
+            // 2. Asignamos el consecutivo automático (si maxItem era 0, el primero será 1)
+            familia.Item = maxItem + 1;
+
+            // 3. Procedemos con el guardado normal
+            _context.Add(familia);
+
+            await _context.SaveChangesAsync();
+            return new ActionResponse<Familia>
+            {
+                WasSuccess = true,
+                Result = familia
+            };
+        }
+        catch (DbUpdateException)
+        {
+            return new ActionResponse<Familia>
+            {
+                WasSuccess = false,
+                Message = "Ya existe el registro que estas intentando crear."
+            };
+        }
+        catch (Exception exception)
+        {
+            return new ActionResponse<Familia>
+            {
+                WasSuccess = false,
+                Message = exception.Message
+            };
+        }
+    }
+
+    public async Task<ActionResponse<IEnumerable<Familia>>> ReorderAsync(List<Familia> familiasReordenadas)
+    {
+        if (familiasReordenadas == null || !familiasReordenadas.Any())
+        {
+            return new ActionResponse<IEnumerable<Familia>>
+            {
+                WasSuccess = false,
+                Message = "No se recibieron datos para reordenar."
+            };
+        }
+
+        long fichaId = familiasReordenadas.First().FichaId;
+
+        try
+        {
+            // 1. Traemos los registros reales que están actualmente en la BD para esa Ficha
+            var familiasBD = await _context.Familias
+                .Where(f => f.FichaId == fichaId)
+                .ToListAsync();
+
+            // 2. Sincronizamos los índices
+            foreach (var itemUI in familiasReordenadas)
+            {
+                var itemBD = familiasBD.FirstOrDefault(f => f.Id == itemUI.Id);
+                if (itemBD != null)
+                {
+                    itemBD.Item = itemUI.Item;
+                }
+            }
+
+            // 3. Guardamos los cambios
+            await _context.SaveChangesAsync();
+
+            return new ActionResponse<IEnumerable<Familia>>
+            {
+                WasSuccess = true,
+                Result = familiasBD.OrderBy(f => f.Item).ToList()
+            };
+        }
+        catch (Exception exception)
+        {
+            return new ActionResponse<IEnumerable<Familia>>
+            {
+                WasSuccess = false,
+                Message = $"Error al persistir el reordenamiento: {exception.Message}"
+            };
+        }
+    }
+
     public async Task<ActionResponse<Familia>> DeleteByLongAsync(long id)
     {
-        var familia = await _context.Familias
+        var familiaAEliminar = await _context.Familias
             .FirstOrDefaultAsync(m => m.Id == id);
 
-        if (familia == null)
+        if (familiaAEliminar == null)
         {
             return new ActionResponse<Familia>
             {
@@ -98,7 +188,29 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
 
         try
         {
-            _context.Familias.Remove(familia);
+            long fichaId = familiaAEliminar.FichaId;
+
+            // 1. CORRECCIÓN: Usamos el operador Value o la coalescencia (?? 0)
+            // para asegurar al compilador que extraeremos un 'int' puro.
+            int itemBorrado = familiaAEliminar.Item ?? 0;
+
+            // 2. Eliminamos el registro elegido
+            _context.Familias.Remove(familiaAEliminar);
+
+            // 3. CORRECCIÓN: En el Where, como f.Item es int?, extraemos su valor con .Value
+            // para poder hacer la comparación numéricas limpiamente.
+            var miembrosAActualizar = await _context.Familias
+                .Where(f => f.FichaId == fichaId && f.Item.HasValue && f.Item.Value > itemBorrado)
+                .OrderBy(f => f.Item)
+                .ToListAsync();
+
+            // 4. Les restamos 1 a su posición
+            foreach (var miembro in miembrosAActualizar)
+            {
+                miembro.Item--;
+            }
+
+            // 5. Guardamos todo de forma atómica
             await _context.SaveChangesAsync();
 
             return new ActionResponse<Familia>

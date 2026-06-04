@@ -1,4 +1,5 @@
-﻿@page "/fichas/familias/details/{FichaId:int}"
+﻿@using SurveyCat.Shared.Entities
+@page "/fichas/familias/details/{FichaId:int}"
 
 @if (loading)
 {
@@ -6,61 +7,83 @@
 }
 else
 {
-    <MudTable Items="@familias"
-              @ref="table"
-              ServerData="LoadListAsync"
-              Dense="true"
-              Hover="true"
-              Striped="true"
-              FixedHeader="true"
-              FixedFooter="true">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @ficha?.CodEncuesta</MudText>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToFamiliarForm())">Crear</MudButton>
-            <MudSpacer />
-            <FilterComponent ApplyFilter="SetFilterValue" />
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh Style="width: 20%;">Parentesco</MudTh>
-            <MudTh Style="width: 20%;">Nombre Completo</MudTh>
-            <MudTh Style="width: 20%;">Identificación</MudTh>
-            <MudTh Style="width: 20%;">Tipo Identificación</MudTh>
-            <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Parentesco">@context.Parentesco?.Nombre</MudTd>
-            <MudTd DataLabel="Nombre Completo">@context.Persona?.NombreCompleto</MudTd>
-            <MudTd DataLabel="Identificación">@context.Persona?.Identificacion</MudTd>
-            <MudTd DataLabel="Tipo Identificación">@context.Persona?.TipoIdentificacion?.Nombre</MudTd>
-            <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
-                <div class="d-flex justify-center">
-                    <MudTooltip Text="Editar">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Variant="Variant.Outlined"
-                                       Color="Color.Warning"
-                                       OnClick="@(() => RedirectToFamiliarForm(context.Id, true))"
-                                       Size="Size.Medium"
-                                       Class="mr-2" />
-                    </MudTooltip>
-                    <MudTooltip Text="Borrar">
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Variant="Variant.Outlined"
-                                       Color="Color.Error"
-                                       OnClick="@(() => DeleteAsync(context))"
-                                       Size="Size.Medium" />
-                    </MudTooltip>
+    <div class="pa-4">
+        @* Contenedor Principal de Arrastre *@
+        <MudDropContainer T="Familia"
+                          Items="@familias"
+                          ItemsSelector="@((item, zone) => item.Item.ToString() == zone)"
+                          ItemDropped="OnItemDropped"
+                          Class="d-flex flex-column gap-2">
+            <ChildContent>
+                @* Cabecera Superior del Módulo *@
+                <div class="d-flex align-center mud-paper pa-4 mb-4 mud-elevation-1">
+                    <MudText Typo="Typo.h6" Class="mr-4">
+                        <i class="bi bi-globe-americas"></i> @ficha?.CodEncuesta
+                    </MudText>
+                    <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
+                    <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToFamiliarForm())">Crear</MudButton>
+                    <MudSpacer />
+                    <FilterComponent ApplyFilter="SetFilterValue" />
                 </div>
-            </MudTd>
-        </RowTemplate>
-        <NoRecordsContent>
-            <MudText>No se encontraron registros.</MudText>
-        </NoRecordsContent>
-        <PagerContent>
-            <MudTablePager RowsPerPageString="Numero de Registros:"
-                           PageSizeOptions="pageSizeOptions"
-                           AllItemsText="Todos"
-                           InfoFormat="@infoFormat" />
-        </PagerContent>
-    </MudTable>
+
+                @* Encabezado de la Tabla de Arrastre *@
+                <div class="d-flex pa-3 mud-theme-primary mud-elevation-1 align-center" style="border-radius: 4px; font-weight: bold;">
+                    <div style="width: 8%; text-align: center;">N°</div>
+                    <div style="width: 22%;">Parentesco</div>
+                    <div style="width: 35%;">Nombre Completo</div>
+                    <div style="width: 25%;">Identificación</div>
+                    <div style="width: 10%; text-align: center;">Acciones</div>
+                </div>
+
+                @* Zona de colocación de los elementos *@
+                @if (familias == null || !familias.Any())
+                {
+                    <div class="d-flex justify-center pa-8 mud-paper mud-elevation-1 mt-2">
+                        <MudText Typo="Typo.body1">No se encontraron registros familiares para esta ficha.</MudText>
+                    </div>
+                }
+                else
+                {
+                    @* Renderizamos una mini zona de arrastre por cada Item disponible *@
+                    @foreach (var fam in familias.OrderBy(f => f.Item))
+                    {
+                        <MudDropZone T="Familia" Identifier="@fam.Item.ToString()" Class="d-flex flex-column gap-2" />
+                    }
+                }
+            </ChildContent>
+            <ItemRenderer>
+                @* Fila Interactiva y Arrastrable *@
+                <div class="d-flex align-center pa-3 mud-paper mud-elevation-1 mud-ripple mt-1"
+                     style="cursor: grab; background-color: var(--mud-palette-background-grey); border-left: 4px solid var(--mud-palette-info);">
+
+                    <div style="width: 8%; text-align: center;">
+                        <MudChip T="string" Color="Color.Info" Size="Size.Small" Variant="Variant.Text"><b>@context.Item</b></MudChip>
+                    </div>
+                    <div style="width: 22%;">@context.Parentesco?.Nombre</div>
+                    <div style="width: 35%;">@context.Persona?.NombreCompleto</div>
+                    <div style="width: 25%;">@(string.IsNullOrWhiteSpace(context.Persona?.Identificacion) ? "---" : context.Persona.Identificacion)</div>
+
+                    <div style="width: 10%; text-align: center;" @onclick:stopPropagation="true">
+                        <div class="d-flex justify-center align-center">
+                            <MudTooltip Text="Editar">
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                               Variant="Variant.Outlined"
+                                               Color="Color.Warning"
+                                               Size="Size.Small"
+                                               OnClick="@(() => RedirectToFamiliarForm(context.Id, true))"
+                                               Class="mr-2" />
+                            </MudTooltip>
+                            <MudTooltip Text="Borrar">
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               Variant="Variant.Outlined"
+                                               Color="Color.Error"
+                                               Size="Size.Small"
+                                               OnClick="@(() => DeleteAsync(context))" />
+                            </MudTooltip>
+                        </div>
+                    </div>
+                </div>
+            </ItemRenderer>
+        </MudDropContainer>
+    </div>
 }

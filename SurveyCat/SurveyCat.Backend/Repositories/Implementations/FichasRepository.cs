@@ -23,6 +23,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
             .Include(f => f.Sector)
             .Include(f => f.Propietarios)
             .Include(f => f.Estado)
+            .Include(f => f.Familias)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))

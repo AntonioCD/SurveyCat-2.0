@@ -1,3 +1,4 @@
-﻿<h3>FamiliaEdit</h3>
+﻿@page "/familias/edit/{Id:int}/{FichaId:int}"
 
+<FamiliaForm Familia="familia" OnValidSubmit="EditAsync" ReturnAction="Return" />
 

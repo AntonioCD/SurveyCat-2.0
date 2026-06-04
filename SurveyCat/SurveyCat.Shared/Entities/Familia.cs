@@ -33,7 +33,7 @@ public class Familia
 
     [Display(Name = "Item")]
     [Range(1, int.MaxValue, ErrorMessage = "El campo {0} debe ser mayor a cero.")]
-    public int Item { get; set; }
+    public int? Item { get; set; }
 
     [Display(Name = "Parentesco")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]

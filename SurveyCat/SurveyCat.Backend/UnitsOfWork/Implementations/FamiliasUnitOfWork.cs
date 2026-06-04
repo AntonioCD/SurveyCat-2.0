@@ -22,5 +22,9 @@ public class FamiliasUnitOfWork : GenericUnitOfWork<Familia>, IFamiliasUnitOfWor
 
     public async Task<ActionResponse<Familia>> GetAsync(long id) => await _familiasRepository.GetAsync(id);
 
+    public override async Task<ActionResponse<Familia>> AddAsync(Familia familia) => await _familiasRepository.AddAsync(familia);
+
+    public async Task<ActionResponse<IEnumerable<Familia>>> ReorderAsync(List<Familia> familiasReordenadas) => await _familiasRepository.ReorderAsync(familiasReordenadas);
+
     public async Task<ActionResponse<Familia>> DeleteByLongAsync(long id) => await _familiasRepository.DeleteByLongAsync(id);
 }

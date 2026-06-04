@@ -72,8 +72,11 @@ public partial class FamiliaForm
 
     private void ParentescoChanged(Diccionario parentesco)
     {
-        selectedParentesco = parentesco;
-        Familia.ParentescoId = parentesco.Id;
+        if (parentesco != null)
+        {
+            selectedParentesco = parentesco;
+            Familia.ParentescoId = parentesco!.Id;
+        }
     }
 
     private async Task<IEnumerable<Diccionario>> SearchParentesco(string searchText, CancellationToken token)
