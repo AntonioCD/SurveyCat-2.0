@@ -1,4 +1,4 @@
-﻿@page "/fichas/propietarios/details/{FichaId:int}"
+﻿@page "/fichas/colindantes/details/{FichaId:int}"
 
 @if (loading)
 {
@@ -6,7 +6,7 @@
 }
 else
 {
-    <MudTable Items="@propietarios"
+    <MudTable Items="@colindantes"
               @ref="table"
               ServerData="LoadListAsync"
               Dense="true"
@@ -15,27 +15,27 @@ else
               FixedHeader="true"
               FixedFooter="true">
         <ToolBarContent>
-            <MudText Typo="Typo.h6" Class="mr-4">PROPIETARIOS (@ficha?.CodEncuesta)</MudText>
+            <MudText Typo="Typo.h6" Class="mr-4">COLINDANTES (@ficha?.CodEncuesta)</MudText>
             <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToPropietarioForm())">Crear</MudButton>
+            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToColindanteForm())">Crear</MudButton>
             <MudSpacer />
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
+            <MudTh Style="width: 20%;">Punto Cardinal</MudTh>
             <MudTh Style="width: 20%;">Nombre / Razon Social</MudTh>
-            <MudTh Style="width: 20%;">Tipo de Derecho</MudTh>
             <MudTh Style="width: 20%;">Identificación</MudTh>
-            <MudTh Style="width: 20%;">Tipo Identificación</MudTh>      
-            <MudTh Style="width: 20%;">¿Presenta Documento?</MudTh>
+            <MudTh Style="width: 20%;">Tipo Identificación</MudTh>
+            <MudTh Style="width: 20%;">¿Presenta Conflicto?</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
+            <MudTd DataLabel="Punto Cardinal">@context.PuntoCardinal?.Nombre</MudTd>
             <MudTd DataLabel="Nombre o Razón Social">@context.Persona?.NombreCompleto</MudTd>
-            <MudTd DataLabel="Tipo de Derecho">@context.TipoDerecho</MudTd>
             <MudTd DataLabel="Identificación">@context.Persona?.Identificacion</MudTd>
             <MudTd DataLabel="Tipo Identificación">@context.Persona?.TipoIdentificacion?.Nombre</MudTd>
-            <MudTd DataLabel="¿Presenta Documento?">
-                @(context.PresentaDocumento ? "Sí" : "No")
+            <MudTd DataLabel="¿Presenta Conflicto?">
+                @(context.PresentaConflicto ? "Sí" : "No")
             </MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
@@ -43,7 +43,7 @@ else
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Variant="Variant.Outlined"
                                        Color="Color.Warning"
-                                       OnClick="@(() => RedirectToPropietarioForm(context.Id, true))"
+                                       OnClick="@(() => RedirectToColindanteForm(context.Id, true))"
                                        Size="Size.Medium"
                                        Class="mr-2" />
                     </MudTooltip>

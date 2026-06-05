@@ -12,6 +12,7 @@ namespace SurveyCat.Backend.Data
 
         public DbSet<BarrioComarca> BarriosComarcas { get; set; }
         public DbSet<Caserio> Caserios { get; set; }
+        public DbSet<Colindante> Colindantes { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Diccionario> Diccionarios { get; set; }
         public DbSet<Familia> Familias { get; set; }
@@ -21,38 +22,6 @@ namespace SurveyCat.Backend.Data
         public DbSet<PersonalEncuesta> PersonalEncuestas { get; set; }
         public DbSet<Propietario> Propietarios { get; set; }
         public DbSet<Sector> Sectores { get; set; }
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    base.OnModelCreating(modelBuilder);
-        //    modelBuilder.Entity<Departamento>().HasIndex(x => x.CodDepto).IsUnique();
-        //    modelBuilder.Entity<Departamento>().HasIndex(x => x.Nombre).IsUnique();
-        //    modelBuilder.Entity<Diccionario>().HasIndex(x => new { x.Catalogo, x.Nombre }).IsUnique();
-        //    modelBuilder.Entity<Municipio>().HasIndex(x => x.CodMuni).IsUnique();
-        //    modelBuilder.Entity<BarrioComarca>().HasIndex(x => x.CodBarrioComarca).IsUnique();
-        //    modelBuilder.Entity<Caserio>().HasIndex(x => x.CodCaserio).IsUnique();
-        //    modelBuilder.Entity<Sector>().HasIndex(x => new { x.MunicipioId, x.NumeroSector }).IsUnique();
-
-        //    var entity = modelBuilder.Entity<Persona>();
-
-        //    // Forzamos el acceso vía Propiedad para disparar la lógica de los Setters
-        //    entity.Property(e => e.PrimerNombre)
-        //          .UsePropertyAccessMode(PropertyAccessMode.Property);
-
-        //    entity.Property(e => e.SegundoNombre)
-        //          .UsePropertyAccessMode(PropertyAccessMode.Property);
-
-        //    entity.Property(e => e.PrimerApellido)
-        //          .UsePropertyAccessMode(PropertyAccessMode.Property);
-
-        //    entity.Property(e => e.SegundoApellido)
-        //          .UsePropertyAccessMode(PropertyAccessMode.Property);
-
-        //    entity.Property(e => e.NombreCompleto)
-        //          .UsePropertyAccessMode(PropertyAccessMode.Property);
-
-        //    DisableCascadingDelete(modelBuilder);
-        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,6 +46,11 @@ namespace SurveyCat.Backend.Data
             modelBuilder.Entity<Caserio>(e =>
             {
                 e.HasIndex(x => x.CodCaserio).IsUnique();
+            });
+
+            modelBuilder.Entity<Colindante>(e =>
+            {
+                e.HasIndex(x => new { x.FichaId, x.PuntoCardinalId, x.PersonaId }).IsUnique();
             });
 
             modelBuilder.Entity<Familia>(e =>
@@ -109,7 +83,6 @@ namespace SurveyCat.Backend.Data
                 e.HasIndex(x => new { x.Catalogo, x.Nombre }).IsUnique();
             });
 
-            // --- CONFIGURACIÓN DE PERSONA ---
             modelBuilder.Entity<Persona>(entity =>
             {
                 entity.UsePropertyAccessMode(PropertyAccessMode.Property);
