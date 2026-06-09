@@ -27,13 +27,14 @@ else
             <FilterComponent @bind-FilterValue="Filter" ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="width: 18%;">Municipio</MudTh>
-            <MudTh Style="width: 18%;">Sector</MudTh>
-            <MudTh Style="width: 18%;">CodEnc</MudTh>
-            <MudTh Style="width: 18%;">Estado</MudTh>
+            <MudTh Style="width: 15.75%;">Municipio</MudTh>
+            <MudTh Style="width: 15.75%;">Sector</MudTh>
+            <MudTh Style="width: 15.75%;">CodEnc</MudTh>
+            <MudTh Style="width: 15.75%;">Estado</MudTh>
             <MudTh Style="width: 9%;"># Propietarios</MudTh>
             <MudTh Style="width: 9%;"># Familiares</MudTh>
             <MudTh Style="width: 9%;"># Colindantes</MudTh>
+            <MudTh Style="width: 9%;"># Conflictos</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
 
@@ -86,6 +87,23 @@ else
                                Class="d-flex justify-space-between px-2">
 
                         <span>@context.ColindantesNumber</span>
+
+                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
+                                 Size="Size.Small"
+                                 Class="ml-2" />
+                    </MudButton>
+                </MudTooltip>
+            </MudTd>
+            <MudTd DataLabel="Conflictos">
+                <MudTooltip Text="Ver Conflictos">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Info"
+                               Size="Size.Medium"
+                               OnClick="@(() => ConflictosAction(@context))"
+                               Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
+                               Class="d-flex justify-space-between px-2">
+
+                        <span>@context.ConflictosNumber</span>
 
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"

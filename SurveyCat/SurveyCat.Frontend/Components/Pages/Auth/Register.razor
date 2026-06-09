@@ -1,6 +1,26 @@
 ﻿@page "/Register"
 @using SurveyCat.Shared.Entities
 
+<MudItem xs="12" Class="mt-2 mb-2">
+    @* d-flex y justify-space-between empujan el título a la izquierda y el input a la derecha *@
+    <div class="d-flex align-center justify-space-between gap-3 pl-1">
+
+        @* BLOQUE IZQUIERDO: Icono + Título y Subtítulo *@
+        <div class="d-flex align-center gap-3">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
+            <div class="d-flex flex-column">
+                <MudText Typo="Typo.h5" Color="Color.Primary">
+                    <b>Nuevo Usuario</b>
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    Complete los datos requeridos para registrar un Usuario.
+                </MudText>
+            </div>
+        </div>
+    </div>
+    <MudDivider Class="mt-3 mb-2" DividerType="DividerType.FullWidth" />
+</MudItem>
+
 @if (loading)
 {
     <Loading />
@@ -45,14 +65,10 @@ else
                                   For="@(() => userDTO.PasswordConfirm)" />
                 </MudCardContent>
             </MudItem>
-            
-            <MudItem xs="12" Class="d-flex justify-center mt-2">
-                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" OnClick="ReturnAction" Class="ms-2 me-2 mb-2">
-                    Regresar
-                </MudButton>
-                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Check" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mb-2">
-                    Guardar
-                </MudButton>
+           
+            <MudItem xs="12" class="d-flex justify-end gap-2 mt-4 mb-4 me-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
             </MudItem>
         </MudGrid>
     </EditForm>

@@ -32,7 +32,7 @@ public partial class MunicipioCreate
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/departamentos/details/{DepartamentoId}");
+        NavigationManager.NavigateTo($"/departamento/details/{DepartamentoId}");
     }
 
 }

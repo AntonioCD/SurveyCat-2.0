@@ -94,7 +94,8 @@ public partial class UsersIndex
             CloseOnEscapeKey = true,
             CloseButton = true,
             MaxWidth = MaxWidth.Small,
-            FullWidth = true
+            FullWidth = true, 
+            NoHeader = true
         };
         IDialogReference? dialog;
         if (isEdit)

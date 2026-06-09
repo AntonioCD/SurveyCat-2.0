@@ -1,0 +1,114 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using MudBlazor;
+using SurveyCat.Frontend.Components.Pages.Personas;
+using SurveyCat.Frontend.Repositories;
+using SurveyCat.Shared.Constants;
+using SurveyCat.Shared.Entities;
+
+namespace SurveyCat.Frontend.Components.Pages.Conflictos;
+
+public partial class ConflictoForm
+{
+    private EditContext editContext = null!;
+    private List<Diccionario>? diccionarios;
+    private List<Diccionario> listaConflictos = new();
+    private List<Diccionario> listaViasGestion = new();
+
+    private Diccionario? selectedConflicto = new();
+    private Diccionario? selectedViaGestion = new();
+
+    [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private IRepository Repository { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+
+    [EditorRequired, Parameter] public Conflicto Conflicto { get; set; } = null!;
+    [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
+    [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Conflicto == null)
+        {
+            Conflicto = new Conflicto();
+        }
+
+        // Recrear el EditContext si el modelo cambió
+        if (editContext == null || editContext.Model != Conflicto)
+        {
+            editContext = new EditContext(Conflicto);
+        }
+
+        await LoadDiccionariosAsync();
+
+        if (Conflicto.Id != 0)
+        {
+            selectedConflicto = listaConflictos.Where(x => x.Id == Conflicto.ConflictoId).FirstOrDefault();
+            selectedViaGestion = listaViasGestion.Where(x => x.Id == Conflicto.ViaGestionId).FirstOrDefault();
+        }
+    }
+
+    private async Task LoadDiccionariosAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<Diccionario>>("/api/diccionarios/combo");
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+
+        diccionarios = responseHttp.Response;
+
+        if (diccionarios != null)
+        {
+            listaConflictos = diccionarios.Where(x => x.Catalogo == Catalogos.ClaseConflicto).ToList();
+            listaViasGestion = diccionarios.Where(x => x.Catalogo == Catalogos.GestionConflicto).ToList();
+        }
+    }
+
+    private void ConflictoChanged(Diccionario conflicto)
+    {
+        if (conflicto != null)
+        {
+            selectedConflicto = conflicto;
+            Conflicto.ConflictoId = conflicto!.Id;
+        }
+    }
+
+    private void ViaGestionChanged(Diccionario viaGestion)
+    {
+        if (viaGestion != null)
+        {
+            selectedViaGestion = viaGestion;
+            Conflicto.ViaGestionId = viaGestion!.Id;
+        }
+    }
+
+    private async Task<IEnumerable<Diccionario>> SearchConflicto(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return listaConflictos!;
+        }
+
+        return listaConflictos!
+            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<Diccionario>> SearchViaGestion(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return listaViasGestion!;
+        }
+
+        return listaViasGestion!
+            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+}

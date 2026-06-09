@@ -131,7 +131,7 @@ public partial class MunicipioDetails
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo($"/departamentos/details/{municipio!.DepartamentoId}");
+        NavigationManager.NavigateTo($"/departamento/details/{municipio!.DepartamentoId}");
     }
 
     private async Task ShowModalAsync(int id = 0, bool isEdit = false)
@@ -139,7 +139,8 @@ public partial class MunicipioDetails
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
-            CloseButton = true
+            CloseButton = true,
+            NoHeader = true
         };
         IDialogReference? dialog;
         if (isEdit)

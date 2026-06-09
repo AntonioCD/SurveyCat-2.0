@@ -100,7 +100,8 @@ public partial class PersonasIndex
             CloseOnEscapeKey = true,
             CloseButton = true,
             MaxWidth = MaxWidth.Medium,
-            FullWidth = true
+            FullWidth = true,
+            NoHeader = true
         };
         IDialogReference? dialog;
         if (isEdit)

@@ -139,7 +139,8 @@ public partial class BarrioComarcaDetails
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
-            CloseButton = true
+            CloseButton = true,
+            NoHeader = true
         };
         IDialogReference? dialog;
         if (isEdit)

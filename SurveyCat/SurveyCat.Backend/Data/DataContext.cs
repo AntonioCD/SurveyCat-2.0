@@ -13,6 +13,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<BarrioComarca> BarriosComarcas { get; set; }
         public DbSet<Caserio> Caserios { get; set; }
         public DbSet<Colindante> Colindantes { get; set; }
+        public DbSet<Conflicto> Conflictos { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Diccionario> Diccionarios { get; set; }
         public DbSet<Familia> Familias { get; set; }
@@ -51,6 +52,11 @@ namespace SurveyCat.Backend.Data
             modelBuilder.Entity<Colindante>(e =>
             {
                 e.HasIndex(x => new { x.FichaId, x.PuntoCardinalId, x.PersonaId }).IsUnique();
+            });
+
+            modelBuilder.Entity<Conflicto>(e =>
+            {
+                e.HasIndex(x => new { x.ConflictoId, x.ViaGestionId, x.ConEstado }).IsUnique();
             });
 
             modelBuilder.Entity<Familia>(e =>

@@ -1,26 +1,28 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using SurveyCat.Frontend.Components.Pages.Conflictos;
+using SurveyCat.Frontend.Components.Pages.PersonalEncuestas;
 using SurveyCat.Frontend.Components.Pages.Sectores;
 using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 using System.Net;
 
-namespace SurveyCat.Frontend.Components.Pages.Municipios;
+namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
-public partial class MunicipioSectoresDetails
+public partial class FichaConflictosDetails
 {
-    private Municipio? municipio;
-    private List<Sector>? sectores;
+    private Ficha? ficha;
+    private List<Conflicto>? conflictos;
 
-    private MudTable<Sector> table = new();
+    private MudTable<Conflicto> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, 5, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/sectores";
+    private const string baseUrl = "api/conflictos";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
-    [Parameter] public int MunicipioId { get; set; }
+    [Parameter] public int FichaId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -39,14 +41,14 @@ public partial class MunicipioSectoresDetails
         await LoadTotalRecordsAsync();
     }
 
-    private async Task<bool> LoadMunicipioAsync()
+    private async Task<bool> LoadFichaAsync()
     {
-        var responseHttp = await Repository.GetAsync<Municipio>($"/api/municipios/{MunicipioId}");
+        var responseHttp = await Repository.GetAsync<Ficha>($"/api/fichas/{FichaId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo($"/departamentos/details/{municipio!.DepartamentoId}");
+                NavigationManager.NavigateTo($"/fichas");
                 return false;
             }
 
@@ -54,24 +56,24 @@ public partial class MunicipioSectoresDetails
             Snackbar.Add(message!, Severity.Error);
             return false;
         }
-        municipio = responseHttp.Response;
+        ficha = responseHttp.Response;
         return true;
     }
 
     private async Task<bool> LoadTotalRecordsAsync()
     {
         loading = true;
-        if (municipio is null)
+        if (ficha is null)
         {
-            var ok = await LoadMunicipioAsync();
+            var ok = await LoadFichaAsync();
             if (!ok)
             {
-                NoMunicipio();
+                NoFicha();
                 return false;
             }
         }
 
-        var url = $"{baseUrl}/totalRecords?id={MunicipioId}";
+        var url = $"{baseUrl}/totalRecords?id={FichaId}";
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
@@ -88,38 +90,38 @@ public partial class MunicipioSectoresDetails
         return true;
     }
 
-    private async Task<TableData<Sector>> LoadListAsync(TableState sector, CancellationToken cancellationToken)
+    private async Task<TableData<Conflicto>> LoadListAsync(TableState conflicto, CancellationToken cancellationToken)
     {
-        int page = sector.Page + 1;
-        int pageSize = sector.PageSize;
-        var url = $"{baseUrl}/paginated?id={MunicipioId}&page={page}&recordsnumber={pageSize}";
+        int page = conflicto.Page + 1;
+        int pageSize = conflicto.PageSize;
+        var url = $"{baseUrl}/paginated?id={FichaId}&page={page}&recordsnumber={pageSize}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<Sector>>(url);
+        var responseHttp = await Repository.GetAsync<List<Conflicto>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<Sector> { Items = [], TotalItems = 0 };
+            return new TableData<Conflicto> { Items = [], TotalItems = 0 };
         }
         if (responseHttp.Response == null)
         {
-            return new TableData<Sector> { Items = [], TotalItems = 0 };
+            return new TableData<Conflicto> { Items = [], TotalItems = 0 };
         }
-        return new TableData<Sector>
+        return new TableData<Conflicto>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
         };
     }
 
-    private void StatesAction(Sector sector)
+    private void StatesAction(Conflicto conflicto)
     {
-        NavigationManager.NavigateTo($"/sectores/details/{sector.Id}");
+        NavigationManager.NavigateTo($"/conflictos/details/{conflicto.Id}");
     }
 
     private async Task SetFilterValue(string value)
@@ -131,16 +133,16 @@ public partial class MunicipioSectoresDetails
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo($"/departamento/details/{municipio!.DepartamentoId}");
+        NavigationManager.NavigateTo($"/fichas");
     }
 
-    private async Task ShowModalAsync(int id = 0, bool isEdit = false)
+    private async Task ShowModalAsync(long id = 0, bool isEdit = false)
     {
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
-            NoHeader = true
+            NoHeader = true,
         };
         IDialogReference? dialog;
         if (isEdit)
@@ -148,15 +150,15 @@ public partial class MunicipioSectoresDetails
             var parameters = new DialogParameters
             {
                 { "Id", id }
-            }; dialog = await DialogService.ShowAsync<SectorEdit>("Editar Sector", parameters, options);
+            }; dialog = await DialogService.ShowAsync<ConflictoEdit>("Editar Conflicto", parameters, options);
         }
         else
         {
             var parameters = new DialogParameters
                 {
-                    { "MunicipioId", MunicipioId }
+                    { "FichaId", FichaId }
                 };
-            dialog = await DialogService.ShowAsync<SectorCreate>("Nuevo Sector", parameters, options);
+            dialog = await DialogService.ShowAsync<ConflictoCreate>("Nuevo Conflicto", parameters, options);
         }
 
         var result = await dialog.Result;
@@ -167,21 +169,21 @@ public partial class MunicipioSectoresDetails
         }
     }
 
-    private void CaseriosAction(Sector sector)
+    private void CaseriosAction(Conflicto conflicto)
     {
-        NavigationManager.NavigateTo($"/sectores/details/{sector.Id}");
+        NavigationManager.NavigateTo($"/conflictos/details/{conflicto.Id}");
     }
 
-    private void NoMunicipio()
+    private void NoFicha()
     {
-        NavigationManager.NavigateTo("/sectores");
+        NavigationManager.NavigateTo("/fichas");
     }
 
-    private async Task DeleteAsync(Sector sector)
+    private async Task DeleteAsync(Conflicto conflicto)
     {
         var parameters = new DialogParameters
             {
-                { "Message", $"¿Estás seguro de que quieres eliminar el Sector {sector.NumeroSector}?" }
+                { "Message", $"¿Estás seguro de que quieres eliminar el Conflicto {conflicto.TipoConflicto?.Nombre}?" }
             };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
@@ -191,7 +193,7 @@ public partial class MunicipioSectoresDetails
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"api/sectores/{sector.Id}");
+        var responseHttp = await Repository.DeleteAsync($"api/conflictos/{conflicto.Id}");
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -200,6 +202,6 @@ public partial class MunicipioSectoresDetails
         }
         await LoadAsync();
         await table.ReloadServerData();
-        Snackbar.Add("Sector eliminado.", Severity.Success);
+        Snackbar.Add("Conflicto eliminado.", Severity.Success);
     }
 }

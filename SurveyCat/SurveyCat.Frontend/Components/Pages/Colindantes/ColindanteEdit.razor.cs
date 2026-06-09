@@ -3,11 +3,11 @@ using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Familias;
+namespace SurveyCat.Frontend.Components.Pages.Colindantes;
 
-public partial class FamiliaEdit
+public partial class ColindanteEdit
 {
-    private Familia? familia;
+    private Colindante? colindante;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -18,13 +18,13 @@ public partial class FamiliaEdit
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHttp = await Repository.GetAsync<Familia>($"api/familias/{Id}");
+        var responseHttp = await Repository.GetAsync<Colindante>($"api/colindantes/{Id}");
 
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("familias");
+                NavigationManager.NavigateTo("colindantes");
             }
             else
             {
@@ -34,17 +34,19 @@ public partial class FamiliaEdit
         }
         else
         {
-            familia = responseHttp.Response;
+            colindante = responseHttp.Response;
         }
     }
 
     private async Task EditAsync()
     {
-        familia!.Ficha = null;
-        familia.Persona = null;
-        familia.Parentesco = null;
+        colindante!.Ficha = null;
+        colindante.Persona = null;
+        colindante.PuntoCardinal = null;
+        colindante.Conflicto = null;
+        colindante.ViaGestion = null;
 
-        var responseHttp = await Repository.PutAsync("api/familias", familia);
+        var responseHttp = await Repository.PutAsync("api/colindantes", colindante);
 
         if (responseHttp.Error)
         {
@@ -59,6 +61,6 @@ public partial class FamiliaEdit
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/familias/details/{FichaId}");
+        NavigationManager.NavigateTo($"/fichas/colindantes/details/{FichaId}");
     }
 }

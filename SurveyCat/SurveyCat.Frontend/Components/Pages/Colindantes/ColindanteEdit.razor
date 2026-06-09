@@ -1,5 +1,3 @@
-﻿<h3>ColindanteEdit</h3>
+﻿@page "/colindantes/edit/{Id:int}/{FichaId:int}"
 
-@code {
-
-}
+<ColindanteForm Colindante="colindante" OnValidSubmit="EditAsync" ReturnAction="Return" />

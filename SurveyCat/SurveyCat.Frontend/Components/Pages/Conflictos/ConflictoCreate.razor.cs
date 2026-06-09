@@ -3,22 +3,22 @@ using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Caserios;
+namespace SurveyCat.Frontend.Components.Pages.Conflictos;
 
-public partial class CaserioCreate
+public partial class ConflictoCreate
 {
-    private Caserio caserio = new();
+    private Conflicto conflicto = new();
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
-    [Parameter] public int BarrioComarcaId { get; set; }
+    [Parameter] public int FichaId { get; set; }
 
     private async Task CreateAsync()
     {
-        caserio.ComarcaId = BarrioComarcaId;
-        var responseHttp = await Repository.PostAsync("/api/caserios", caserio);
+        conflicto.FichaId = FichaId;
+        var responseHttp = await Repository.PostAsync("/api/conflictos", conflicto);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -32,6 +32,6 @@ public partial class CaserioCreate
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/barriosComarcas/details/{BarrioComarcaId}");
+        NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
     }
 }

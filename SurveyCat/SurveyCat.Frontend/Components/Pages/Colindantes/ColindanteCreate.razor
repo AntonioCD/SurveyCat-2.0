@@ -1,5 +1,3 @@
-﻿<h3>ColindanteCreate</h3>
+﻿@page "/colindantes/create/{FichaId:int}"
 
-@code {
-
-}
+<ColindanteForm Colindante="colindante" OnValidSubmit="CreateAsync" ReturnAction="Return" />

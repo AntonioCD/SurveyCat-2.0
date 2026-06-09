@@ -1,6 +1,26 @@
 ﻿<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
 
+    <MudItem xs="12" Class="mb-2">
+        @* d-flex y justify-space-between empujan el título a la izquierda y el input a la derecha *@
+        <div class="d-flex align-center justify-space-between gap-3 pl-1">
+
+            @* BLOQUE IZQUIERDO: Icono + Título y Subtítulo *@
+            <div class="d-flex align-center gap-3">
+                <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
+                <div class="d-flex flex-column">
+                    <MudText Typo="Typo.h5" Color="Color.Primary">
+                        <b>@(BarrioComarca?.Id != 0 ? "Editar Barrio/Comarca" : "Nuevo Barrio/Comarca")</b>
+                    </MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        Complete los datos requeridos para registrar/editar un Barrio/Comarca.
+                    </MudText>
+                </div>
+            </div>
+        </div>
+        <MudDivider Class="mt-3 mb-2" DividerType="DividerType.FullWidth" />
+    </MudItem>
+
     <MudTextField Label="Nombre del Barrio/Comarca"
                   @bind-Value="@BarrioComarca.Nombre"
                   For="@(() => BarrioComarca.Nombre)"
