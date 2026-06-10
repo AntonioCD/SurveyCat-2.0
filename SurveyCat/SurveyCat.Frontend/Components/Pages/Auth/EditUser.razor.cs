@@ -29,11 +29,26 @@ public partial class EditUser
         await LoadUserAsync();
     }
 
-    [Obsolete]
-    private void ShowModal()
+    //[Obsolete]
+    //private void ShowModal()
+    //{
+    //    var closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+    //    DialogService.Show<ChangePassword>("Cambiar Contraseña", closeOnEscapeKey);
+    //}
+
+    private async Task ShowModal()
     {
-        var closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        DialogService.Show<ChangePassword>("Cambiar Contraseña", closeOnEscapeKey);
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            BackdropClick = false // Evita que se cierre por error si hacen clic afuera
+        };
+
+        var dialog = await DialogService.ShowAsync<ChangePassword>("Cambiar Contraseña", options);
+        // Opcional: puedes esperar el resultado si lo necesitas
+        // var result = await dialog.Result;
     }
 
     private async Task LoadUserAsync()
@@ -64,9 +79,9 @@ public partial class EditUser
             return;
         }
 
-        await LoginService.LoginAsync(responseHttp.Response!.Token);
+        //await LoginService.LoginAsync(responseHttp.Response!.Token);
         Snackbar.Add("Usuario modificado con éxito.", Severity.Success);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/users");
     }
 
     private void ReturnAction()

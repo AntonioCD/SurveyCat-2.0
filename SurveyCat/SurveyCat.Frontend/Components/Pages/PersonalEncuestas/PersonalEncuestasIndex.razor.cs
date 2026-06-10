@@ -93,36 +93,48 @@ public partial class PersonalEncuestasIndex
         await table.ReloadServerData();
     }
 
-    private async Task ShowModalAsync(int id = 0, bool isEdit = false)
+    private void RedirectToPersonalEncuestaForm(long id = 0, bool isEdit = false)
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            CloseButton = true,
-            MaxWidth = MaxWidth.Small,
-            FullWidth = true,
-            NoHeader = true
-        };
-        IDialogReference? dialog;
         if (isEdit)
         {
-            var parameters = new DialogParameters
-            {
-                { "Id", id }
-            }; dialog = await DialogService.ShowAsync<PersonalEncuestaEdit>("Editar Personal de Encuesta", parameters, options);
+            NavigationManager.NavigateTo($"/personalEncuesta/edit/{id}");
         }
         else
         {
-            dialog = await DialogService.ShowAsync<PersonalEncuestaCreate>("Nuevo Personal de Encuesta", options);
-        }
-
-        var result = await dialog.Result;
-        if (result!.Canceled!)
-        {
-            await LoadTotalRecordsAsync();
-            await table.ReloadServerData();
+            NavigationManager.NavigateTo($"/personalEncuesta/create");
         }
     }
+
+    //private async Task ShowModalAsync(int id = 0, bool isEdit = false)
+    //{
+    //    var options = new DialogOptions
+    //    {
+    //        CloseOnEscapeKey = true,
+    //        CloseButton = true,
+    //        MaxWidth = MaxWidth.Small,
+    //        FullWidth = true,
+    //        NoHeader = true
+    //    };
+    //    IDialogReference? dialog;
+    //    if (isEdit)
+    //    {
+    //        var parameters = new DialogParameters
+    //        {
+    //            { "Id", id }
+    //        }; dialog = await DialogService.ShowAsync<PersonalEncuestaEdit>("Editar Personal de Encuesta", parameters, options);
+    //    }
+    //    else
+    //    {
+    //        dialog = await DialogService.ShowAsync<PersonalEncuestaCreate>("Nuevo Personal de Encuesta", options);
+    //    }
+
+    //    var result = await dialog.Result;
+    //    if (result!.Canceled!)
+    //    {
+    //        await LoadTotalRecordsAsync();
+    //        await table.ReloadServerData();
+    //    }
+    //}
 
     private async Task DeleteAsync(PersonalEncuesta personalEncuesta)
     {

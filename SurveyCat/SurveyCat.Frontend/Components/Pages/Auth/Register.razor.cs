@@ -46,7 +46,10 @@ public partial class Register
             Snackbar.Add(message!, Severity.Error);
             return;
         }
-        personalEncuestas = responseHttp.Response;
+
+        personalEncuestas = responseHttp.Response!
+        .Where(p => string.IsNullOrWhiteSpace(p.UserId))
+        .ToList();
     }
 
     private void PersonalEncuestaChanged(PersonalEncuesta personalEncuesta)
@@ -104,7 +107,7 @@ public partial class Register
             return;
         }
 
-        await LoginService.LoginAsync(responseHttp.Response!.Token);
-        NavigationManager.NavigateTo("/");
+        //await LoginService.LoginAsync(responseHttp.Response!.Token);
+        NavigationManager.NavigateTo("/users");
     }
 }

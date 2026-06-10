@@ -93,8 +93,8 @@ public partial class UsersIndex
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
-            MaxWidth = MaxWidth.Small,
-            FullWidth = true, 
+            //MaxWidth = MaxWidth.Small,
+            //FullWidth = true, 
             NoHeader = true
         };
         IDialogReference? dialog;

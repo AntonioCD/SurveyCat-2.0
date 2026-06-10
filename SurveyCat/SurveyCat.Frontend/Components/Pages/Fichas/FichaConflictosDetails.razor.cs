@@ -149,7 +149,8 @@ public partial class FichaConflictosDetails
         {
             var parameters = new DialogParameters
             {
-                { "Id", id }
+                { "Id", id },
+                { "FichaId", FichaId }
             }; dialog = await DialogService.ShowAsync<ConflictoEdit>("Editar Conflicto", parameters, options);
         }
         else

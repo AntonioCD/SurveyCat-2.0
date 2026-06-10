@@ -26,23 +26,149 @@
 
     <MudGrid>
         <MudItem xs="12">
-            <MudText Typo="Typo.h6" Class="deep-purple-text"><b>DATOS GENERALES</b></MudText>
+            @if(PersonalEncuesta?.Id == 0) {
+                <MudButton Variant = "Variant.Outlined"
+                    EndIcon = "@Icons.Material.Filled.PersonSearch"
+                    Color = "Color.Info" OnClick = "@(() => ShowModalPersonaSearchAsync())" >
+                    Buscar Persona
+                </MudButton >
+            }
+
+            @if (PersonalEncuesta!.PersonaId == 0)
+            {
+                @* Si es 0, el input existe, está vacío y es 'required', disparando el globo *@
+                <input @key="PersonalEncuesta.PersonaId"
+                       type="text"
+                       value=""
+                       required
+                       oninvalid="this.setCustomValidity('Debe buscar y seleccionar una persona.')"
+                       oninput="this.setCustomValidity('')"
+                       style="opacity: 0; width: 1px; height: 1px; position: absolute; pointer-events: none;" />
+            }
+            else
+            {
+                @* Si es mayor a 0, renderizamos un input con valor lleno y SIN 'required' *@
+                <input @key="PersonalEncuesta.PersonaId"
+                       type="text"
+                       value="@PersonalEncuesta.PersonaId"
+                       style="opacity: 0; width: 1px; height: 1px; position: absolute; pointer-events: none;" />
+            }
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Primer Nombre"
+                          Variant="Variant.Filled"
+                          @bind-Value="persona!.PrimerNombre"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Segundo Nombre"
+                          Variant="Variant.Filled"
+                          @bind-Value="persona!.SegundoNombre"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Primer Apellido"
+                          Variant="Variant.Filled"
+                          @bind-Value="persona!.PrimerApellido"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Segundo Apellido"
+                          Variant="Variant.Filled"
+                          @bind-Value="persona!.SegundoApellido"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Identificación"
+                          Variant="Variant.Filled"
+                          @bind-Value="persona!.Identificacion"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Genero"
+                          Variant="Variant.Filled"
+                          @bind-Value="persona!.Genero"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudNumericField Label="Edad"
+                             Variant="Variant.Filled"
+                             @bind-Value="persona!.Edad"
+                             Margin="Margin.Dense"
+                             ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Estado Civil"
+                          Variant="Variant.Filled"
+                          Value="@(persona?.EstadoCivil?.Nombre ?? string.Empty)"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
         </MudItem>
 
         <MudItem xs="12">
-            <MudAutocomplete T="Persona"
-                             Label="Persona"
-                             Placeholder="-- Seleccione una persona --"
-                             SearchFunc="SearchPersona"
-                             Value="selectedPersona"
-                             ValueChanged="PersonaChangedAsync"
-                             ReadOnly="@(PersonalEncuesta.Id != 0)"
-                             Variant="Variant.Outlined" Margin="Margin.Dense"
-                             ToStringFunc="@(e=> e==null?null : $"{e.NombreCompleto}")">
-                <ItemTemplate Context="itemContext">
-                    @itemContext.NombreCompleto
-                </ItemTemplate>
-            </MudAutocomplete>
+            <MudTextField Label="Profesión u Oficio"
+                          Variant="Variant.Filled"
+                          Value="@(persona?.Profesion?.Nombre ?? string.Empty)"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Departamento"
+                          Variant="Variant.Filled"
+                          Value="@(persona?.Municipio?.Departamento?.Nombre ?? string.Empty)"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Municipio"
+                          Variant="Variant.Filled"
+                          Value="@(persona?.Municipio?.Nombre ?? string.Empty)"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Barrio/Comarca"
+                          Variant="Variant.Filled"
+                          Value="@(persona?.BarrioComarca?.Nombre ?? string.Empty)"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12" sm="3">
+            <MudTextField Label="Caserío"
+                          Variant="Variant.Filled"
+                          Value="@(persona?.Caserio?.Nombre ?? string.Empty)"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudTextField Label="Dirección Domiciliar"
+                          Variant="Variant.Filled"
+                          @bind-Value="persona!.Direccion"
+                          Margin="Margin.Dense"
+                          ReadOnly="true" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6" Class="deep-purple-text"><b>DATOS GENERALES</b></MudText>
         </MudItem>
 
         <MudItem xs="12">

@@ -43,7 +43,7 @@ public partial class ConflictoForm
 
         if (Conflicto.Id != 0)
         {
-            selectedConflicto = listaConflictos.Where(x => x.Id == Conflicto.ConflictoId).FirstOrDefault();
+            selectedConflicto = listaConflictos.Where(x => x.Id == Conflicto.TipoConflictoId).FirstOrDefault();
             selectedViaGestion = listaViasGestion.Where(x => x.Id == Conflicto.ViaGestionId).FirstOrDefault();
         }
     }
@@ -73,7 +73,7 @@ public partial class ConflictoForm
         if (conflicto != null)
         {
             selectedConflicto = conflicto;
-            Conflicto.ConflictoId = conflicto!.Id;
+            Conflicto.TipoConflictoId = conflicto!.Id;
         }
     }
 

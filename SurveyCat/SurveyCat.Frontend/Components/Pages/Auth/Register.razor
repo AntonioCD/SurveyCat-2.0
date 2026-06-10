@@ -13,12 +13,12 @@
                     <b>Nuevo Usuario</b>
                 </MudText>
                 <MudText Typo="Typo.caption" Color="Color.Secondary">
-                    Complete los datos requeridos para registrar un Usuario.
+                    Complete los datos requeridos para registrar un nuevo Usuario.
                 </MudText>
             </div>
         </div>
     </div>
-    <MudDivider Class="mt-3 mb-2" DividerType="DividerType.FullWidth" />
+    <MudDivider Class="mt-3 mb-4" DividerType="DividerType.FullWidth" />
 </MudItem>
 
 @if (loading)
@@ -32,43 +32,58 @@ else
               OnInvalidSubmit="InvalidForm"
               FormName="RegisterForm">
         <DataAnnotationsValidator />
-        <MudGrid>
+
+        @* pa-4 asegura el padding general uniforme del formulario *@
+        <MudGrid Class="pa-4">
+
+            @* Autocomplete con variante Outlined *@
             <MudItem xs="12">
-                <MudCardContent>
-                    <MudAutocomplete T="PersonalEncuesta"
-                                     Label="Personal"
-                                     Placeholder="--Seleccione un Personal--"
-                                     SearchFunc="SearchPersonalEncuestas"
-                                     Value="selectedPersonalEncuesta"
-                                     ValueChanged="PersonalEncuestaChanged"
-                                     ToStringFunc="@(e=> e.Persona==null ? null : $"{e.Persona!.NombreCompleto}")">
-                        <ItemTemplate Context="itemContext">
-                            @itemContext.Persona!.NombreCompleto
-                        </ItemTemplate>
-                    </MudAutocomplete>
-                </MudCardContent>
+                <MudAutocomplete T="PersonalEncuesta"
+                                 Label="Personal"
+                                 Variant="Variant.Outlined"
+                                 Placeholder="--Seleccione un Personal--"
+                                 SearchFunc="SearchPersonalEncuestas"
+                                 Value="selectedPersonalEncuesta"
+                                 ValueChanged="PersonalEncuestaChanged"
+                                 ToStringFunc="@(e=> e.Persona==null ? null : $"{e.Persona!.NombreCompleto}")">
+                    <ItemTemplate Context="itemContext">
+                        @itemContext.Persona!.NombreCompleto
+                    </ItemTemplate>
+                </MudAutocomplete>
             </MudItem>
+
+            @* Contraseña con variante Outlined *@
             <MudItem xs="12" sm="6">
-                <MudCardContent>
-                    <MudTextField Label="Contraseña"
-                                  InputType="InputType.Password"
-                                  @bind-Value="userDTO.Password"
-                                  For="@(() => userDTO.Password)" />
-                   
-                </MudCardContent>
+                <MudTextField Label="Contraseña"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              @bind-Value="userDTO.Password"
+                              For="@(() => userDTO.Password)" />
             </MudItem>
+
+            @* Confirmar Contraseña con variante Outlined *@
             <MudItem xs="12" sm="6">
-                <MudCardContent>
-                    <MudTextField Label="Confirmar Contraseña"
-                                  InputType="InputType.Password"
-                                  @bind-Value="userDTO.PasswordConfirm"
-                                  For="@(() => userDTO.PasswordConfirm)" />
-                </MudCardContent>
+                <MudTextField Label="Confirmar Contraseña"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              @bind-Value="userDTO.PasswordConfirm"
+                              For="@(() => userDTO.PasswordConfirm)" />
             </MudItem>
-           
-            <MudItem xs="12" class="d-flex justify-end gap-2 mt-4 mb-4 me-4">
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+
+            @* Botones con colores e identificadores consistentes con la paleta activa *@
+            <MudItem xs="12" class="d-flex justify-end gap-2 mt-6">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           OnClick="ReturnAction"
+                           Class="px-6">
+                    CANCELAR
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           ButtonType="ButtonType.Submit"
+                           Class="px-6">
+                    GUARDAR
+                </MudButton>
             </MudItem>
         </MudGrid>
     </EditForm>

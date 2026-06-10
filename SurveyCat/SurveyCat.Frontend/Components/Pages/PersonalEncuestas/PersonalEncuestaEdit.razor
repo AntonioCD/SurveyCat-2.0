@@ -1,14 +1,5 @@
-﻿@if (personalEncuesta is null)
-{
-    <Loading />
-}
-else
-{
-    <MudDialog>
-        <DialogContent>
-            <PersonalEncuestaForm PersonalEncuesta="personalEncuesta" OnValidSubmit="EditAsync" ReturnAction="Return" />
-        </DialogContent>
-    </MudDialog>
-}
+﻿@page "/personalEncuesta/edit/{Id:int}"
+
+<PersonalEncuestaForm PersonalEncuesta="personalEncuesta" OnValidSubmit="EditAsync" ReturnAction="Return" />
 
 

@@ -27,7 +27,7 @@ public class Conflicto
 
     [Display(Name = "Clase de Conflicto")]
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-    public int ConflictoId { get; set; }
+    public int TipoConflictoId { get; set; }
 
     public Diccionario? TipoConflicto { get; set; }
 

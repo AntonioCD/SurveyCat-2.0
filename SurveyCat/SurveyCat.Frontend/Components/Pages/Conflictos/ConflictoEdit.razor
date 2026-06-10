@@ -1,5 +1,12 @@
-﻿<h3>ConflictoEdit</h3>
-
-@code {
-
+﻿@if (conflicto is null)
+{
+    <Loading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <ConflictoForm Conflicto="conflicto" OnValidSubmit="EditAsync" ReturnAction="Return" />
+        </DialogContent>
+    </MudDialog>
 }

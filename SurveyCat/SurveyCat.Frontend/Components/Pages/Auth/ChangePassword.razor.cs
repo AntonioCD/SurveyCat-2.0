@@ -29,13 +29,13 @@ public partial class ChangePassword
         }
 
         MudDialog.Cancel();
-        NavigationManager.NavigateTo("/EditUser");
+        NavigationManager.NavigateTo("/users");
         Snackbar.Add("Contraseña Modificada con éxito.", Severity.Success);
     }
 
-    private void ReturnAction()
+    private void Cancel()
     {
         MudDialog.Cancel();
-        NavigationManager.NavigateTo("/EditUser");
     }
+
 }

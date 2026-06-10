@@ -1,90 +1,100 @@
 ﻿@page "/EditUser"
 @using SurveyCat.Shared.Entities
 
+<MudItem xs="12" Class="mt-2 mb-2">
+    @* BLOQUE DE ENCABEZADO: Mismo diseño limpio que los demás formularios *@
+    <div class="d-flex align-center justify-space-between gap-3 pl-1">
+        <div class="d-flex align-center gap-3">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
+            <div class="d-flex flex-column">
+                <MudText Typo="Typo.h5" Color="Color.Primary">
+                    <b>Editar Usuario</b>
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    Modifique los parámetros o el estado de acceso del usuario seleccionado.
+                </MudText>
+            </div>
+        </div>
+    </div>
+    <MudDivider Class="mt-3 mb-4" DividerType="DividerType.FullWidth" />
+</MudItem>
+
 @if (loading)
 {
     <Loading />
 }
 else
 {
-    @* Contenedor principal centrado vertical y horizontalmente *@
-    <MudContainer MaxWidth="MaxWidth.Small" Class="mt-10">
-        <MudPaper Elevation="4" Class="pa-8">
+    <EditForm Model="user" OnValidSubmit="SaveUserAsync">
+        <DataAnnotationsValidator />
 
-            @* Encabezado centrado *@
-            <div class="d-flex flex-column align-center mb-6">
-                <MudIcon Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Large" />
-                <MudText Typo="Typo.h5" Class="mt-2">Editar Usuario</MudText>
-            </div>
+        @* pa-4 para el padding general uniforme sin contenedores flotantes *@
+        <MudGrid Class="pa-4">
 
-            <EditForm Model="user" OnValidSubmit="SaveUserAsync">
-                <DataAnnotationsValidator />
+            @* Nombre Completo (Lectura) *@
+            <MudItem xs="12">
+                <MudTextField Label="Nombre Completo"
+                              Variant="Variant.Filled"
+                              @bind-Value="user!.PersonalEncuesta!.Persona!.NombreCompleto"
+                              ReadOnly="true"
+                              HelperText="Datos provenientes del registro de Persona" />
+            </MudItem>
 
-                <MudGrid Spacing="3">
-                    @* Campo de Nombre - Ocupa todo el ancho en móvil, se ve mejor centrado *@
-                    <MudItem xs="12">
-                        <MudTextField Label="Nombre Completo"
-                                      Variant="Variant.Outlined"
-                                      @bind-Value="user!.PersonalEncuesta!.Persona!.NombreCompleto"
-                                      ReadOnly="true"
-                                      HelperText="Datos provenientes del registro de Persona" />
-                    </MudItem>
+            @* Código (Lectura) *@
+            <MudItem xs="12" sm="6">
+                <MudTextField Label="Código"
+                              Variant="Variant.Filled"
+                              @bind-Value="user!.PersonalEncuesta!.Codigo"
+                              ReadOnly="true"
+                              HelperText="Datos provenientes de Personal" />
+            </MudItem>
 
-                    <MudItem xs="12" md="6">
-                        <MudTextField Label="Código"
-                                      Variant="Variant.Outlined"
-                                      @bind-Value="user!.PersonalEncuesta!.Codigo"
-                                      ReadOnly="true"
-                                      HelperText="Datos provenientes de Personal" />
-                    </MudItem>
+            @* Brigada (Lectura) *@
+            <MudItem xs="12" sm="6">
+                <MudTextField Label="Brigada"
+                              Variant="Variant.Filled"
+                              @bind-Value="user!.PersonalEncuesta!.Brigada"
+                              ReadOnly="true"
+                              HelperText="Datos provenientes de Personal" />
+            </MudItem>
 
-                    <MudItem xs="12" md="6">
-                        <MudTextField Label="Brigada"
-                                      Variant="Variant.Outlined"
-                                      @bind-Value="user!.PersonalEncuesta!.Brigada"
-                                      ReadOnly="true"
-                                      HelperText="Datos provenientes de Personal" />
-                    </MudItem>
+            @* Checkbox alineado limpiamente de forma horizontal *@
+            <MudItem xs="12" Class="mt-2">
+                <MudCheckBox Label="Usuario Activo"
+                             @bind-Value="user!.Activo"
+                             Color="Color.Primary"
+                             For="@(() => user!.Activo)" />
+            </MudItem>
 
-                    @* Checkbox centrado o alineado con el texto *@
-                    <MudItem xs="12" Class="d-flex justify-center">
-                        <MudCheckBox Label="Usuario Activo"
-                                     @bind-Value="user!.Activo"
-                                     Color="Color.Primary"
-                                     For="@(() => user!.Activo)" />
-                    </MudItem>
+            @* BOTONERA: Alineada a la derecha, sin botones gigantes superpuestos *@
+            @* BOTONERA: Alineada a la derecha, limpia y consistente *@
+            <MudItem xs="12" Class="d-flex justify-end gap-2 mt-6">
 
-                    @* Botones de Acción - Organizados y centrados *@
-                    <MudItem xs="12" Class="d-flex flex-column gap-3 mt-4">
-                        <MudButton Variant="Variant.Filled"
-                                   StartIcon="@Icons.Material.Filled.Save"
-                                   Color="Color.Primary"
-                                   FullWidth="true"
-                                   Size="Size.Large"
-                                   ButtonType="ButtonType.Submit">
-                            Guardar Cambios
-                        </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
+                           OnClick="ReturnAction"
+                           Class="px-6">
+                    CANCELAR
+                </MudButton>
 
-                        <div class="d-flex gap-2">
-                            <MudButton Variant="Variant.Filled"
-                                       StartIcon="@Icons.Material.Filled.LockReset"
-                                       Color="Color.Secondary"
-                                       FullWidth="true"
-                                       OnClick="ShowModal">
-                                Contraseña
-                            </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Info"
+                           StartIcon="@Icons.Material.Filled.LockReset"
+                           OnClick="ShowModal"
+                           Class="px-6">
+                    CAMBIAR CONTRASEÑA
+                </MudButton>
 
-                            <MudButton Variant="Variant.Filled"
-                                       StartIcon="@Icons.Material.Filled.ArrowBack"
-                                       Color="Color.Default"
-                                       FullWidth="true"
-                                       OnClick="ReturnAction">
-                                Regresar
-                            </MudButton>
-                        </div>
-                    </MudItem>
-                </MudGrid>
-            </EditForm>
-        </MudPaper>
-    </MudContainer>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           ButtonType="ButtonType.Submit"
+                           Class="px-6">
+                    GUARDAR
+                </MudButton>
+
+            </MudItem>
+        </MudGrid>
+    </EditForm>
 }
