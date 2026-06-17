@@ -28,8 +28,9 @@ else
             <FilterComponent @bind-FilterValue="Filter" ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Catálogo</MudTh>
-            <MudTh>Nombre</MudTh>
+            <MudTh Style="width: 20%;">Catálogo</MudTh>
+            <MudTh Style="width: 39%;">Nombre</MudTh>
+            <MudTh Style="width: 20%;">Código</MudTh>
             <MudTh Style="width: 20%;">Activo</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
@@ -45,6 +46,7 @@ else
         <RowTemplate>
             <MudTd DataLabel="Catálogo">@context.Catalogo</MudTd>
             <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+            <MudTd DataLabel="Código">@context.Codigo</MudTd>
             <MudTd DataLabel="Activo" Style="text-align: left;">
                 @if (context.Activo)
                 {

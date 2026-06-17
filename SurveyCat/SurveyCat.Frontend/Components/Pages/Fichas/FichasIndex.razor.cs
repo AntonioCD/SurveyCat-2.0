@@ -101,6 +101,11 @@ public partial class FichasIndex
         NavigationManager.NavigateTo($"/fichas/conflictos/details/{ficha.Id}");
     }
 
+    private void DocumentosAnexosAction(Ficha ficha)
+    {
+        NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{ficha.Id}");
+    }
+
     private async Task SetFilterValue(string value)
     {
         Filter = value;

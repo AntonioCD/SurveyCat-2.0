@@ -25,6 +25,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
             .Include(f => f.Estado)
             .Include(f => f.Familias)
             .Include(f => f.Conflictos)
+            .Include(f => f.DocumentosAnexos)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -86,6 +87,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
              .Include(f => f.Familias)
              .Include(f => f.Conflictos!)
              .ThenInclude(c => c.TipoConflicto)
+             .Include(f => f.DocumentosAnexos)
              //.ThenInclude(f => f.Persona!)
              //.ThenInclude(f => f.TipoIdentificacion)
              .FirstOrDefaultAsync(m => m.Id == id);

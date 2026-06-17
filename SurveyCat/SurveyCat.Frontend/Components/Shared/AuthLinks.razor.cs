@@ -18,9 +18,19 @@ public partial class AuthLinks
         var nameClaim = claims.FirstOrDefault(x => x.Type == "PrimerNombre");
     }
 
-    private void EditAction()
+    private async Task ChangePassword()
     {
-        NavigationManager.NavigateTo("/EditUser");
+        var options = new DialogOptions()
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            BackdropClick = false // Evita que se cierre por error si hacen clic afuera
+        };
+
+        var dialog = await DialogService.ShowAsync<ChangePassword>("Cambiar Contraseña", options);
+        // Opcional: puedes esperar el resultado si lo necesitas
+        // var result = await dialog.Result;
     }
 
     private void ShowModalLogIn()
@@ -33,11 +43,5 @@ public partial class AuthLinks
     {
         var closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
         DialogService.ShowAsync<Logout>("Cerrar Sesión", closeOnEscapeKey);
-    }
-
-    private void ShowModalRegister()
-    {
-        var closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        DialogService.ShowAsync<Register>("Registar Usuario", closeOnEscapeKey);
     }
 }

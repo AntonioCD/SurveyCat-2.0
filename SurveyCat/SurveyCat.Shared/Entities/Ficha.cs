@@ -244,7 +244,7 @@ public class Ficha
 
     public ICollection<Conflicto>? Conflictos { get; set; }
 
-    //public ICollection<DocumentoAnexo> DocumentosAnexos { get; set; } = new List<DocumentoAnexo>();
+    public ICollection<DocumentoAnexo>? DocumentosAnexos { get; set; }
 
     // =========================================
     // CONTADORES
@@ -257,4 +257,6 @@ public class Ficha
     public int ColindantesNumber => Colindantes == null ? 0 : Colindantes.Count;
 
     public int ConflictosNumber => Conflictos == null ? 0 : Conflictos.Count;
+
+    public int DocumentosAnexosNumber => DocumentosAnexos == null ? 0 : DocumentosAnexos.Count;
 }

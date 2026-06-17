@@ -29,27 +29,20 @@ public partial class EditUser
         await LoadUserAsync();
     }
 
-    //[Obsolete]
-    //private void ShowModal()
+    //private async Task ShowModal()
     //{
-    //    var closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-    //    DialogService.Show<ChangePassword>("Cambiar Contraseña", closeOnEscapeKey);
+    //    var options = new DialogOptions()
+    //    {
+    //        CloseOnEscapeKey = true,
+    //        MaxWidth = MaxWidth.Small,
+    //        FullWidth = true,
+    //        BackdropClick = false // Evita que se cierre por error si hacen clic afuera
+    //    };
+
+    //    var dialog = await DialogService.ShowAsync<ChangePassword>("Cambiar Contraseña", options);
+    //    // Opcional: puedes esperar el resultado si lo necesitas
+    //    // var result = await dialog.Result;
     //}
-
-    private async Task ShowModal()
-    {
-        var options = new DialogOptions()
-        {
-            CloseOnEscapeKey = true,
-            MaxWidth = MaxWidth.Small,
-            FullWidth = true,
-            BackdropClick = false // Evita que se cierre por error si hacen clic afuera
-        };
-
-        var dialog = await DialogService.ShowAsync<ChangePassword>("Cambiar Contraseña", options);
-        // Opcional: puedes esperar el resultado si lo necesitas
-        // var result = await dialog.Result;
-    }
 
     private async Task LoadUserAsync()
     {

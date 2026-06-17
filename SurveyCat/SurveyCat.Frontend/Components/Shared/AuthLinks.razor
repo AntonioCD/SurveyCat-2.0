@@ -4,28 +4,36 @@
             var nombreCompleto = context.User.FindFirst("PrimerNombre")?.Value
             ?? context.User.Identity?.Name;
         }
-        <div class="pa-4">
-            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Align="Align.Center">
-                ¡Hola, @nombreCompleto!
+
+        <div class="px-4 py-3 mud-theme-primary-hover" style="min-width: 220px; border-radius: 4px 4px 0 0;">
+            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Align="Align.Center" Class="mud-text-bold">
+                ¡HOLA, @nombreCompleto?.ToUpper()!
             </MudText>
         </div>
-        <MudDivider />
 
-        <MudMenuItem OnClick="EditAction" Icon="@Icons.Material.Filled.Person">
-            Editar Perfil
+        <MudDivider Class="my-1" />
+
+        <MudMenuItem OnClick="ChangePassword"
+                     Icon="@Icons.Material.Filled.LockReset"
+                     IconColor="Color.Secondary"
+                     Class="py-2">
+            Cambiar Contraseña
         </MudMenuItem>
 
-        <MudMenuItem OnClick="ShowModalLogOut" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Error">
+        <MudMenuItem OnClick="ShowModalLogOut"
+                     Icon="@Icons.Material.Filled.ExitToApp"
+                     IconColor="Color.Error"
+                     Class="py-2">
             Cerrar Sesión
         </MudMenuItem>
     </Authorized>
 
     <NotAuthorized>
-        <MudMenuItem OnClick="ShowModalRegister" Icon="@Icons.Material.Filled.HowToReg">
-            Nuevo Registro
-        </MudMenuItem>
-
-        <MudMenuItem OnClick="ShowModalLogIn" Icon="@Icons.Material.Filled.Login">
+        <MudMenuItem OnClick="ShowModalLogIn"
+                     Icon="@Icons.Material.Filled.Login"
+                     IconColor="Color.Primary"
+                     Class="py-2"
+                     style="min-width: 220px;">
             Iniciar Sesión
         </MudMenuItem>
     </NotAuthorized>

@@ -46,7 +46,7 @@ else
                               Variant="Variant.Filled"
                               @bind-Value="user!.PersonalEncuesta!.Codigo"
                               ReadOnly="true"
-                              HelperText="Datos provenientes de Personal" />
+                              HelperText="Datos provenientes de Personal Encuesta" />
             </MudItem>
 
             @* Brigada (Lectura) *@
@@ -54,8 +54,8 @@ else
                 <MudTextField Label="Brigada"
                               Variant="Variant.Filled"
                               @bind-Value="user!.PersonalEncuesta!.Brigada"
-                              ReadOnly="true"
-                              HelperText="Datos provenientes de Personal" />
+                              ReadOnly="true" 
+                              HelperText="Datos provenientes de Personal Encuesta" />
             </MudItem>
 
             @* Checkbox alineado limpiamente de forma horizontal *@
@@ -78,13 +78,13 @@ else
                     CANCELAR
                 </MudButton>
 
-                <MudButton Variant="Variant.Filled"
+               @*  <MudButton Variant="Variant.Filled"
                            Color="Color.Info"
                            StartIcon="@Icons.Material.Filled.LockReset"
                            OnClick="ShowModal"
                            Class="px-6">
                     CAMBIAR CONTRASEÑA
-                </MudButton>
+                </MudButton> *@
 
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"

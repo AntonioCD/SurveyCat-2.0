@@ -93,8 +93,6 @@ public partial class UsersIndex
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
-            //MaxWidth = MaxWidth.Small,
-            //FullWidth = true, 
             NoHeader = true
         };
         IDialogReference? dialog;
@@ -116,38 +114,5 @@ public partial class UsersIndex
             await LoadTotalRecordsAsync();
             await table.ReloadServerData();
         }
-    }
-
-    private async Task DeleteAsync(User user)
-    {
-        //    var parameters = new DialogParameters
-        //    {
-        //        { "Message", $"Estas seguro de borrar el Personal de Encuesta: {personalEncuesta.Persona!.NombreCompleto}" }
-        //    };
-        //    var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
-        //    var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
-        //    var result = await dialog.Result;
-        //    if (result!.Canceled)
-        //    {
-        //        return;
-        //    }
-
-        //    var responseHttp = await Repository.DeleteAsync($"{baseUrl}/{personalEncuesta.Id}");
-        //    if (responseHttp.Error)
-        //    {
-        //        if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-        //        {
-        //            NavigationManager.NavigateTo("/personalEncuestas");
-        //        }
-        //        else
-        //        {
-        //            var message = await responseHttp.GetErrorMessageAsync();
-        //            Snackbar.Add(message!, Severity.Error);
-        //        }
-        //        return;
-        //    }
-        //    await LoadTotalRecordsAsync();
-        //    await table.ReloadServerData();
-        //    Snackbar.Add("Registro borrado", Severity.Success);
     }
 }

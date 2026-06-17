@@ -72,27 +72,63 @@ public class AccountsController : ControllerBase
         return NoContent();
     }
 
+    //[HttpPut]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //public async Task<IActionResult> PutAsync(User user)
+    //{
+    //    try
+    //    {
+    //        var currentUser = await _usersUnitOfWork.GetUserAsync(User.Identity!.Name!);
+    //        if (currentUser == null)
+    //        {
+    //            return NotFound();
+    //        }
+
+    //        currentUser.Activo = user.Activo;
+
+    //        var result = await _usersUnitOfWork.UpdateUserAsync(currentUser);
+    //        if (result.Succeeded)
+    //        {
+    //            return Ok(BuildToken(currentUser));
+    //        }
+
+    //        return BadRequest(result.Errors.FirstOrDefault());
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return BadRequest(ex.Message);
+    //    }
+    //}
+
     [HttpPut]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> PutAsync(User user)
     {
         try
         {
-            var currentUser = await _usersUnitOfWork.GetUserAsync(User.Identity!.Name!);
-            if (currentUser == null)
+            // 1. Buscamos en la base de datos al usuario que se desea editar usando su Id (o user.UserName)
+            var userToUpdate = await _usersUnitOfWork.GetUserAsync(Guid.Parse(user.Id));
+
+            if (userToUpdate == null)
             {
-                return NotFound();
+                return NotFound($"No se encontró el usuario con el ID especificado.");
             }
 
-            currentUser.Activo = user.Activo;
+            // 2. Trasladamos los cambios que permitas editar (en este caso, el estado Activo)
+            userToUpdate.Activo = user.Activo;
 
-            var result = await _usersUnitOfWork.UpdateUserAsync(currentUser);
+            // Si necesitas que se actualicen más datos en el futuro, los mapeas aquí abajo:
+            // userToUpdate.PhoneNumber = user.PhoneNumber;
+
+            // 3. Ejecutamos la actualización a través de tu Unit of Work
+            var result = await _usersUnitOfWork.UpdateUserAsync(userToUpdate);
             if (result.Succeeded)
             {
-                return Ok(BuildToken(currentUser));
+                // 4. Ya no regresamos un Token, respondemos con un estado exitoso estándar
+                return Ok(userToUpdate); // HTTP 204: Éxito sin contenido de retorno
             }
 
-            return BadRequest(result.Errors.FirstOrDefault());
+            return BadRequest(result.Errors.FirstOrDefault()?.Description ?? "Error al actualizar el usuario.");
         }
         catch (Exception ex)
         {

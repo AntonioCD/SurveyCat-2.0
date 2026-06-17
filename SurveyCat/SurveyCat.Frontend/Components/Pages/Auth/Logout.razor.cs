@@ -13,6 +13,7 @@ public partial class Logout
     private async Task LogoutActionAsync()
     {
         await LoginService.LogoutAsync();
+        NavigationManager.NavigateTo("/", forceLoad: false);
         CancelAction();
     }
 

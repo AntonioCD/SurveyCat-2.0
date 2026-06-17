@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyCat.Backend.Data;
 
@@ -11,9 +12,11 @@ using SurveyCat.Backend.Data;
 namespace SurveyCat.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260617162345_AddDocumentoAnexoAndAdjuntoEntities")]
+    partial class AddDocumentoAnexoAndAdjuntoEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,7 +187,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("DocumentoAnexoId", "ItemPagina")
                         .IsUnique();
 
-                    b.ToTable("Adjuntos");
+                    b.ToTable("Adjunto");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.BarrioComarca", b =>

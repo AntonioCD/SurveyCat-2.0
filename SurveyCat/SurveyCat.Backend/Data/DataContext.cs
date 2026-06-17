@@ -10,12 +10,14 @@ namespace SurveyCat.Backend.Data
         {
         }
 
+        public DbSet<Adjunto> Adjuntos { get; set; }
         public DbSet<BarrioComarca> BarriosComarcas { get; set; }
         public DbSet<Caserio> Caserios { get; set; }
         public DbSet<Colindante> Colindantes { get; set; }
         public DbSet<Conflicto> Conflictos { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Diccionario> Diccionarios { get; set; }
+        public DbSet<DocumentoAnexo> DocumentosAnexos { get; set; }
         public DbSet<Familia> Familias { get; set; }
         public DbSet<Ficha> Fichas { get; set; }
         public DbSet<Municipio> Municipios { get; set; }
@@ -27,6 +29,11 @@ namespace SurveyCat.Backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Adjunto>(e =>
+            {
+                e.HasIndex(x => new { x.DocumentoAnexoId, x.ItemPagina }).IsUnique();
+            });
 
             modelBuilder.Entity<Departamento>(e =>
             {

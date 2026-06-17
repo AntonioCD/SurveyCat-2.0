@@ -28,13 +28,24 @@ else
         </ToolBarContent>
         <HeaderContent>
             <MudTh>Nombre Completo</MudTh>
+            <MudTh Style="width: 20%;">Identificación</MudTh>
             <MudTh Style="width: 20%;">Rol</MudTh>
+            <MudTh Style="width: 20%;">Activo</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
 
         <RowTemplate>
-            <MudTd DataLabel="Nombre Completo">@context.PersonalEncuesta!.Persona!.NombreCompleto</MudTd>
-            <MudTd DataLabel="Rol">@context.PersonalEncuesta!.TipoRol</MudTd>
+            <MudTd DataLabel="Nombre Completo">@context.PersonalEncuesta?.Persona?.NombreCompleto</MudTd>
+            <MudTd DataLabel="Identificación">@context.PersonalEncuesta?.Persona?.Identificacion</MudTd>
+            <MudTd DataLabel="Rol">@context.PersonalEncuesta?.TipoRol</MudTd>
+            <MudTd DataLabel="Activo" Style="text-align: center;">
+                <div class="d-flex justify-left">
+                    <MudCheckBox Value="@context.Activo"
+                                 Color="Color.Primary"
+                                 ReadOnly="true"
+                                 Dense="true" />
+                </div>
+            </MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">
@@ -44,13 +55,6 @@ else
                                        OnClick="@(() => ShowModalAsync(context.Id, true))"
                                        Size="Size.Medium"
                                        Class="mr-2" />
-                    </MudTooltip>
-                    <MudTooltip Text="Borrar">
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Variant="Variant.Outlined"
-                                       Color="Color.Error"
-                                       OnClick="@(() => DeleteAsync(context))"
-                                       Size="Size.Medium" />
                     </MudTooltip>
                 </div>
             </MudTd>
