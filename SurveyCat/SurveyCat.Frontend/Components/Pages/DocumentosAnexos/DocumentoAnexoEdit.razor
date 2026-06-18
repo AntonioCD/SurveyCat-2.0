@@ -1,5 +1,12 @@
-﻿<h3>DocumentoAnexoEdit</h3>
-
-@code {
-
+﻿@if (documentoAnexo is null)
+{
+    <Loading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <DocumentoAnexoForm DocumentoAnexo="documentoAnexo" OnValidSubmit="EditAsync" ReturnAction="Return" />
+        </DialogContent>
+    </MudDialog>
 }

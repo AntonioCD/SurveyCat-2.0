@@ -14,13 +14,13 @@
 
                 @* BLOQUE IZQUIERDO: Icono + Título y Subtítulo *@
                 <div class="d-flex align-center gap-3">
-                    <MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1" Color="Color.Primary" Size="Size.Large" />
+                    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
                     <div class="d-flex flex-column">
                         <MudText Typo="Typo.h5" Color="Color.Primary">
                             <b>@(DocumentoAnexo?.Id != 0 ? "Editar Documento Anexo" : "Nuevo Documento Anexo")</b>
                         </MudText>
                         <MudText Typo="Typo.caption" Color="Color.Secondary">
-                            Complete los datos requeridos para registrar/editar un conflicto.
+                            Complete los datos requeridos para registrar/editar un documento anexo.
                         </MudText>
                     </div>
                 </div>
