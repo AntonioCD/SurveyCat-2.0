@@ -1,27 +1,26 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SurveyCat.Frontend.Components.Pages.Conflictos;
-using SurveyCat.Frontend.Components.Pages.DocumentosAnexos;
+using SurveyCat.Frontend.Components.Pages.Adjuntos;
 using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 using System.Net;
 
-namespace SurveyCat.Frontend.Components.Pages.Fichas;
+namespace SurveyCat.Frontend.Components.Pages.DocumentosAnexos;
 
-public partial class FichaDocumentosAnexosDetails
+public partial class DocumentoAnexoDetails
 {
-    private Ficha? ficha;
-    private List<DocumentoAnexo>? documentosAnexos;
+    private DocumentoAnexo? documentoAnexo;
+    private List<Adjunto>? adjuntos;
 
-    private MudTable<DocumentoAnexo> table = new();
+    private MudTable<Adjunto> table = new();
     private readonly int[] pageSizeOptions = { 10, 25, 50, 5, int.MaxValue };
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/documentosAnexos";
+    private const string baseUrl = "api/adjuntos";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
-    [Parameter] public int FichaId { get; set; }
+    [Parameter] public int DocumentoAnexoId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -40,14 +39,14 @@ public partial class FichaDocumentosAnexosDetails
         await LoadTotalRecordsAsync();
     }
 
-    private async Task<bool> LoadFichaAsync()
+    private async Task<bool> LoadDocumentoAnexoAsync()
     {
-        var responseHttp = await Repository.GetAsync<Ficha>($"/api/fichas/{FichaId}");
+        var responseHttp = await Repository.GetAsync<DocumentoAnexo>($"/api/documentosAnexos/{DocumentoAnexoId}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo($"/fichas");
+                NavigationManager.NavigateTo("/documentosAnexos");
                 return false;
             }
 
@@ -55,24 +54,24 @@ public partial class FichaDocumentosAnexosDetails
             Snackbar.Add(message!, Severity.Error);
             return false;
         }
-        ficha = responseHttp.Response;
+        documentoAnexo = responseHttp.Response;
         return true;
     }
 
     private async Task<bool> LoadTotalRecordsAsync()
     {
         loading = true;
-        if (ficha is null)
+        if (documentoAnexo is null)
         {
-            var ok = await LoadFichaAsync();
+            var ok = await LoadDocumentoAnexoAsync();
             if (!ok)
             {
-                NoFicha();
+                NoDepartamento();
                 return false;
             }
         }
 
-        var url = $"{baseUrl}/totalRecords?id={FichaId}";
+        var url = $"{baseUrl}/totalRecords?id={DocumentoAnexoId}";
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
@@ -89,72 +88,43 @@ public partial class FichaDocumentosAnexosDetails
         return true;
     }
 
-    private async Task<TableData<DocumentoAnexo>> LoadListAsync(TableState documentoAnexo, CancellationToken cancellationToken)
+    private async Task<TableData<Adjunto>> LoadListAsync(TableState adjunto, CancellationToken cancellationToken)
     {
-        int page = documentoAnexo.Page + 1;
-        int pageSize = documentoAnexo.PageSize;
-        var url = $"{baseUrl}/paginated?id={FichaId}&page={page}&recordsnumber={pageSize}";
+        int page = adjunto.Page + 1;
+        int pageSize = adjunto.PageSize;
+        var url = $"{baseUrl}/paginated?id={DocumentoAnexoId}&page={page}&recordsnumber={pageSize}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
             url += $"&filter={Filter}";
         }
 
-        var responseHttp = await Repository.GetAsync<List<DocumentoAnexo>>(url);
+        var responseHttp = await Repository.GetAsync<List<Adjunto>>(url);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
-            return new TableData<DocumentoAnexo> { Items = [], TotalItems = 0 };
+            return new TableData<Adjunto> { Items = [], TotalItems = 0 };
         }
         if (responseHttp.Response == null)
         {
-            return new TableData<DocumentoAnexo> { Items = [], TotalItems = 0 };
+            return new TableData<Adjunto> { Items = [], TotalItems = 0 };
         }
-        return new TableData<DocumentoAnexo>
+        return new TableData<Adjunto>
         {
             Items = responseHttp.Response,
             TotalItems = totalRecords
         };
     }
 
-    private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    private void StatesAction(Adjunto adjunto)
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            CloseButton = true,
-            NoHeader = true,
-        };
-        IDialogReference? dialog;
-        if (isEdit)
-        {
-            var parameters = new DialogParameters
-            {
-                { "Id", id },
-                { "FichaId", FichaId }
-            }; dialog = await DialogService.ShowAsync<DocumentoAnexoEdit>("Editar Documento Anexo", parameters, options);
-        }
-        else
-        {
-            var parameters = new DialogParameters
-                {
-                    { "FichaId", FichaId }
-                };
-            dialog = await DialogService.ShowAsync<DocumentoAnexoCreate>("Nuevo Documento Anexo", parameters, options);
-        }
-
-        var result = await dialog.Result;
-        if (result!.Canceled!)
-        {
-            await LoadTotalRecordsAsync();
-            await table.ReloadServerData();
-        }
+        NavigationManager.NavigateTo($"/adjuntos/details/{adjunto.Id}");
     }
 
-    private void AdjuntosAction(DocumentoAnexo documentoAnexo)
+    private void SectoresAction(Adjunto adjunto)
     {
-        NavigationManager.NavigateTo($"/documentoAnexo/details/{documentoAnexo.Id}");
+        NavigationManager.NavigateTo($"/adjuntos/sectores/details/{adjunto.Id}");
     }
 
     private async Task SetFilterValue(string value)
@@ -166,19 +136,57 @@ public partial class FichaDocumentosAnexosDetails
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo($"/fichas");
+        NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{DocumentoAnexoId}");
     }
 
-    private void NoFicha()
+    private async Task ShowModalAsync(int id = 0, bool isEdit = false)
     {
-        NavigationManager.NavigateTo("/fichas");
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            NoHeader = true
+        };
+        IDialogReference? dialog;
+        if (isEdit)
+        {
+            var parameters = new DialogParameters
+            {
+                { "Id", id }
+            }; dialog = await DialogService.ShowAsync<AdjuntoEdit>("Editar Adjunto", parameters, options);
+        }
+        else
+        {
+            var parameters = new DialogParameters
+                {
+                    { "DocumentoAnexoId", DocumentoAnexoId }
+                };
+            dialog = await DialogService.ShowAsync<AdjuntoCreate>("Nuevo Adjunto", parameters, options);
+        }
+
+        var result = await dialog.Result;
+        if (result!.Canceled!)
+        {
+            await LoadTotalRecordsAsync();
+            await table.ReloadServerData();
+        }
     }
 
-    private async Task DeleteAsync(DocumentoAnexo documentoAnexo)
+    private void BarriosComarcasAction(Adjunto adjunto)
+    {
+        NavigationManager.NavigateTo($"/adjuntos/details/{adjunto.Id}");
+    }
+
+    private void NoDepartamento()
+    {
+        NavigationManager.NavigateTo("/documentosAnexos");
+    }
+
+    private async Task DeleteAsync(Adjunto adjunto)
     {
         var parameters = new DialogParameters
             {
-                { "Message", $"¿Estás seguro de que quieres eliminar el Documento Anexo {documentoAnexo.Documento?.Nombre}?" }
+                { "Message", $"¿Estás seguro de que quieres eliminar el Adjunto {adjunto.NombreArchivo}?" }
             };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
@@ -188,7 +196,7 @@ public partial class FichaDocumentosAnexosDetails
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"api/documentosAnexos/{documentoAnexo.Id}");
+        var responseHttp = await Repository.DeleteAsync($"api/adjuntos/{adjunto.Id}");
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -197,6 +205,6 @@ public partial class FichaDocumentosAnexosDetails
         }
         await LoadAsync();
         await table.ReloadServerData();
-        Snackbar.Add("DocumentoAnexo eliminado.", Severity.Success);
+        Snackbar.Add("Adjunto eliminado.", Severity.Success);
     }
 }

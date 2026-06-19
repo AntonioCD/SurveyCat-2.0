@@ -22,6 +22,7 @@ builder.Services.AddTransient<SeedDb>();
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+builder.Services.AddScoped<IAdjuntosRepository, AdjuntosRepository>();
 builder.Services.AddScoped<IBarriosComarcasRepository, BarriosComarcasRepository>();
 builder.Services.AddScoped<ICaseriosRepository, CaseriosRepository>();
 builder.Services.AddScoped<IColindantesRepository, ColindantesRepository>();
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IPropietariosRepository, PropietariosRepository>();
 builder.Services.AddScoped<ISectoresRepository, SectoresRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 
+builder.Services.AddScoped<IAdjuntosUnitOfWork, AdjuntosUnitOfWork>();
 builder.Services.AddScoped<IBarriosComarcasUnitOfWork, BarriosComarcasUnitOfWork>();
 builder.Services.AddScoped<ICaseriosUnitOfWork, CaseriosUnitOfWork>();
 builder.Services.AddScoped<IColindantesUnitOfWork, ColindantesUnitOfWork>();

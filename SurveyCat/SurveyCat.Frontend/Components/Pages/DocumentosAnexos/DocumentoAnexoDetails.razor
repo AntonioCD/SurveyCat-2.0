@@ -1,4 +1,4 @@
-﻿@page "/fichas/documentosAnexos/details/{FichaId:int}"
+﻿@page "/documentoAnexo/details/{DocumentoAnexoId:int}"
 
 @if (loading)
 {
@@ -6,7 +6,7 @@
 }
 else
 {
-    <MudTable Items="@documentosAnexos"
+    <MudTable Items="@adjuntos"
               @ref="table"
               ServerData="LoadListAsync"
               Dense="true"
@@ -15,38 +15,22 @@ else
               FixedHeader="true"
               FixedFooter="true">
         <ToolBarContent>
-            <MudText Typo="Typo.h6" Class="mr-4">DOCUMENTOS ANEXOS (@ficha?.CodEncuesta)</MudText>
+            <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @documentoAnexo?.Documento?.Nombre</MudText>
             <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
             <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => ShowModalAsync())">Crear</MudButton>
             <MudSpacer />
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="width: 59%;">Documento</MudTh>
-            <MudTh Style="width: 20%;"># Páginas</MudTh>
-            <MudTh Style="width: 20%;"># Adjuntos</MudTh>
+            <MudTh Style="width: 20%;">Item</MudTh>
+            <MudTh Style="width: 20%;">Nombre de Archivo</MudTh>
+            <MudTh Style="width: 59%;">Ubicación</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Documento">@context.Documento?.Nombre</MudTd>
-            <MudTd DataLabel="# Páginas">@context.NumeroPaginas</MudTd>
-            <MudTd DataLabel="Adjuntos">
-                <MudTooltip Text="Ver Adjuntos">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
-                               Size="Size.Medium"
-                               OnClick="@(() => AdjuntosAction(@context))"
-                               Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
-                               Class="d-flex justify-space-between px-2">
-
-                        <span>@context.AdjuntosNumber</span>
-
-                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
-                                 Size="Size.Small"
-                                 Class="ml-2" />
-                    </MudButton>
-                </MudTooltip>
-            </MudTd>
+            <MudTd DataLabel="Item">@context.ItemPagina</MudTd>
+            <MudTd DataLabel="Nombre de Archivo">@context.NombreArchivo</MudTd>
+            <MudTd DataLabel="Ubicación">@context.Ruta</MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">
@@ -78,3 +62,9 @@ else
         </PagerContent>
     </MudTable>
 }
+
+
+
+
+
+
