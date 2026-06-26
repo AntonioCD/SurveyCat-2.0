@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.Repositories.Implementations;
 using SurveyCat.Backend.Repositories.Interfaces;
@@ -110,6 +112,25 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// =========================================================================
+// CONFIGURACIÓN DEL PROVEEDOR DE ARCHIVOS FÍSICOS DESDE APPSETTINGS
+// =========================================================================
+var localFolderPath = builder.Configuration["StorageSettings:LocalFolderPath"]
+                      ?? @"C:\SurveyCatFiles\Adjuntos"; // Valor por defecto si no existe
+
+if (!Directory.Exists(localFolderPath))
+{
+    Directory.CreateDirectory(localFolderPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(localFolderPath),
+    RequestPath = "/localfiles"
+});
+// =========================================================================
+
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

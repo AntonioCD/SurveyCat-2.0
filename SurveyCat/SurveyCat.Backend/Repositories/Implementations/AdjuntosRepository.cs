@@ -75,4 +75,35 @@ public class AdjuntosRepository : GenericRepository<Adjunto>, IAdjuntosRepositor
             Result = adjunto
         };
     }
+
+    public override async Task<ActionResponse<Adjunto>> AddAsync(Adjunto adjunto)
+    {
+        try
+        {
+            _context.Add(adjunto);
+
+            await _context.SaveChangesAsync();
+            return new ActionResponse<Adjunto>
+            {
+                WasSuccess = true,
+                Result = adjunto
+            };
+        }
+        catch (DbUpdateException)
+        {
+            return new ActionResponse<Adjunto>
+            {
+                WasSuccess = false,
+                Message = "Ya existe el registro que estas intentando crear."
+            };
+        }
+        catch (Exception exception)
+        {
+            return new ActionResponse<Adjunto>
+            {
+                WasSuccess = false,
+                Message = exception.Message
+            };
+        }
+    }
 }

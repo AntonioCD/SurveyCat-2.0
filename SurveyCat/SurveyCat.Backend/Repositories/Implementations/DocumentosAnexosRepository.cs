@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿    using Microsoft.EntityFrameworkCore;
 using SurveyCat.Backend.Data;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -19,7 +19,8 @@ public class DocumentosAnexosRepository : GenericRepository<DocumentoAnexo>, IDo
     public override async Task<ActionResponse<IEnumerable<DocumentoAnexo>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.DocumentosAnexos
-            .Include(p => p.Documento)
+            .Include(d => d.Documento)
+            .Include(d => d.Adjuntos)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))

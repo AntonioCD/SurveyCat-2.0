@@ -22,9 +22,11 @@ public partial class AdjuntoForm
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
     [Parameter] public int DocumentoAnexoId { get; set; }
+
     [EditorRequired, Parameter] public Adjunto Adjunto { get; set; } = null!;
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
     [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
+    [Parameter] public EventCallback<IBrowserFile> OnFileSelected { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -86,18 +88,20 @@ public partial class AdjuntoForm
         GenerarNombreArchivo();
     }
 
-    private void UploadFileAsync(InputFileChangeEventArgs e)
+    private async Task UploadFileAsync(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file != null)
         {
             ArchivoOriginalName = file.Name;
-            Extension = Path.GetExtension(file.Name); // Extrae la extensión (.pdf)
+            Extension = Path.GetExtension(file.Name);
 
             GenerarNombreArchivo();
 
-            // Seteamos una ruta relativa simulada con el nombre final calculado
             Adjunto.Ruta = $"uploads/docs/{Adjunto.NombreArchivo}";
+
+            // Enviamos el objeto binario al componente Padre
+            await OnFileSelected.InvokeAsync(file);
         }
     }
 
@@ -107,7 +111,7 @@ public partial class AdjuntoForm
         if (documentoAnexo?.Documento != null)
         {
             var codigo = documentoAnexo.Documento.Codigo ?? string.Empty;
-            var numPaginas = documentoAnexo.NumeroPaginas;
+            var numPaginas = documentoAnexo.NumeroPaginas.ToString("D2");
 
             // :D2 convierte el número 1 en "01", el 9 en "09", manteniendo intactos números superiores (ej: 12)
             var itemPaginaStr = Adjunto.ItemPagina.ToString("D2");

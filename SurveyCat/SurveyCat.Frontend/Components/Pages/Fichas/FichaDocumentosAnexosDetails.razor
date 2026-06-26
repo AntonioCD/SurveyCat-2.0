@@ -22,13 +22,15 @@ else
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="width: 59%;">Documento</MudTh>
+            <MudTh Style="width: 39%;">Documento</MudTh>
+            <MudTh Style="width: 20%;">Código</MudTh>
             <MudTh Style="width: 20%;"># Páginas</MudTh>
             <MudTh Style="width: 20%;"># Adjuntos</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Documento">@context.Documento?.Nombre</MudTd>
+            <MudTd DataLabel="Documento">@context.Documento?.Codigo</MudTd>
             <MudTd DataLabel="# Páginas">@context.NumeroPaginas</MudTd>
             <MudTd DataLabel="Adjuntos">
                 <MudTooltip Text="Ver Adjuntos">

@@ -11,4 +11,6 @@ public interface IAdjuntosRepository
     Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
 
     Task<ActionResponse<Adjunto>> GetAsync(int id);
+
+    Task<ActionResponse<Adjunto>> AddAsync(Adjunto adjunto);
 }

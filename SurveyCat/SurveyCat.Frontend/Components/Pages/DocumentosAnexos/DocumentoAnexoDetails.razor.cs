@@ -5,6 +5,7 @@ using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 using System.Net;
+using static System.Net.WebRequestMethods;
 
 namespace SurveyCat.Frontend.Components.Pages.DocumentosAnexos;
 
@@ -26,6 +27,7 @@ public partial class DocumentoAnexoDetails
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private HttpClient Http { get; set; } = null!;
 
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
 
@@ -139,31 +141,38 @@ public partial class DocumentoAnexoDetails
         NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{DocumentoAnexoId}");
     }
 
-    private async Task ShowModalAsync(int id = 0, bool isEdit = false)
+    private async Task ShowModalAsync()
     {
+        // 1. SI ES CREACIÓN Y NO TIENE CÓDIGO...
+        if (documentoAnexo?.Ficha == null || string.IsNullOrWhiteSpace(documentoAnexo.Ficha.CodEncuesta))
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+            Snackbar.Add(
+                "No se puede agregar un adjunto porque el documento anexo no tiene un código de encuesta válido asignado.",
+                Severity.Warning,
+                config => { config.CloseAfterNavigation = true; }
+            );
+
+            return;
+        }
+
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
             NoHeader = true
         };
-        IDialogReference? dialog;
-        if (isEdit)
-        {
-            var parameters = new DialogParameters
-            {
-                { "Id", id }
-            }; dialog = await DialogService.ShowAsync<AdjuntoEdit>("Editar Adjunto", parameters, options);
-        }
-        else
-        {
-            var parameters = new DialogParameters
-                {
-                    { "DocumentoAnexoId", DocumentoAnexoId }
-                };
-            dialog = await DialogService.ShowAsync<AdjuntoCreate>("Nuevo Adjunto", parameters, options);
-        }
 
+        IDialogReference? dialog;
+
+        var parameters = new DialogParameters
+            {
+                { "DocumentoAnexoId", DocumentoAnexoId },
+                { "CodEncuesta", documentoAnexo!.Ficha!.CodEncuesta }
+            };
+
+        dialog = await DialogService.ShowAsync<AdjuntoCreate>("Nuevo Adjunto", parameters, options);
+        
         var result = await dialog.Result;
         if (result!.Canceled!)
         {
@@ -180,6 +189,28 @@ public partial class DocumentoAnexoDetails
     private void NoDepartamento()
     {
         NavigationManager.NavigateTo("/documentosAnexos");
+    }
+
+    private async Task VerDocumentoCompletoAsync(Adjunto adjunto)
+    {
+        var parameters = new DialogParameters();
+
+        var apiBaseUrl = Http.BaseAddress?.ToString().TrimEnd('/') ?? "";
+        var rutaLimpia = adjunto.Ruta.TrimStart('/');
+        var urlCompleta = $"{apiBaseUrl}/{rutaLimpia}";
+
+        parameters.Add("DocumentoUrl", urlCompleta);
+        parameters.Add("NombreArchivo", adjunto.NombreArchivo);
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true,
+            CloseOnEscapeKey = true
+        };
+
+        await DialogService.ShowAsync<AdjuntoVisor>(adjunto.NombreArchivo, parameters, options);
     }
 
     private async Task DeleteAsync(Adjunto adjunto)

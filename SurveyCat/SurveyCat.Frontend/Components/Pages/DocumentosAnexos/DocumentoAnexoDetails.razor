@@ -22,8 +22,8 @@ else
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="width: 20%;">Item</MudTh>
-            <MudTh Style="width: 20%;">Nombre de Archivo</MudTh>
+            <MudTh Style="width: 10%;">Item</MudTh>
+            <MudTh Style="width: 30%;">Nombre de Archivo</MudTh>
             <MudTh Style="width: 59%;">Ubicación</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
@@ -33,11 +33,12 @@ else
             <MudTd DataLabel="Ubicación">@context.Ruta</MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
-                    <MudTooltip Text="Editar">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                    @* ACCIÓN PARA VER ARCHIVO COMPLETO *@
+                    <MudTooltip Text="Visualizar Documento">
+                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
                                        Variant="Variant.Outlined"
-                                       Color="Color.Warning"
-                                       OnClick="@(() => ShowModalAsync(context.Id, true))"
+                                       Color="Color.Info"
+                                       OnClick="@(() => VerDocumentoCompletoAsync(context))"
                                        Size="Size.Medium"
                                        Class="mr-2" />
                     </MudTooltip>
@@ -62,7 +63,6 @@ else
         </PagerContent>
     </MudTable>
 }
-
 
 
 

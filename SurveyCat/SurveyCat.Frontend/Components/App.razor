@@ -16,6 +16,49 @@
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        function inicializarArrastre(elementId) {
+            // Esperamos un milisegundo a que el DOM procese el ID
+            setTimeout(() => {
+                const slider = document.getElementById(elementId);
+                if (!slider) return;
+
+                let isDown = false;
+                let startX, startY;
+                let scrollLeft, scrollTop;
+
+                slider.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    slider.style.cursor = 'grabbing';
+                    startX = e.pageX - slider.offsetLeft;
+                    startY = e.pageY - slider.offsetTop;
+                    scrollLeft = slider.scrollLeft;
+                    scrollTop = slider.scrollTop;
+                });
+
+                slider.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    slider.style.cursor = 'grab';
+                });
+
+                slider.addEventListener('mouseup', () => {
+                    isDown = false;
+                    slider.style.cursor = 'grab';
+                });
+
+                slider.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - slider.offsetLeft;
+                    const y = e.pageY - slider.offsetTop;
+                    const walkX = (x - startX);
+                    const walkY = (y - startY);
+                    slider.scrollLeft = scrollLeft - walkX;
+                    slider.scrollTop = scrollTop - walkY;
+                });
+            }, 50);
+        }
+    </script>
 </body>
 
 </html>

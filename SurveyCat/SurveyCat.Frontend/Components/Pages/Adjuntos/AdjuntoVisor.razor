@@ -1,0 +1,58 @@
+﻿@inject IJSRuntime JSRuntime
+
+<MudDialog>
+    <TitleContent>
+        <div class="d-flex align-center justify-space-between w-100 pr-4">
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.FindInPage" Class="mr-2" />
+                @NombreArchivo
+            </MudText>
+
+            @if (!DocumentoUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="d-flex gap-2 align-center">
+                    <MudTooltip Text="Acercar (Zoom +)">
+                        <MudIconButton Icon="@Icons.Material.Filled.ZoomIn" Color="Color.Info" Variant="Variant.Filled" Size="Size.Small" OnClick="ZoomIn" />
+                    </MudTooltip>
+                    <MudTooltip Text="Alejar (Zoom -)">
+                        <MudIconButton Icon="@Icons.Material.Filled.ZoomOut" Color="Color.Info" Variant="Variant.Filled" Size="Size.Small" OnClick="ZoomOut" />
+                    </MudTooltip>
+                    <MudTooltip Text="Tamaño Original (100%)">
+                        <MudIconButton Icon="@Icons.Material.Filled.YoutubeSearchedFor" Color="Color.Secondary" Variant="Variant.Filled" Size="Size.Small" OnClick="ResetZoom" />
+                    </MudTooltip>
+
+                    <MudDivider Vertical="true" FlexItem="true" Class="mx-2" Style="height:24px; border-color: var(--mud-palette-divider);" />
+
+                    <MudTooltip Text="Pantalla Completa">
+                        <MudIconButton Icon="@Icons.Material.Filled.Fullscreen" Color="Color.Tertiary" Variant="Variant.Filled" Size="Size.Small" OnClick="ToggleFullscreen" />
+                    </MudTooltip>
+                </div>
+            }
+        </div>
+    </TitleContent>
+    <DialogContent>
+        @* Contenedor limpio de eventos C# *@
+        <div id="@containerId"
+             class="d-flex justify-center align-center pa-2 mud-background-gray-darken"
+             style="height: 65vh; overflow: auto; border: 1px solid var(--mud-palette-divider); border-radius: 8px; cursor: @(zoomScale > 1.0 ? "grab" : "default"); user-select: none;">
+
+            @if (DocumentoUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                <object data="@DocumentoUrl" type="application/pdf" width="100%" height="100%">
+                    <p>Tu navegador no admite la visualización directa de PDFs. <a href="@DocumentoUrl" target="_blank">Haz clic aquí para descargarlo.</a></p>
+                </object>
+            }
+            else
+            {
+                <img src="@DocumentoUrl"
+                     alt="@NombreArchivo"
+                     style="scale: @(zoomScale); transform-origin: center center; transition: scale 0.2s ease-in-out; max-width: 95%; height: auto; object-fit: contain; box-shadow: var(--mud-elevation-8); border-radius: 4px; pointer-events: none;" />
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudText Typo="Typo.caption" Class="ml-4">Zoom actual: @(Math.Round(zoomScale * 100))%</MudText>
+        <MudSpacer />
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Cerrar">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>

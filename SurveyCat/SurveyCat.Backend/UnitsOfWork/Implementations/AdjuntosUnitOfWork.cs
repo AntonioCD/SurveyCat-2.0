@@ -1,4 +1,5 @@
-﻿using SurveyCat.Backend.Repositories.Interfaces;
+﻿using SurveyCat.Backend.Repositories.Implementations;
+using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
@@ -20,4 +21,6 @@ public class AdjuntosUnitOfWork : GenericUnitOfWork<Adjunto>, IAdjuntosUnitOfWor
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination) => await _adjuntosRepository.GetTotalRecordsAsync(pagination);
 
     public override async Task<ActionResponse<Adjunto>> GetAsync(int id) => await _adjuntosRepository.GetAsync(id);
+
+    public override async Task<ActionResponse<Adjunto>> AddAsync(Adjunto adjunto) => await _adjuntosRepository.AddAsync(adjunto);
 }
