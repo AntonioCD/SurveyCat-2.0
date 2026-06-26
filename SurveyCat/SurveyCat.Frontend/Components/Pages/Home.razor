@@ -2,6 +2,15 @@
 
 <PageTitle>Inicio - SurveyCat</PageTitle>
 
+@if (cargando)
+{
+    <div class="d-flex justify-center align-center" style="height: 50vh;">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+    </div>
+}
+else if (dashboardData != null)
+{
+
 <AuthorizeView Roles="Administrador">
     <Authorized>
         <div class="d-flex align-center justify-space-between mb-6">
@@ -19,7 +28,7 @@
                         <MudIcon Icon="@Icons.Material.Filled.Description" />
                     </MudAvatar>
                     <div>
-                        <MudText Typo="Typo.h5" Class="font-weight-bold">1,245</MudText>
+                        <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichas</MudText>
                         <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas Registradas</MudText>
                     </div>
                 </MudPaper>
@@ -27,33 +36,33 @@
             <MudItem xs="12" sm="6" md="3">
                 <MudPaper Elevation="3" Class="pa-4 d-flex align-center rounded-lg border-l-4 border-solid mud-border-secondary">
                     <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Large" Class="mr-4">
-                        <MudIcon Icon="@Icons.Material.Filled.People" />
+                        <MudIcon Icon="@Icons.Material.Filled.RemoveRedEye" />
                     </MudAvatar>
                     <div>
-                        <MudText Typo="Typo.h5" Class="font-weight-bold">3,890</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Propietarios</MudText>
+                            <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichasControlCalidad</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas en Control de Calidad</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="3">
                 <MudPaper Elevation="3" Class="pa-4 d-flex align-center rounded-lg border-l-4 border-solid mud-border-info">
                     <MudAvatar Color="Color.Info" Variant="Variant.Outlined" Size="Size.Large" Class="mr-4">
-                        <MudIcon Icon="@Icons.Material.Filled.SupportAgent" />
+                            <MudIcon Icon="@Icons.Material.Filled.Error" />
                     </MudAvatar>
                     <div>
-                        <MudText Typo="Typo.h5" Class="font-weight-bold">24</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Personal Activo</MudText>
+                            <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichasEnCorrecion</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas en Corrección</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="3">
                 <MudPaper Elevation="3" Class="pa-4 d-flex align-center rounded-lg border-l-4 border-solid mud-border-success">
                     <MudAvatar Color="Color.Success" Variant="Variant.Outlined" Size="Size.Large" Class="mr-4">
-                        <MudIcon Icon="@Icons.Material.Filled.Map" />
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" />
                     </MudAvatar>
                     <div>
-                        <MudText Typo="Typo.h5" Class="font-weight-bold">5</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Departamentos</MudText>
+                            <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichasAprobadas</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas Aprobadas</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
@@ -71,15 +80,15 @@
             <MudItem xs="12" md="4">
                 <MudPaper Elevation="3" Class="pa-5 rounded-lg d-flex flex-column" Style="height: 100%;">
                     <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold">Accesos Rápidos</MudText>
-                    
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" StartIcon="@Icons.Material.Filled.Add" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-md">
-                        Nueva Ficha Catastral
+
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-md" Href="/fichas">
+                        Fichas Catastrales
                     </MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Dark" Size="Size.Large" StartIcon="@Icons.Material.Filled.PersonAdd" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-sm">
-                        Registrar Propietario
+                        <MudButton Variant="Variant.Filled" Color="Color.Dark" Size="Size.Large" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-sm" Href="/personalEncuestas">
+                        Personal de Encuestas
                     </MudButton>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Info" Size="Size.Large" StartIcon="@Icons.Material.Filled.AssignmentInd" FullWidth="true" Class="mb-auto rounded-lg py-3 border-solid border-2">
-                        Asignar Personal
+                        <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Large" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-sm" Href="/diccionarios">
+                        Diccionario de Catálogos
                     </MudButton>
 
                     <MudDivider Class="my-4" />
@@ -94,24 +103,22 @@
         @* SECCIÓN 3: Actividad Reciente (Llena el espacio en blanco inferior) *@
         <MudGrid>
             <MudItem xs="12">
-                <MudTable Items="@ActividadReciente" Elevation="3" Class="rounded-lg" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <MudTable Items="@dashboardData.FichasRecientes" Elevation="3" Class="rounded-lg" Hover="true" Breakpoint="Breakpoint.Sm">
                     <ToolBarContent>
                         <MudText Typo="Typo.h6" Class="font-weight-bold">Últimas Fichas Registradas</MudText>
                         <MudSpacer />
-                        <MudButton Color="Color.Primary" Variant="Variant.Text" EndIcon="@Icons.Material.Filled.ArrowForward">Ver todas</MudButton>
+                            <MudButton Color="Color.Primary" Variant="Variant.Text" EndIcon="@Icons.Material.Filled.ArrowForward" Href="/fichas">Ver todas</MudButton>
                     </ToolBarContent>
                     <HeaderContent>
-                        <MudTh>Código Ficha</MudTh>
-                        <MudTh>Propietario</MudTh>
-                        <MudTh>Departamento</MudTh>
+                        <MudTh>Código </MudTh>
+                        <MudTh>Municipio</MudTh>
                         <MudTh>Fecha de Registro</MudTh>
                         <MudTh>Estado</MudTh>
                     </HeaderContent>
                     <RowTemplate Context="fila">
                         <MudTd DataLabel="Código"><strong>@fila.Codigo</strong></MudTd>
-                        <MudTd DataLabel="Propietario">@fila.Propietario</MudTd>
                         <MudTd DataLabel="Departamento">@fila.Departamento</MudTd>
-                        <MudTd DataLabel="Fecha">@fila.Fecha</MudTd>
+                        <MudTd DataLabel="Fecha">@fila.FechaEncuesta</MudTd>
                         <MudTd DataLabel="Estado">
                             <MudChip T="string" Color="@(fila.Estado == "Completada" ? Color.Success : Color.Warning)" Size="Size.Small" Variant="Variant.Filled">
                                 @fila.Estado
@@ -133,29 +140,5 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@code {
-    // Datos simulados para el gráfico de barras
-    public List<ChartSeries> Series = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "Fichas Nuevas", Data = new double[] { 40, 75, 60, 95, 120, 110 } }
-    };
-    public string[] XAxisLabels = { "Ene", "Feb", "Mar", "Abr", "May", "Jun" };
-
-    // Clase y datos simulados para la tabla inferior
-    public class RegistroFicha
-    {
-        public string Codigo { get; set; } = string.Empty;
-        public string Propietario { get; set; } = string.Empty;
-        public string Departamento { get; set; } = string.Empty;
-        public string Fecha { get; set; } = string.Empty;
-        public string Estado { get; set; } = string.Empty;
-    }
-
-    public List<RegistroFicha> ActividadReciente = new List<RegistroFicha>
-    {
-        new RegistroFicha { Codigo = "RUR-0210-001", Propietario = "Mónica Gómez Cristina", Departamento = "Matagalpa", Fecha = "26/06/2026", Estado = "Completada" },
-        new RegistroFicha { Codigo = "URB-0345-089", Propietario = "Juan Pérez González", Departamento = "Managua", Fecha = "25/06/2026", Estado = "Pendiente" },
-        new RegistroFicha { Codigo = "RUR-0111-234", Propietario = "María Silva Rojas", Departamento = "Estelí", Fecha = "24/06/2026", Estado = "Completada" },
-        new RegistroFicha { Codigo = "URB-0992-002", Propietario = "Carlos Ruiz", Departamento = "León", Fecha = "22/06/2026", Estado = "Completada" }
-    };
 }
+
