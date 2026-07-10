@@ -29,12 +29,28 @@ public class Repository : IRepository
         return new HttpResponseWrapper<T>(default, true, responseHttp);
     }
 
-    public async Task<HttpResponseWrapper<object>> PostAsync<T>(string url, T model)
+    //public async Task<HttpResponseWrapper<object>> PostAsync<T>(string url, T model)
+    //{
+    //    var messageJSON = JsonSerializer.Serialize(model);
+    //    var messageContet = new StringContent(messageJSON, Encoding.UTF8, "application/json");
+    //    var responseHttp = await _httpClient.PostAsync(url, messageContet);
+    //    return new HttpResponseWrapper<object>(null, !responseHttp.IsSuccessStatusCode, responseHttp);
+    //}
+
+    public async Task<HttpResponseWrapper<T>> PostAsync<T>(string url, T model)
     {
         var messageJSON = JsonSerializer.Serialize(model);
         var messageContet = new StringContent(messageJSON, Encoding.UTF8, "application/json");
         var responseHttp = await _httpClient.PostAsync(url, messageContet);
-        return new HttpResponseWrapper<object>(null, !responseHttp.IsSuccessStatusCode, responseHttp);
+
+        if (responseHttp.IsSuccessStatusCode)
+        {
+            // Deserializar la respuesta al tipo T
+            var response = await UnserializeAnswerAsync<T>(responseHttp);
+            return new HttpResponseWrapper<T>(response, false, responseHttp);
+        }
+
+        return new HttpResponseWrapper<T>(default, true, responseHttp);
     }
 
     public async Task<HttpResponseWrapper<TActionResponse>> PostAsync<T, TActionResponse>(string url, T model)

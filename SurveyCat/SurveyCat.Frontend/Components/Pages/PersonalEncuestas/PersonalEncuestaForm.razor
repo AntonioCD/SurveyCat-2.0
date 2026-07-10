@@ -171,7 +171,7 @@
             <MudText Typo="Typo.h6" Class="deep-purple-text"><b>DATOS GENERALES</b></MudText>
         </MudItem>
 
-        <MudItem xs="12">
+        <MudItem xs="12" sm="6">
             <MudTextField Label="Código de Técnico"
                           @bind-Value="PersonalEncuesta.Codigo"
                           @bind-Value:after="() => PersonalEncuesta.Codigo = PersonalEncuesta.Codigo.ToUpper()"
@@ -179,7 +179,7 @@
                           For="@(() => PersonalEncuesta.Codigo)" Variant="Variant.Outlined" Margin="Margin.Dense" />
         </MudItem>
 
-        <MudItem xs="12">
+        <MudItem xs="12" sm="6">
             <MudTextField Label="Código de Brigada"
                           @bind-Value="PersonalEncuesta.Brigada"
                           @bind-Value:after="() => PersonalEncuesta.Brigada = PersonalEncuesta.Brigada.ToUpper()"

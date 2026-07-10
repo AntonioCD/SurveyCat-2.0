@@ -58,8 +58,18 @@ public partial class PropietarioEdit
         Snackbar.Add("Registro guardado.", Severity.Success);
     }
 
+    // En PropietarioCreate.razor.cs y PropietarioEdit.razor.cs
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/propietarios/details/{FichaId}");
+        // Si viene de la ficha, vuelve a la ficha
+        if (NavigationManager.Uri.Contains("/fichas/edit/"))
+        {
+            NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=1");
+        }
+        else
+        {
+            // Si viene de la vista independiente, va a la lista de propietarios
+            NavigationManager.NavigateTo($"/fichas/propietarios/details/{FichaId}");
+        }
     }
 }

@@ -21,6 +21,7 @@ public class PropietariosRepository : GenericRepository<Propietario>, IPropietar
         var queryable = _context.Propietarios
             .Include(p => p.Persona!)
             .ThenInclude(p => p.TipoIdentificacion)
+            .Where(p => p.FichaId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -41,8 +42,9 @@ public class PropietariosRepository : GenericRepository<Propietario>, IPropietar
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
     {
         var queryable = _context.Propietarios
-            .Include(p => p.Persona)
+            .Include(p => p.Persona!)
             .ThenInclude(p => p.TipoIdentificacion)
+            .Where(p => p.FichaId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -84,7 +86,7 @@ public class PropietariosRepository : GenericRepository<Propietario>, IPropietar
 
     public async Task<ActionResponse<Propietario>> DeleteByLongAsync(long id)
     {
-        var propietario = await _context.Propietarios     
+        var propietario = await _context.Propietarios
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (propietario == null)

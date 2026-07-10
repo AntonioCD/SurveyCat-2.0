@@ -39,13 +39,14 @@ else
             @* Autocomplete con variante Outlined *@
             <MudItem xs="12">
                 <MudAutocomplete T="PersonalEncuesta"
-                                 Label="Personal"
+                                 Label="Personal *"
                                  Variant="Variant.Outlined"
                                  Placeholder="--Seleccione un Personal--"
                                  SearchFunc="SearchPersonalEncuestas"
                                  Value="selectedPersonalEncuesta"
                                  ValueChanged="PersonalEncuestaChanged"
-                                 ToStringFunc="@(e=> e.Persona==null ? null : $"{e.Persona!.NombreCompleto}")">
+                                 ToStringFunc="@(e => e?.Persona?.NombreCompleto ?? string.Empty)"
+                                 Clearable="true">
                     <ItemTemplate Context="itemContext">
                         @itemContext.Persona!.NombreCompleto
                     </ItemTemplate>

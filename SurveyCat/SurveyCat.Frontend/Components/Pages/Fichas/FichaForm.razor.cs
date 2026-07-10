@@ -56,6 +56,7 @@ public partial class FichaForm
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     [EditorRequired, Parameter] public Ficha Ficha { get; set; } = null!;
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
@@ -63,6 +64,14 @@ public partial class FichaForm
 
     protected override async Task OnParametersSetAsync()
     {
+        // Lee el parámetro tab de la URL
+        var uri = new Uri(NavigationManager.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        if (int.TryParse(query.Get("tab"), out int tabIndex))
+        {
+            activeTabIndex = tabIndex;
+        }
+
         if (Ficha == null)
         {
             Ficha = new Ficha();

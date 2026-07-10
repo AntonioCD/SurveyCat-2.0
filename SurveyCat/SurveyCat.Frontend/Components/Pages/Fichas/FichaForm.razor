@@ -2,17 +2,152 @@
 @using SurveyCat.Shared.Entities
 @using System.ComponentModel.DataAnnotations
 
-<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit" >
+<style>
+    /* Estilos para simular el look de Meta Ads Manager */
+    .meta-tabs .mud-tabs-header {
+        background-color: var(--mud-palette-surface);
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+        padding: 0 16px;
+    }
+
+    .meta-tabs .mud-tab {
+        font-weight: 500;
+        font-size: 14px;
+        padding: 12px 20px;
+        color: var(--mud-palette-text-secondary);
+        text-transform: none !important;
+        letter-spacing: normal !important;
+    }
+
+        .meta-tabs .mud-tab .mud-tab-icon {
+            margin-right: 8px;
+        }
+
+        .meta-tabs .mud-tab.mud-selected {
+            color: var(--mud-palette-primary);
+            background-color: var(--mud-palette-primary-hover);
+        }
+
+    .meta-tabs .mud-tab-indicator {
+        background-color: var(--mud-palette-primary);
+        height: 3px;
+        border-radius: 2px;
+    }
+
+    .meta-tabs .mud-panel {
+        background-color: var(--mud-palette-surface);
+        padding: 0;
+    }
+
+    .tab-content {
+        padding: 20px;
+    }
+
+    .validation-summary-custom {
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border: 1px solid var(--mud-palette-error);
+        background-color: var(--mud-palette-error-light);
+        overflow: hidden;
+    }
+
+        .validation-summary-custom .mud-paper {
+            background-color: transparent !important;
+        }
+
+        .validation-summary-custom ul {
+            margin: 0;
+            padding: 12px 16px 16px 16px;
+            list-style: none;
+        }
+
+            .validation-summary-custom ul li {
+                color: var(--mud-palette-error);
+                padding: 2px 0 2px 24px;
+                position: relative;
+            }
+
+                .validation-summary-custom ul li::before {
+                    content: "•";
+                    position: absolute;
+                    left: 0;
+                    color: var(--mud-palette-error);
+                    font-weight: bold;
+                }
+
+    /* Estilos para el contenedor de propietarios */
+    .propietarios-container {
+        min-height: 300px;
+        padding: 4px 0;
+    }
+
+        .propietarios-container .mud-table {
+            margin-top: 0;
+        }
+
+            .propietarios-container .mud-table .mud-table-toolbar {
+                padding: 8px 0;
+            }
+
+                .propietarios-container .mud-table .mud-table-toolbar .mud-text {
+                    font-size: 14px;
+                }
+
+            .propietarios-container .mud-table .mud-table-row {
+                transition: background-color 0.2s ease;
+            }
+
+                .propietarios-container .mud-table .mud-table-row:hover {
+                    background-color: var(--mud-palette-primary-hover);
+                }
+
+    /* Estilo para los encabezados de sección */
+    .section-header {
+        background-color: var(--mud-palette-primary-hover);
+        padding: 10px 16px;
+        border-bottom: 2px solid var(--mud-palette-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .section-header .mud-icon {
+            color: var(--mud-palette-primary) !important;
+        }
+
+        .section-header .mud-text {
+            color: var(--mud-palette-primary) !important;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+</style>
+
+<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
 
-    <ValidationSummary />
+    @if (editContext?.GetValidationMessages().Any() == true)
+    {
+        <MudPaper Class="validation-summary-custom pa-3" Elevation="1">
+            <div class="d-flex align-center gap-2">
+                <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Size="Size.Small" />
+                <MudText Typo="Typo.subtitle2" Color="Color.Error">
+                    <b>Corrige los siguientes errores:</b>
+                </MudText>
+            </div>
+            <ul>
+                @foreach (var message in editContext.GetValidationMessages())
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        </MudPaper>
+    }
 
     <MudGrid>
         <MudItem xs="12" Class="mb-2">
-            @* d-flex y justify-space-between empujan el título a la izquierda y el input a la derecha *@
             <div class="d-flex align-center justify-space-between gap-3 pl-1">
-
-                @* BLOQUE IZQUIERDO: Icono + Título y Subtítulo *@
                 <div class="d-flex align-center gap-3">
                     <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder" Color="Color.Primary" Size="Size.Large" />
                     <div class="d-flex flex-column">
@@ -24,8 +159,6 @@
                         </MudText>
                     </div>
                 </div>
-
-                @* BLOQUE DERECHO: Código de Encuesta limpio y alineado *@
                 <div style="width: 240px;">
                     <MudTextField Label="CÓDIGO DE ENCUESTA"
                                   @bind-Value="Ficha.CodEncuesta"
@@ -35,670 +168,666 @@
                                   Margin="Margin.None"
                                   ReadOnly="true" />
                 </div>
-
             </div>
             <MudDivider Class="mt-3 mb-2" DividerType="DividerType.FullWidth" />
         </MudItem>
 
         <MudItem xs="12">
-            <MudExpansionPanels MultiExpansion="true">
+            <MudTabs Elevation="1"
+                     Rounded="true"
+                     Outlined="true"
+                     ApplyEffectsToContainer="true"
+                     Class="meta-tabs"
+                     Style="border-radius: 8px; overflow: hidden;"
+                     ActiveTabClass="border-solid border-2 mud-border-primary"
+                     @bind-ActivePanelIndex="activeTabIndex">
 
-                @* ================= SECCIÓN 1: DATOS DEL PERSONAL ================= *@
-                <MudExpansionPanel IsExpanded="true"
-                                   Elevation="2"
-                                   Class="modern-panel mb-4"
-                                   Style="border-left: 6px solid var(--mud-palette-primary); border-radius: 8px; overflow: hidden;">
-                    <TitleContent>
-                        @* py-2 le da una altura perfecta al encabezado y gap-3 separa el icono de forma armónica *@
-                        <div class="d-flex align-center py-2 gap-3">
-                            @* Icono mediano con el color principal del tema *@
-                            <MudIcon Icon="@Icons.Material.Filled.AccessibilityNew" Color="Color.Primary" Size="Size.Medium" />
+                <!-- TAB 1: Datos de la Ficha -->
+                <MudTabPanel Text="Datos de la Ficha"
+                             Icon="@Icons.Material.Filled.Description"
+                             IconColor="Color.Primary">
+                    <div class="pa-10">
+                        <MudGrid>
+                            <!-- Datos del Personal -->
+                            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
+                                <div class="section-header">
+                                    <MudIcon Icon="@Icons.Material.Filled.AccessibilityNew" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText>Datos del Personal</MudText>
+                                </div>
+                                <div class="pa-4">
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="PersonalEncuesta"
+                                                             Label="Encuestador"
+                                                             Placeholder="-- Seleccione un Encuestador --"
+                                                             SearchFunc="SearchEncuestador"
+                                                             Value="selectedEncuestador"
+                                                             ValueChanged="EncuestadorChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Required="true"
+                                                             RequiredError="El Encuestador es requerido."
+                                                             For="@(() => selectedEncuestador)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Persona?.NombreCompleto
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
 
-                            @* Bajamos a Typo.subtitle1 y usamos TextPrimary para que se adapte al Modo Oscuro *@
-                            <MudText Typo="Typo.subtitle1" Color="Color.Primary">
-                                <b>Datos del Personal</b>
-                            </MudText>
-                        </div>
-                    </TitleContent>
-                    <ChildContent>
-                        @* px-4 (padding horizontal) y pb-4 (padding inferior) le dan una separación impecable a los inputs *@
-                        <div class="px-2 pb-3 pt-1">
-                            <MudGrid>
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="PersonalEncuesta"
-                                                        Label="Encuestador"
-                                                        Placeholder="-- Seleccione un Encuestador --"
-                                                        SearchFunc="SearchEncuestador"
-                                                        Value="selectedEncuestador"
-                                                        ValueChanged="EncuestadorChanged"
-                                                        Variant="Variant.Outlined"
-                                                        Margin="Margin.Dense"
-                                                        Required="true"
-                                                        RequiredError="El Encuestador es requerido."
-                                                        For="@(() => selectedEncuestador)"
-                                                        ResetValueOnEmptyText="true"
-                                                        CoerceText="false"
-                                                        CoerceValue="false"
-                                                        ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Persona?.NombreCompleto
-                                        </ItemTemplate>
-                                    </MudAutocomplete>   
-                                </MudItem>
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="PersonalEncuesta"
+                                                             Label="Técnico Catastral"
+                                                             Placeholder="-- Seleccione un Técnico Catastral --"
+                                                             SearchFunc="SearchTecnicoCatastral"
+                                                             Value="selectedTecnicoCatastral"
+                                                             ValueChanged="TecnicoCatastralChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Required="true"
+                                                             RequiredError="El Técnico es requerido."
+                                                             For="@(() => selectedTecnicoCatastral)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Persona?.NombreCompleto
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
 
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="PersonalEncuesta"
-                                                     Label="Técnico Catastral"
-                                                     Placeholder="-- Seleccione un Técnico Catastral --"
-                                                     SearchFunc="SearchTecnicoCatastral"
-                                                     Value="selectedTecnicoCatastral"
-                                                     ValueChanged="TecnicoCatastralChanged"
-                                                     Variant="Variant.Outlined" 
-                                                     Margin="Margin.Dense"
-                                                     Required="true"
-                                                     RequiredError="El Técnico es requerido."
-                                                     For="@(() => selectedTecnicoCatastral)"
-                                                     ResetValueOnEmptyText="true"
-                                                     CoerceText="false"
-                                                     CoerceValue="false"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Persona?.NombreCompleto}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Persona?.NombreCompleto
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="PersonalEncuesta"
+                                                             Label="Jefe de Campo"
+                                                             Placeholder="-- Seleccione un Jefe de Campo --"
+                                                             SearchFunc="SearchSupervisor"
+                                                             Value="selectedSupervisor"
+                                                             ValueChanged="SupervisorChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Required="true"
+                                                             RequiredError="El Jefe de Campo es requerido."
+                                                             For="@(() => selectedSupervisor)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Persona?.NombreCompleto
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+                                    </MudGrid>
+                                </div>
+                            </MudPaper>
 
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="PersonalEncuesta"
-                                                     Label="Jefe de Campo"
-                                                     Placeholder="-- Seleccione un Jefe de Campo --"
-                                                     SearchFunc="SearchSupervisor"
-                                                     Value="selectedSupervisor"
-                                                     ValueChanged="SupervisorChanged"
-                                                     Variant="Variant.Outlined" 
-                                                     Margin="Margin.Dense"
-                                                     Required="true"
-                                                     RequiredError="El Jefe de Campo es requerido."
-                                                     For="@(() => selectedSupervisor)"
-                                                     ResetValueOnEmptyText="true"
-                                                     CoerceText="false"
-                                                     CoerceValue="false"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Persona?.NombreCompleto}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Persona?.NombreCompleto
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                    </ChildContent>
-                </MudExpansionPanel>
+                            <!-- Datos Generales -->
+                            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
+                                <div class="section-header">
+                                    <MudIcon Icon="@Icons.Material.Filled.Assignment" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText>Datos Generales</MudText>
+                                </div>
+                                <div class="pa-4">
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="Departamento"
+                                                             Label="Departamento"
+                                                             Placeholder="-- Seleccione un Departamento --"
+                                                             SearchFunc="SearchDepartamento"
+                                                             Value="selectedDepartamento"
+                                                             ValueChanged="DepartamentoChangedAsync"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Required="true"
+                                                             RequiredError="El Departamento es requerido."
+                                                             For="@(() => selectedDepartamento)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Nombre
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
 
-                @* ================= SECCIÓN 2: DATOS GENERALES ================= *@ 
-                <MudExpansionPanel IsExpanded="true"
-                                   Elevation="2"
-                                   Class="modern-panel mb-4"
-                                   Style="border-left: 6px solid var(--mud-palette-primary); border-radius: 8px; overflow: hidden;">
-                    <TitleContent>
-                        @* d-flex justify-space-between empuja el título a la izquierda y el código a la derecha *@
-                        <div class="d-flex justify-space-between align-center w-100 py-1 pe-2">
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="Municipio"
+                                                             Label="Municipio"
+                                                             Placeholder="-- Seleccione un Municipio --"
+                                                             SearchFunc="SearchMunicipio"
+                                                             Value="selectedMunicipio"
+                                                             ValueChanged="MunicipioChangedAsync"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Required="true"
+                                                             RequiredError="El Municipio es requerido."
+                                                             For="@(() => selectedMunicipio)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Nombre
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
 
-                            @* BLOQUE IZQUIERDO: Icono + Título *@
-                            <div class="d-flex align-center gap-3">
-                                <MudIcon Icon="@Icons.Material.Filled.Assignment" Color="Color.Primary" Size="Size.Medium" />
-                                <MudText Typo="Typo.subtitle1" Color="Color.Primary">
-                                    <b>Datos Generales</b>
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="Sector"
+                                                             Label="Sector"
+                                                             Placeholder="-- Seleccione un Sector --"
+                                                             SearchFunc="SearchSector"
+                                                             Value="selectedSector"
+                                                             ValueChanged="SectorChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Required="true"
+                                                             RequiredError="El Sector es requerido."
+                                                             For="@(() => selectedSector)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.NumeroSector}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.NumeroSector
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudTextField Label="Consecutivo"
+                                                          @bind-Value="Ficha.Consecutivo"
+                                                          OnBlur="GenerarCodigoEncuesta"
+                                                          Variant="Variant.Outlined"
+                                                          Margin="Margin.Dense"
+                                                          Required="true"
+                                                          RequiredError="El número consecutivo es requerido."
+                                                          For="@(() => Ficha.Consecutivo)"
+                                                          InputType="InputType.Number"
+                                                          MaxLength="4"
+                                                          Placeholder="Ej: 0001" />
+                                        </MudItem>
+                                    </MudGrid>
+                                </div>
+                            </MudPaper>
+
+                            <!-- Datos del Inmueble -->
+                            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
+                                <div class="section-header">
+                                    <MudIcon Icon="@Icons.Material.Filled.Domain" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText>Datos del Inmueble</MudText>
+                                </div>
+                                <div class="pa-4">
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="6" style="position: relative;">
+                                            <MudSelect T="TipoEncuesta" Label="Tipo de Parcela"
+                                                       @bind-Value="Ficha.TipoEncuesta"
+                                                       For="@(() => Ficha.TipoEncuesta)"
+                                                       Variant="Variant.Outlined"
+                                                       Margin="Margin.Dense"
+                                                       AnchorOrigin="Origin.BottomCenter"
+                                                       Required="true"
+                                                       Validation="@(new RangeAttribute(1, int.MaxValue) { ErrorMessage = "Seleccione un Tipo de Parcela." })">
+
+                                                @foreach (TipoEncuesta item in Enum.GetValues(typeof(TipoEncuesta)))
+                                                {
+                                                    <MudSelectItem Value="@item">
+                                                        @((int)item == 0 ? "-- Seleccione un Tipo --" : item.ToString())
+                                                    </MudSelectItem>
+                                                }
+                                            </MudSelect>
+
+                                            @if ((int)Ficha.TipoEncuesta == 0)
+                                            {
+                                                <input @key="@((int)Ficha.TipoEncuesta)"
+                                                       type="text"
+                                                       value=""
+                                                       required
+                                                       oninvalid="this.setCustomValidity('Seleccione un Tipo de Parcela.')"
+                                                       oninput="this.setCustomValidity('')"
+                                                       style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
+                                            }
+                                            else
+                                            {
+                                                <input @key="@((int)Ficha.TipoEncuesta)"
+                                                       type="text"
+                                                       value="@((int)Ficha.TipoEncuesta)"
+                                                       style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
+                                            }
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudTextField Label="Nombre de la Finca"
+                                                          @bind-Value="Ficha.NombreFinca"
+                                                          OnBlur="@(() => Ficha.NombreFinca = Ficha.NombreFinca?.ToUpper())"
+                                                          Immediate="true"
+                                                          For="@(() => Ficha.NombreFinca)"
+                                                          Variant="Variant.Outlined"
+                                                          Margin="Margin.Dense" />
+                                        </MudItem>
+
+                                        <!-- Ubicación -->
+                                        <MudItem xs="12">
+                                            <MudPaper Class="pa-4" Elevation="0" Outlined="true" Style="border-radius: 8px;">
+                                                <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:center">
+                                                    Ubicación
+                                                </MudText>
+                                                <MudGrid>
+                                                    <MudItem xs="12" sm="6">
+                                                        <MudAutocomplete T="BarrioComarca"
+                                                                         Label="Barrio/Comarca"
+                                                                         Placeholder="-- Seleccione un Barrio/Comarca --"
+                                                                         SearchFunc="SearchBarrioComarca"
+                                                                         Value="selectedBarrioComarca"
+                                                                         ValueChanged="BarrioComarcaChangedAsync"
+                                                                         Variant="Variant.Outlined"
+                                                                         Margin="Margin.Dense"
+                                                                         ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                            <ItemTemplate Context="itemContext">
+                                                                @itemContext.Nombre
+                                                            </ItemTemplate>
+                                                        </MudAutocomplete>
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" sm="6">
+                                                        <MudAutocomplete T="Caserio"
+                                                                         Label="Caserio"
+                                                                         Placeholder="-- Seleccione un Caserio --"
+                                                                         SearchFunc="SearchCaserio"
+                                                                         Value="selectedCaserio"
+                                                                         ValueChanged="CaserioChanged"
+                                                                         Variant="Variant.Outlined"
+                                                                         Margin="Margin.Dense"
+                                                                         ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                            <ItemTemplate Context="itemContext">
+                                                                @itemContext.Nombre
+                                                            </ItemTemplate>
+                                                        </MudAutocomplete>
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" sm="6">
+                                                        <MudTextField Label="Manzana"
+                                                                      @bind-Value="Ficha.Manzana"
+                                                                      OnBlur="@(() => Ficha.Manzana = Ficha.Manzana?.ToUpper())"
+                                                                      Immediate="true"
+                                                                      For="@(() => Ficha.Manzana)"
+                                                                      Variant="Variant.Outlined"
+                                                                      Margin="Margin.Dense" />
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" sm="6">
+                                                        <MudTextField Label="Lote"
+                                                                      @bind-Value="Ficha.Lote"
+                                                                      OnBlur="@(() => Ficha.Lote = Ficha.Lote?.ToUpper())"
+                                                                      Immediate="true"
+                                                                      For="@(() => Ficha.Lote)"
+                                                                      Variant="Variant.Outlined"
+                                                                      Margin="Margin.Dense" />
+                                                    </MudItem>
+
+                                                    <MudItem xs="12">
+                                                        <MudTextField Label="Dirección"
+                                                                      @bind-Value="Ficha.Direccion"
+                                                                      Variant="Variant.Outlined"
+                                                                      Margin="Margin.Dense" />
+                                                    </MudItem>
+                                                </MudGrid>
+                                            </MudPaper>
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudSelect T="TipoUsoParcela?" Label="Tipo de Uso"
+                                                       @bind-Value="Ficha.TipoUso"
+                                                       Variant="Variant.Outlined"
+                                                       Margin="Margin.Dense"
+                                                       Clearable="true"
+                                                       Placeholder="Seleccione">
+                                                @foreach (TipoUsoParcela item in Enum.GetValues(typeof(TipoUsoParcela)))
+                                                {
+                                                    <MudSelectItem Value="@((TipoUsoParcela?)item)">@item.ToString()</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudTextField Label="Descripción"
+                                                          @bind-Value="Ficha.DescripcionTipoUso"
+                                                          OnBlur="@(() => Ficha.DescripcionTipoUso = Ficha.DescripcionTipoUso?.ToUpper())"
+                                                          Immediate="true"
+                                                          For="@(() => Ficha.DescripcionTipoUso)"
+                                                          Variant="Variant.Outlined"
+                                                          Margin="Margin.Dense" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudNumericField Label="Area Estimada"
+                                                             @bind-Value="Ficha.AreaEstimada"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="Diccionario"
+                                                             Label="Unidad de Medida"
+                                                             Placeholder="-- Seleccione una UDM --"
+                                                             SearchFunc="SearchUnidadMedida"
+                                                             Value="selectedUnidadMedida"
+                                                             ValueChanged="UnidadMedidaChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Nombre
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+
+                                        <MudItem xs="12">
+                                            <MudAutocomplete T="Diccionario"
+                                                             Label="Origen de la Tierra"
+                                                             Placeholder="-- Seleccione el Origen --"
+                                                             SearchFunc="SearchOrigenTierra"
+                                                             Value="selectedOrigenTierra"
+                                                             ValueChanged="OrigenTierraChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Nombre
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+
+                                        <!-- Servidumbre -->
+                                        <MudItem xs="12">
+                                            <MudPaper Class="pa-4" Elevation="0" Outlined="true" Style="border-radius: 8px;">
+                                                <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:center">
+                                                    Servidumbre
+                                                </MudText>
+                                                <MudGrid>
+                                                    <MudItem xs="12" sm="6" Class="d-flex justify-left">
+                                                        <MudCheckBox Label="¿Posee Servidumbre?"
+                                                                     @bind-Value="Ficha.Servidumbre"
+                                                                     Color="Color.Primary"
+                                                                     For="@(() => Ficha.Servidumbre)" />
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" sm="6">
+                                                        <MudAutocomplete T="Diccionario"
+                                                                         Label="Servidumbre de Agua"
+                                                                         Placeholder="-- Seleccione un tipo --"
+                                                                         SearchFunc="SearchServidumbreAgua"
+                                                                         Value="selectedServidumbreAgua"
+                                                                         ValueChanged="ServidumbreAguaChanged"
+                                                                         Variant="Variant.Outlined"
+                                                                         Margin="Margin.Dense"
+                                                                         ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                            <ItemTemplate Context="itemContext">
+                                                                @itemContext.Nombre
+                                                            </ItemTemplate>
+                                                        </MudAutocomplete>
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" sm="6">
+                                                        <MudAutocomplete T="Diccionario"
+                                                                         Label="Servidumbre de Pase"
+                                                                         Placeholder="-- Seleccione un tipo --"
+                                                                         SearchFunc="SearchServidumbrePase"
+                                                                         Value="selectedServidumbrePase"
+                                                                         ValueChanged="ServidumbrePaseChanged"
+                                                                         Variant="Variant.Outlined"
+                                                                         Margin="Margin.Dense"
+                                                                         ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                            <ItemTemplate Context="itemContext">
+                                                                @itemContext.Nombre
+                                                            </ItemTemplate>
+                                                        </MudAutocomplete>
+                                                    </MudItem>
+
+                                                    <MudItem xs="12" sm="6">
+                                                        <MudAutocomplete T="Diccionario"
+                                                                         Label="Servidumbre (Otra)"
+                                                                         Placeholder="-- Seleccione un tipo --"
+                                                                         SearchFunc="SearchServidumbreOtra"
+                                                                         Value="selectedServidumbreOtra"
+                                                                         ValueChanged="ServidumbreOtraChanged"
+                                                                         Variant="Variant.Outlined"
+                                                                         Margin="Margin.Dense"
+                                                                         ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                            <ItemTemplate Context="itemContext">
+                                                                @itemContext.Nombre
+                                                            </ItemTemplate>
+                                                        </MudAutocomplete>
+                                                    </MudItem>
+                                                </MudGrid>
+                                            </MudPaper>
+                                        </MudItem>
+                                    </MudGrid>
+                                </div>
+                            </MudPaper>
+
+                            <!-- Datos del Entrevistado -->
+                            <MudPaper Class="mb-0" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
+                                <div class="section-header">
+                                    <MudIcon Icon="@Icons.Material.Filled.SpatialAudioOff" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText>Datos del Entrevistado</MudText>
+                                </div>
+                                <div class="pa-4">
+                                    <MudGrid>
+                                        <MudItem xs="12">
+                                            <MudButton Variant="Variant.Outlined"
+                                                       EndIcon="@Icons.Material.Filled.PersonSearch"
+                                                       Color="Color.Info"
+                                                       OnClick="@(() => ShowModalPersonaSearchAsync())">
+                                                Buscar Persona
+                                            </MudButton>
+
+                                            @if (Ficha.InformanteId == 0)
+                                            {
+                                                <input @key="Ficha.InformanteId"
+                                                       type="text"
+                                                       value=""
+                                                       required
+                                                       oninvalid="this.setCustomValidity('Debe buscar y seleccionar un entrevistado.')"
+                                                       oninput="this.setCustomValidity('')"
+                                                       style="opacity: 0; width: 1px; height: 1px; position: absolute; pointer-events: none;" />
+                                            }
+                                            else
+                                            {
+                                                <input @key="Ficha.InformanteId"
+                                                       type="text"
+                                                       value="@Ficha.InformanteId"
+                                                       style="opacity: 0; width: 1px; height: 1px; position: absolute; pointer-events: none;" />
+                                            }
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Primer Nombre"
+                                                          Variant="Variant.Filled"
+                                                          @bind-Value="informante!.PrimerNombre"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Segundo Nombre"
+                                                          Variant="Variant.Filled"
+                                                          @bind-Value="informante!.SegundoNombre"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Primer Apellido"
+                                                          Variant="Variant.Filled"
+                                                          @bind-Value="informante!.PrimerApellido"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Segundo Apellido"
+                                                          Variant="Variant.Filled"
+                                                          @bind-Value="informante!.SegundoApellido"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Identificación"
+                                                          Variant="Variant.Filled"
+                                                          @bind-Value="informante!.Identificacion"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Genero"
+                                                          Variant="Variant.Filled"
+                                                          @bind-Value="informante!.Genero"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudNumericField Label="Edad"
+                                                             Variant="Variant.Filled"
+                                                             @bind-Value="informante!.Edad"
+                                                             Margin="Margin.Dense"
+                                                             ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Estado Civil"
+                                                          Variant="Variant.Filled"
+                                                          Value="@(informante?.EstadoCivil?.Nombre ?? string.Empty)"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12">
+                                            <MudTextField Label="Profesión u Oficio"
+                                                          Variant="Variant.Filled"
+                                                          Value="@(informante?.Profesion?.Nombre ?? string.Empty)"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Departamento"
+                                                          Variant="Variant.Filled"
+                                                          Value="@(informante?.Municipio?.Departamento?.Nombre ?? string.Empty)"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Municipio"
+                                                          Variant="Variant.Filled"
+                                                          Value="@(informante?.Municipio?.Nombre ?? string.Empty)"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Barrio/Comarca"
+                                                          Variant="Variant.Filled"
+                                                          Value="@(informante?.BarrioComarca?.Nombre ?? string.Empty)"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="3">
+                                            <MudTextField Label="Caserío"
+                                                          Variant="Variant.Filled"
+                                                          Value="@(informante?.Caserio?.Nombre ?? string.Empty)"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12">
+                                            <MudTextField Label="Dirección Domiciliar"
+                                                          Variant="Variant.Filled"
+                                                          @bind-Value="informante!.Direccion"
+                                                          Margin="Margin.Dense"
+                                                          ReadOnly="true" />
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="Diccionario"
+                                                             Label="Relación con Parcela"
+                                                             Placeholder="-- Seleccione un tipo --"
+                                                             SearchFunc="SearchRelacionInformanteParcela"
+                                                             Value="selectedRelacionInformanteParcela"
+                                                             ValueChanged="RelacionInformanteParcelaChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Nombre
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="Diccionario"
+                                                             Label="Relación con Propietario"
+                                                             Placeholder="-- Seleccione un tipo --"
+                                                             SearchFunc="SearchRelacionInformantePropietario"
+                                                             Value="selectedRelacionInformantePropietario"
+                                                             ValueChanged="RelacionInformantePropietarioChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Nombre
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+                                    </MudGrid>
+                                </div>
+                            </MudPaper>
+
+                            <!-- Botones de acción dentro de la pestaña -->
+                            <MudItem xs="12" class="d-flex justify-end gap-2 mt-4">
+                                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </div>
+                </MudTabPanel>
+
+                <!-- TAB 2: Propietarios -->
+                <MudTabPanel Text="Propietarios"
+                             Icon="@Icons.Material.Filled.People"
+                             IconColor="Color.Primary">
+                    <div class="pa-4 propietarios-container">
+                        @if (Ficha.Id > 0)
+                        {
+                            <FichaPropietariosDetails FichaId="Ficha.Id" />
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                                <MudText>
+                                    <b>⚠️ Guarda la ficha primero</b>
+                                    <br />
+                                    Los propietarios solo pueden gestionarse después de guardar la ficha.
                                 </MudText>
-                            </div>
-                        </div>
-                    </TitleContent>
-                    <ChildContent>
-                        @* px-4 (padding horizontal) y pb-4 (padding inferior) le dan una separación impecable a los inputs *@
-                        <div class="px-2 pb-3 pt-1">
-                            <MudGrid>
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="Departamento"
-                                                     Label="Departamento"
-                                                     Placeholder="-- Seleccione un Departamento --"
-                                                     SearchFunc="SearchDepartamento"
-                                                     Value="selectedDepartamento"
-                                                     ValueChanged="DepartamentoChangedAsync"
-                                                     Variant="Variant.Outlined" 
-                                                     Margin="Margin.Dense"
-                                                     Required="true"
-                                                     RequiredError="El Departamento es requerido."
-                                                     For="@(() => selectedDepartamento)"
-                                                     ResetValueOnEmptyText="true"
-                                                     CoerceText="false"
-                                                     CoerceValue="false"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Nombre
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="Municipio"
-                                                     Label="Municipio"
-                                                     Placeholder="-- Seleccione un Municipio --"
-                                                     SearchFunc="SearchMunicipio"
-                                                     Value="selectedMunicipio"
-                                                     ValueChanged="MunicipioChangedAsync"
-                                                     Variant="Variant.Outlined" 
-                                                     Margin="Margin.Dense"
-                                                     Required="true"
-                                                     RequiredError="El Municipio es requerido."
-                                                     For="@(() => selectedMunicipio)"
-                                                     ResetValueOnEmptyText="true"
-                                                     CoerceText="false"
-                                                     CoerceValue="false"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Nombre
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="Sector"
-                                                     Label="Sector"
-                                                     Placeholder="-- Seleccione un Sector --"
-                                                     SearchFunc="SearchSector"
-                                                     Value="selectedSector"
-                                                     ValueChanged="SectorChanged"
-                                                     Variant="Variant.Outlined" 
-                                                     Margin="Margin.Dense"
-                                                     Required="true"
-                                                     RequiredError="El Sector es requerido."
-                                                     For="@(() => selectedSector)"
-                                                     ResetValueOnEmptyText="true"
-                                                     CoerceText="false"
-                                                     CoerceValue="false"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.NumeroSector}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.NumeroSector
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-                                <MudItem xs="12" sm="6">
-                                    <MudTextField Label="Consecutivo"
-                                                  @bind-Value="Ficha.Consecutivo"
-                                                  OnBlur="GenerarCodigoEncuesta"
-                                                  Variant="Variant.Outlined"
-                                                  Margin="Margin.Dense"  
-                                                  Required="true"
-                                                  RequiredError="El número consecutivo es requerido."
-                                                  For="@(() => Ficha.Consecutivo)"
-                                                  InputType="InputType.Number"
-                                                  MaxLength="4"
-                                                  Placeholder="Ej: 0001" />
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                    </ChildContent>
-                </MudExpansionPanel>
-
-                @* ================= SECCIÓN 3: DATOS DEL INMUEBLE ================= *@
-                <MudExpansionPanel IsExpanded="true"
-                                   Elevation="2"
-                                   Class="modern-panel mb-4"
-                                   Style="border-left: 6px solid var(--mud-palette-primary); border-radius: 8px; overflow: hidden;">
-                    <TitleContent>
-                        @* py-2 le da una altura perfecta al encabezado y gap-3 separa el icono de forma armónica *@
-                        <div class="d-flex align-center py-2 gap-3">
-                            @* Icono mediano con el color principal del tema *@
-                            <MudIcon Icon="@Icons.Material.Filled.Domain" Color="Color.Primary" Size="Size.Medium" />
-
-                            @* Bajamos a Typo.subtitle1 y usamos TextPrimary para que se adapte al Modo Oscuro *@
-                            <MudText Typo="Typo.subtitle1" Color="Color.Primary">
-                                <b>Datos del Inmueble</b>
-                            </MudText>
-                        </div>
-                    </TitleContent>
-                    <ChildContent>
-                        @* px-4 (padding horizontal) y pb-4 (padding inferior) le dan una separación impecable a los inputs *@
-                        <div class="px-2 pb-3 pt-1">
-                            <MudGrid>
-                                <MudItem xs="12" sm="6" style="position: relative;">
-                                    <MudSelect T="TipoEncuesta" Label="Tipo de Parcela"
-                                               @bind-Value="Ficha.TipoEncuesta"
-                                               For="@(() => Ficha.TipoEncuesta)"
-                                               Variant="Variant.Outlined"
-                                               Margin="Margin.Dense"
-                                               AnchorOrigin="Origin.BottomCenter"
-                            
-                                               Required="true"
-                                               Validation="@(new RangeAttribute(1, int.MaxValue) { ErrorMessage = "Seleccione un Tipo de Parcela." })">
-
-                                        @foreach (TipoEncuesta item in Enum.GetValues(typeof(TipoEncuesta)))
-                                        {
-                                            <MudSelectItem Value="@item">
-                                                @( (int)item == 0 ? "-- Seleccione un Tipo --" : item.ToString() )
-                                            </MudSelectItem>
-                                        }
-                                    </MudSelect>
-
-                                    @if ((int)Ficha.TipoEncuesta == 0)
-                                    {
-                                        <input @key="@((int)Ficha.TipoEncuesta)"
-                                               type="text"
-                                               value=""
-                                               required
-                                               oninvalid="this.setCustomValidity('Seleccione un Tipo de Parcela.')"
-                                               oninput="this.setCustomValidity('')"
-                                               style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
-                                    }
-                                    else
-                                    {
-                                        <input @key="@((int)Ficha.TipoEncuesta)"
-                                               type="text"
-                                               value="@((int)Ficha.TipoEncuesta)"
-                                               style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
-                                    }
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudTextField Label="Nombre de la Finca"
-                                                  @bind-Value="Ficha.NombreFinca"
-                                                  OnBlur="@(() => Ficha.NombreFinca = Ficha.NombreFinca?.ToUpper())"
-                                                  Immediate="true"
-                                                  For="@(() => Ficha.NombreFinca)"
-                                                  Variant="Variant.Outlined"
-                                                  Margin="Margin.Dense" />
-                                </MudItem>
-
-                                <!-- Recuadro de Ubicación -->
-                                <MudItem xs="12">
-                                    <MudPaper Class="pa-4" Elevation="0" Outlined="true" Style="border-radius: 8px;">
-                                        <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:center">
-                                            Ubicación
-                                        </MudText>
-                                        <MudGrid>
-                                            <MudItem xs="12" sm="6">
-                                                <MudAutocomplete T="BarrioComarca"
-                                                                 Label="Barrio/Comarca"
-                                                                 Placeholder="-- Seleccione un Barrio/Comarca --"
-                                                                 SearchFunc="SearchBarrioComarca"
-                                                                 Value="selectedBarrioComarca"
-                                                                 ValueChanged="BarrioComarcaChangedAsync"
-                                                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                                 ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                                    <ItemTemplate Context="itemContext">
-                                                        @itemContext.Nombre
-                                                    </ItemTemplate>
-                                                </MudAutocomplete>
-                                            </MudItem>
-
-                                            <MudItem xs="12" sm="6">
-                                                <MudAutocomplete T="Caserio"
-                                                                 Label="Caserio"
-                                                                 Placeholder="-- Seleccione un Caserio --"
-                                                                 SearchFunc="SearchCaserio"
-                                                                 Value="selectedCaserio"
-                                                                 ValueChanged="CaserioChanged"
-                                                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                                 ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                                    <ItemTemplate Context="itemContext">
-                                                        @itemContext.Nombre
-                                                    </ItemTemplate>
-                                                </MudAutocomplete>
-                                            </MudItem>
-
-                                            <MudItem xs="12" sm="6">
-                                                <MudTextField Label="Manzana"
-                                                              @bind-Value="Ficha.Manzana"
-                                                              OnBlur="@(() => Ficha.Manzana = Ficha.Manzana?.ToUpper())"
-                                                              Immediate="true"
-                                                              For="@(() => Ficha.Manzana)"
-                                                              Variant="Variant.Outlined"
-                                                              Margin="Margin.Dense" />
-                                            </MudItem>
-
-                                            <MudItem xs="12" sm="6">
-                                                <MudTextField Label="Lote"
-                                                              @bind-Value="Ficha.Lote"
-                                                              OnBlur="@(() => Ficha.Lote = Ficha.Lote?.ToUpper())"
-                                                              Immediate="true"
-                                                              For="@(() => Ficha.Lote)"
-                                                              Variant="Variant.Outlined"
-                                                              Margin="Margin.Dense" />
-                                            </MudItem>
-
-                                            <MudItem xs="12">
-                                                <MudTextField Label="Dirección"
-                                                              @bind-Value="Ficha.Direccion"
-                                                              Variant="Variant.Outlined"
-                                                              Margin="Margin.Dense" />
-                                            </MudItem>
-                                        </MudGrid>
-                                    </MudPaper>
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudSelect T="TipoUsoParcela?" Label="Tipo de Uso"
-                                               @bind-Value="Ficha.TipoUso"
-                                               Variant="Variant.Outlined" Margin="Margin.Dense"
-                                               Clearable="true" Placeholder="Seleccione">
-                                        @foreach (TipoUsoParcela item in Enum.GetValues(typeof(TipoUsoParcela)))
-                                        {
-                                            <MudSelectItem Value="@((TipoUsoParcela?)item)">@item.ToString()</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudTextField Label="Descripción"
-                                                  @bind-Value="Ficha.DescripcionTipoUso"
-                                                  OnBlur="@(() => Ficha.DescripcionTipoUso = Ficha.DescripcionTipoUso?.ToUpper())"
-                                                  Immediate="true"
-                                                  For="@(() => Ficha.DescripcionTipoUso)"
-                                                  Variant="Variant.Outlined"
-                                                  Margin="Margin.Dense" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudNumericField Label="Area Estimada" @bind-Value="Ficha.AreaEstimada"
-                                                     Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="Diccionario"
-                                                     Label="Unidad de Medida"
-                                                     Placeholder="-- Seleccione una UDM --"
-                                                     SearchFunc="SearchUnidadMedida"
-                                                     Value="selectedUnidadMedida"
-                                                     ValueChanged="UnidadMedidaChanged"
-                                                     Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Nombre
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-
-                                <MudItem xs="12">
-                                    <MudAutocomplete T="Diccionario"
-                                                     Label="Origen de la Tierra"
-                                                     Placeholder="-- Seleccione el Origen --"
-                                                     SearchFunc="SearchOrigenTierra"
-                                                     Value="selectedOrigenTierra"
-                                                     ValueChanged="OrigenTierraChanged"
-                                                     Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Nombre
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-
-                                <MudItem xs="12">
-                                    <MudPaper Class="pa-4" Elevation="0" Outlined="true" Style="border-radius: 8px;">
-                                        <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:center">
-                                            Servidumbre
-                                        </MudText>
-                                        <MudGrid>
-                                            <MudItem xs="12" sm="6" Class="d-flex justify-left">
-                                                <MudCheckBox Label="¿Posee Servidumbre?"
-                                                             @bind-Value="Ficha.Servidumbre"
-                                                             Color="Color.Primary"
-                                                             For="@(() => Ficha.Servidumbre)" />
-                                            </MudItem>
-
-                                            <MudItem xs="12" sm="6">
-                                                <MudAutocomplete T="Diccionario"
-                                                                 Label="Servidumbre de Agua"
-                                                                 Placeholder="-- Seleccione un tipo --"
-                                                                 SearchFunc="SearchServidumbreAgua"
-                                                                 Value="selectedServidumbreAgua"
-                                                                 ValueChanged="ServidumbreAguaChanged"
-                                                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                                 ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                                    <ItemTemplate Context="itemContext">
-                                                        @itemContext.Nombre
-                                                    </ItemTemplate>
-                                                </MudAutocomplete>
-                                            </MudItem>
-
-                                            <MudItem xs="12" sm="6">
-                                                <MudAutocomplete T="Diccionario"
-                                                                 Label="Servidumbre de Pase"
-                                                                 Placeholder="-- Seleccione un tipo --"
-                                                                 SearchFunc="SearchServidumbrePase"
-                                                                 Value="selectedServidumbrePase"
-                                                                 ValueChanged="ServidumbrePaseChanged"
-                                                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                                 ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                                    <ItemTemplate Context="itemContext">
-                                                        @itemContext.Nombre
-                                                    </ItemTemplate>
-                                                </MudAutocomplete>
-                                            </MudItem>
-
-                                            <MudItem xs="12" sm="6">
-                                                <MudAutocomplete T="Diccionario"
-                                                                 Label="Servidumbre (Otra)"
-                                                                 Placeholder="-- Seleccione un tipo --"
-                                                                 SearchFunc="SearchServidumbreOtra"
-                                                                 Value="selectedServidumbreOtra"
-                                                                 ValueChanged="ServidumbreOtraChanged"
-                                                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                                 ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                                    <ItemTemplate Context="itemContext">
-                                                        @itemContext.Nombre
-                                                    </ItemTemplate>
-                                                </MudAutocomplete>
-                                            </MudItem>
-                                        </MudGrid>
-                                    </MudPaper>
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                    </ChildContent>
-                </MudExpansionPanel>
-
-                @* ================= SECCIÓN 4: DATOS DEL ENTREVISTADO ================= *@
-                <MudExpansionPanel IsExpanded="true"
-                                   Elevation="2"
-                                   Class="modern-panel mb-4"
-                                   Style="border-left: 6px solid var(--mud-palette-primary); border-radius: 8px; overflow: hidden;">
-                    <TitleContent>
-                        @* py-2 le da una altura perfecta al encabezado y gap-3 separa el icono de forma armónica *@
-                        <div class="d-flex align-center py-2 gap-3">
-                            @* Icono mediano con el color principal del tema *@
-                            <MudIcon Icon="@Icons.Material.Filled.SpatialAudioOff" Color="Color.Primary" Size="Size.Medium" />
-
-                            @* Bajamos a Typo.subtitle1 y usamos TextPrimary para que se adapte al Modo Oscuro *@
-                            <MudText Typo="Typo.subtitle1" Color="Color.Primary">
-                                <b>Datos del Entrevistado</b>
-                            </MudText>
-                        </div>
-                    </TitleContent>
-                    <ChildContent>
-                        @* px-4 (padding horizontal) y pb-4 (padding inferior) le dan una separación impecable a los inputs *@
-                        <div class="px-2 pb-3 pt-1">
-                            <MudGrid>
-                                <MudItem xs="12">
-                                    <MudButton Variant="Variant.Outlined"
-                                               EndIcon="@Icons.Material.Filled.PersonSearch"
-                                               Color="Color.Info" OnClick="@(() => ShowModalPersonaSearchAsync())">
-                                        Buscar Persona
-                                    </MudButton>
-
-                                    @if (Ficha.InformanteId == 0)
-                                    {
-                                        @* Si es 0, el input existe, está vacío y es 'required', disparando el globo *@
-                                        <input @key="Ficha.InformanteId"
-                                               type="text"
-                                               value=""
-                                               required
-                                               oninvalid="this.setCustomValidity('Debe buscar y seleccionar un entrevistado.')"
-                                               oninput="this.setCustomValidity('')"
-                                               style="opacity: 0; width: 1px; height: 1px; position: absolute; pointer-events: none;" />
-                                    }
-                                    else
-                                    {
-                                        @* Si es mayor a 0, renderizamos un input con valor lleno y SIN 'required' *@
-                                        <input @key="Ficha.InformanteId"
-                                               type="text"
-                                               value="@Ficha.InformanteId"
-                                               style="opacity: 0; width: 1px; height: 1px; position: absolute; pointer-events: none;" />
-                                    }
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Primer Nombre"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.PrimerNombre"
-                                                  Margin="Margin.Dense"
-                                                 
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Segundo Nombre"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.SegundoNombre"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Primer Apellido"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.PrimerApellido"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Segundo Apellido"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.SegundoApellido"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Identificación"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.Identificacion"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Genero"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.Genero"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudNumericField Label="Edad"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.Edad"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Estado Civil"
-                                                  Variant="Variant.Filled"
-                                                  Value="@(informante?.EstadoCivil?.Nombre ?? string.Empty)"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12">
-                                    <MudTextField Label="Profesión u Oficio"
-                                                  Variant="Variant.Filled"
-                                                  Value="@(informante?.Profesion?.Nombre ?? string.Empty)"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Departamento"
-                                                  Variant="Variant.Filled"
-                                                  Value="@(informante?.Municipio?.Departamento?.Nombre ?? string.Empty)"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Municipio"
-                                                  Variant="Variant.Filled"
-                                                  Value="@(informante?.Municipio?.Nombre ?? string.Empty)"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Barrio/Comarca"
-                                                  Variant="Variant.Filled"
-                                                  Value="@(informante?.BarrioComarca?.Nombre ?? string.Empty)"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="3">
-                                    <MudTextField Label="Caserío"
-                                                  Variant="Variant.Filled"
-                                                  Value="@(informante?.Caserio?.Nombre ?? string.Empty)"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12">
-                                    <MudTextField Label="Dirección Domiciliar"
-                                                  Variant="Variant.Filled"
-                                                  @bind-Value="informante!.Direccion"
-                                                  Margin="Margin.Dense"
-                                                  ReadOnly="true" />
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="Diccionario"
-                                                     Label="Relación con Parcela"
-                                                     Placeholder="-- Seleccione un tipo --"
-                                                     SearchFunc="SearchRelacionInformanteParcela"
-                                                     Value="selectedRelacionInformanteParcela"
-                                                     ValueChanged="RelacionInformanteParcelaChanged"
-                                                     Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Nombre
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-
-                                <MudItem xs="12" sm="6">
-                                    <MudAutocomplete T="Diccionario"
-                                                     Label="Relación con Propietario"
-                                                     Placeholder="-- Seleccione un tipo --"
-                                                     SearchFunc="SearchRelacionInformantePropietario"
-                                                     Value="selectedRelacionInformantePropietario"
-                                                     ValueChanged="RelacionInformantePropietarioChanged"
-                                                     Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                     ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                                        <ItemTemplate Context="itemContext">
-                                            @itemContext.Nombre
-                                        </ItemTemplate>
-                                    </MudAutocomplete>
-                                </MudItem>
-                            </MudGrid>
-                        </div>
-                    </ChildContent>
-                </MudExpansionPanel>
-            </MudExpansionPanels>
+                            </MudAlert>
+                        }
+                    </div>
+                </MudTabPanel>
+            </MudTabs>
         </MudItem>
-
-        <MudItem xs="12" class="d-flex justify-end gap-2 mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
-        </MudItem>
-
     </MudGrid>
 </EditForm>
+
+@code {
+    private int activeTabIndex = 0; // 0 = Datos Ficha, 1 = Propietarios
+}

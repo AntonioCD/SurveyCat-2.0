@@ -66,8 +66,10 @@ namespace SurveyCat.Frontend.Components.Pages.Fichas
                 return;
             }
 
-            Return();
-            Snackbar.Add("Registro guardado.", Severity.Success);
+            Snackbar.Add("Ficha guardada exitosamente.", Severity.Success);
+
+            // Recargar la misma página con la pestaña de propietarios activa
+            NavigationManager.NavigateTo($"/fichas/edit/{Id}?tab=1", forceLoad: true);
         }
 
         private void Return()

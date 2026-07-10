@@ -21,7 +21,7 @@ public partial class FichaPropietariosDetails
     private const string baseUrl = "api/propietarios";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
-    [Parameter] public int FichaId { get; set; }
+    [Parameter] public long FichaId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -29,6 +29,7 @@ public partial class FichaPropietariosDetails
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnPropietarioChanged { get; set; } // Para notificar cambios
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,7 +48,7 @@ public partial class FichaPropietariosDetails
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo($"/fichas");
+                // No navegamos, solo retornamos false
                 return false;
             }
 
@@ -120,6 +121,7 @@ public partial class FichaPropietariosDetails
 
     private void StatesAction(Propietario propietario)
     {
+        // Redirigimos dentro del contexto de la ficha
         NavigationManager.NavigateTo($"/propietarios/details/{propietario.Id}");
     }
 
@@ -130,9 +132,10 @@ public partial class FichaPropietariosDetails
         await table.ReloadServerData();
     }
 
+    // Ya no navegamos fuera, solo notificamos
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo($"/fichas");
+        // No hacemos nada, estamos dentro de la ficha
     }
 
     private void RedirectToPropietarioForm(long id = 0, bool isEdit = false)
@@ -154,7 +157,8 @@ public partial class FichaPropietariosDetails
 
     private void NoFicha()
     {
-        NavigationManager.NavigateTo("/fichas");
+        // Mostramos un mensaje en lugar de navegar
+        Snackbar.Add("No se encontró la ficha asociada.", Severity.Warning);
     }
 
     private async Task DeleteAsync(Propietario propietario)
@@ -181,5 +185,8 @@ public partial class FichaPropietariosDetails
         await LoadAsync();
         await table.ReloadServerData();
         Snackbar.Add("Propietario eliminado.", Severity.Success);
+
+        // Notificar cambio
+        await OnPropietarioChanged.InvokeAsync();
     }
 }

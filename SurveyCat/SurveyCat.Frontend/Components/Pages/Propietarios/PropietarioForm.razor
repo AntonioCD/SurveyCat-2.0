@@ -191,37 +191,37 @@
                                                   ReadOnly="true" />
                                 </MudItem>
 
-                                    <MudItem xs="12" sm="6">
-                                        <MudNumericField Label="# Hijos" @bind-Value="Propietario.Hijos"
-                                                         Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                    </MudItem>
+                                @* <MudItem xs="12" sm="6">
+                                    <MudNumericField Label="# Hijos" @bind-Value="Propietario.Hijos"
+                                                        Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                </MudItem>
 
-                                    <MudItem xs="12" sm="6">
-                                        <MudNumericField Label="# Hijas" @bind-Value="Propietario.Hijas"
-                                                         Variant="Variant.Outlined" Margin="Margin.Dense" />
-                                    </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudNumericField Label="# Hijas" @bind-Value="Propietario.Hijas"
+                                                        Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                </MudItem>
 
-                                    <MudItem xs="12" sm="6">
-                                        <MudSelect T="PerfilPropietario?" Label="Perfil"
-                                                   @bind-Value="Propietario.Perfil"
-                                                   Variant="Variant.Outlined" Margin="Margin.Dense"
-                                                   Clearable="true" Placeholder="Seleccione">
-                                            @foreach (PerfilPropietario item in Enum.GetValues(typeof(PerfilPropietario)))
-                                            {
-                                                <MudSelectItem Value="@((PerfilPropietario?)item)">@item.ToString()</MudSelectItem>
-                                            }
-                                        </MudSelect>
-                                    </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudSelect T="PerfilPropietario?" Label="Perfil"
+                                                @bind-Value="Propietario.Perfil"
+                                                Variant="Variant.Outlined" Margin="Margin.Dense"
+                                                Clearable="true" Placeholder="Seleccione">
+                                        @foreach (PerfilPropietario item in Enum.GetValues(typeof(PerfilPropietario)))
+                                        {
+                                            <MudSelectItem Value="@((PerfilPropietario?)item)">@item.ToString()</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </MudItem>
 
-                                    <MudItem xs="12" sm="6">
-                                        <MudTextField Label="Especificar Perfil"
-                                                      @bind-Value="Propietario.EspecificarPerfil"
-                                                      OnBlur="@(() => Propietario.EspecificarPerfil = Propietario.EspecificarPerfil?.ToUpper())"
-                                                      Immediate="true"
-                                                      For="@(() => Propietario.EspecificarPerfil)"
-                                                      Variant="Variant.Outlined"
-                                                      Margin="Margin.Dense" />
-                                    </MudItem>
+                                <MudItem xs="12" sm="6">
+                                    <MudTextField Label="Especificar Perfil"
+                                                    @bind-Value="Propietario.EspecificarPerfil"
+                                                    OnBlur="@(() => Propietario.EspecificarPerfil = Propietario.EspecificarPerfil?.ToUpper())"
+                                                    Immediate="true"
+                                                    For="@(() => Propietario.EspecificarPerfil)"
+                                                    Variant="Variant.Outlined"
+                                                    Margin="Margin.Dense" />
+                                </MudItem> *@
                             </MudGrid>
                         </div>
                     </ChildContent>

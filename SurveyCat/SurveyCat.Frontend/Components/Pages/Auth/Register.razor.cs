@@ -17,7 +17,8 @@ public partial class Register
     private string? imageUrl;
     private string? titleLabel;
 
-    private PersonalEncuesta selectedPersonalEncuesta = new();
+    //private PersonalEncuesta selectedPersonalEncuesta = new();
+    private PersonalEncuesta selectedPersonalEncuesta;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private ILoginService LoginService { get; set; } = null!;
@@ -52,7 +53,7 @@ public partial class Register
         .ToList();
     }
 
-    private void PersonalEncuestaChanged(PersonalEncuesta personalEncuesta)
+    private void PersonalEncuestaChanged(PersonalEncuesta? personalEncuesta)
     {
         selectedPersonalEncuesta = personalEncuesta;
     }

@@ -15,7 +15,7 @@ public partial class FichaCreate
 
     private async Task CreateAsync()
     {
-        var responseHttp = await Repository.PostAsync("/api/fichas", ficha);
+        var responseHttp = await Repository.PostAsync<Ficha>("/api/fichas", ficha);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -23,8 +23,19 @@ public partial class FichaCreate
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro creado", Severity.Success);
+        // Obtener el ID de la ficha creada - Cast a Ficha
+        var fichaCreada = responseHttp.Response as Ficha;
+
+        if (fichaCreada == null)
+        {
+            Snackbar.Add("Error al obtener los datos de la ficha creada.", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add($"¡Ficha {fichaCreada.CodEncuesta} creada exitosamente! Ahora puedes agregar propietarios.", Severity.Success);
+
+        // Redirigir a la edición con la pestaña de propietarios activa
+        NavigationManager.NavigateTo($"/fichas/edit/{fichaCreada.Id}?tab=1");
     }
 
     private void Return()

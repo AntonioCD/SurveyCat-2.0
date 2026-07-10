@@ -16,7 +16,7 @@ else
               FixedFooter="true">
         <ToolBarContent>
             <MudText Typo="Typo.h6" Class="mr-4">PROPIETARIOS (@ficha?.CodEncuesta)</MudText>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
+            <!-- Quitamos el botón "Regresar" porque ya estamos dentro de la ficha -->
             <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToPropietarioForm())">Crear</MudButton>
             <MudSpacer />
             <FilterComponent ApplyFilter="SetFilterValue" />
@@ -25,7 +25,7 @@ else
             <MudTh Style="width: 20%;">Nombre / Razon Social</MudTh>
             <MudTh Style="width: 20%;">Tipo de Derecho</MudTh>
             <MudTh Style="width: 20%;">Identificación</MudTh>
-            <MudTh Style="width: 20%;">Tipo Identificación</MudTh>      
+            <MudTh Style="width: 20%;">Tipo Identificación</MudTh>
             <MudTh Style="width: 20%;">¿Presenta Documento?</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
@@ -68,4 +68,3 @@ else
         </PagerContent>
     </MudTable>
 }
-
