@@ -12,13 +12,15 @@ public partial class DocumentoAnexoCreate
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int FichaId { get; set; }
+    [Parameter] public bool IsEmbedded { get; set; } = false;
 
     private async Task CreateAsync()
     {
         documentoAnexo.FichaId = FichaId;
-        var responseHttp = await Repository.PostAsync("/api/documentosAnexos", documentoAnexo);
+        var responseHttp = await Repository.PostAsync<DocumentoAnexo>("/api/documentosAnexos", documentoAnexo);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -26,12 +28,27 @@ public partial class DocumentoAnexoCreate
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro creado", Severity.Success);
+        Snackbar.Add("Documento Anexo creado exitosamente.", Severity.Success);
+
+        if (IsEmbedded)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+        }
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+        if (IsEmbedded)
+        {
+            MudDialog.Cancel();
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+        }
     }
 }

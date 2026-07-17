@@ -18,7 +18,7 @@ public partial class FamiliaCreate
     private async Task CreateAsync()
     {
         familia.FichaId = FichaId;
-        var responseHttp = await Repository.PostAsync("/api/familias", familia);
+        var responseHttp = await Repository.PostAsync<Familia>("/api/familias", familia);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -26,12 +26,13 @@ public partial class FamiliaCreate
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro creado", Severity.Success);
+        // Volver a la ficha con la pestaña de Núcleo Familiar activa (tab=2)
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
+        Snackbar.Add("Familiar creado exitosamente.", Severity.Success);
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/familias/details/{FichaId}");
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
     }
 }

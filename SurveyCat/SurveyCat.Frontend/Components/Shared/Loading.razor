@@ -1,6 +1,16 @@
-﻿<MudCard>
-    <div class="overlay d-flex flex-column justify-content-center align-items-center p-3">
-        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Class="mb-3" />
-        <MudText Typo="Typo.h5">@Label</MudText>
-    </div>
-</MudCard>
+﻿<div class="d-flex justify-center align-center" style="min-height: 400px;">
+    <MudCard Class="pa-10" Elevation="0">
+        <div class="d-flex flex-column justify-center align-center">
+            <MudProgressCircular Indeterminate="true"
+                                 Color="Color.Primary"
+                                 Size="Size.Large"
+                                 Class="mb-4" />
+            <MudText Typo="Typo.h5" Color="Color.Primary">
+                <b>@Label</b>
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Dark" Class="mt-2">
+                Cargando información del formulario
+            </MudText>
+        </div>
+    </MudCard>
+</div>

@@ -22,12 +22,15 @@ public partial class DocumentoAnexoDetails
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
     [Parameter] public int DocumentoAnexoId { get; set; }
+    [Parameter] public int FichaId { get; set; }
+    [Parameter] public bool IsEmbedded { get; set; } = false;
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private HttpClient Http { get; set; } = null!;
+    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
 
@@ -48,12 +51,23 @@ public partial class DocumentoAnexoDetails
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("/documentosAnexos");
+                if (IsEmbedded)
+                {
+                    MudDialog.Cancel();
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/documentosAnexos");
+                }
                 return false;
             }
 
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
+            if (IsEmbedded)
+            {
+                MudDialog.Cancel();
+            }
             return false;
         }
         documentoAnexo = responseHttp.Response;
@@ -83,6 +97,7 @@ public partial class DocumentoAnexoDetails
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
+            loading = false;
             return false;
         }
         totalRecords = responseHttp.Response;
@@ -119,16 +134,6 @@ public partial class DocumentoAnexoDetails
         };
     }
 
-    private void StatesAction(Adjunto adjunto)
-    {
-        NavigationManager.NavigateTo($"/adjuntos/details/{adjunto.Id}");
-    }
-
-    private void SectoresAction(Adjunto adjunto)
-    {
-        NavigationManager.NavigateTo($"/adjuntos/sectores/details/{adjunto.Id}");
-    }
-
     private async Task SetFilterValue(string value)
     {
         Filter = value;
@@ -138,21 +143,23 @@ public partial class DocumentoAnexoDetails
 
     private void ReturnAction()
     {
-        NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{DocumentoAnexoId}");
+        if (IsEmbedded)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+        }
     }
 
     private async Task ShowModalAsync()
     {
-        // 1. SI ES CREACIÓN Y NO TIENE CÓDIGO...
         if (documentoAnexo?.Ficha == null || string.IsNullOrWhiteSpace(documentoAnexo.Ficha.CodEncuesta))
         {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
             Snackbar.Add(
-                "No se puede agregar un adjunto porque el documento anexo no tiene un código de encuesta válido asignado.",
-                Severity.Warning,
-                config => { config.CloseAfterNavigation = true; }
-            );
-
+                "No se puede agregar un adjunto porque el documento anexo no tiene un código de encuesta válido.",
+                Severity.Warning);
             return;
         }
 
@@ -160,35 +167,24 @@ public partial class DocumentoAnexoDetails
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
-            NoHeader = true
+            NoHeader = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
         };
 
-        IDialogReference? dialog;
-
         var parameters = new DialogParameters
-            {
-                { "DocumentoAnexoId", DocumentoAnexoId },
-                { "CodEncuesta", documentoAnexo!.Ficha!.CodEncuesta }
-            };
-
-        dialog = await DialogService.ShowAsync<AdjuntoCreate>("Nuevo Adjunto", parameters, options);
-        
-        var result = await dialog.Result;
-        if (result!.Canceled!)
         {
-            await LoadTotalRecordsAsync();
-            await table.ReloadServerData();
-        }
-    }
+            { "DocumentoAnexoId", DocumentoAnexoId },
+            { "CodEncuesta", documentoAnexo!.Ficha!.CodEncuesta },
+            { "IsEmbedded", true },
+            { "FichaId", FichaId }
+        };
 
-    private void BarriosComarcasAction(Adjunto adjunto)
-    {
-        NavigationManager.NavigateTo($"/adjuntos/details/{adjunto.Id}");
-    }
+        var dialog = await DialogService.ShowAsync<AdjuntoCreate>("Nuevo Adjunto", parameters, options);
 
-    private void NoDepartamento()
-    {
-        NavigationManager.NavigateTo("/documentosAnexos");
+        var result = await dialog.Result;
+        await LoadTotalRecordsAsync();
+        await table.ReloadServerData();
     }
 
     private async Task VerDocumentoCompletoAsync(Adjunto adjunto)
@@ -216,9 +212,9 @@ public partial class DocumentoAnexoDetails
     private async Task DeleteAsync(Adjunto adjunto)
     {
         var parameters = new DialogParameters
-            {
-                { "Message", $"¿Estás seguro de que quieres eliminar el Adjunto {adjunto.NombreArchivo}?" }
-            };
+        {
+            { "Message", $"¿Estás seguro de que quieres eliminar el Adjunto {adjunto.NombreArchivo}?" }
+        };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
         var result = await dialog.Result;
@@ -237,5 +233,17 @@ public partial class DocumentoAnexoDetails
         await LoadAsync();
         await table.ReloadServerData();
         Snackbar.Add("Adjunto eliminado.", Severity.Success);
+    }
+
+    private void NoDepartamento()
+    {
+        if (IsEmbedded)
+        {
+            MudDialog.Cancel();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/documentosAnexos");
+        }
     }
 }

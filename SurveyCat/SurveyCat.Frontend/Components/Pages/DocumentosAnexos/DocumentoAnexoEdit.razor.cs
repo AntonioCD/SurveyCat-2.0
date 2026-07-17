@@ -12,9 +12,11 @@ public partial class DocumentoAnexoEdit
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public long Id { get; set; }
     [Parameter] public int FichaId { get; set; }
+    [Parameter] public bool IsEmbedded { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,12 +26,23 @@ public partial class DocumentoAnexoEdit
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("documentosAnexos");
+                if (IsEmbedded)
+                {
+                    MudDialog.Cancel();
+                }
+                else
+                {
+                    NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+                }
             }
             else
             {
                 var messageError = await responseHttp.GetErrorMessageAsync();
                 Snackbar.Add(messageError!, Severity.Error);
+                if (IsEmbedded)
+                {
+                    MudDialog.Cancel();
+                }
             }
         }
         else
@@ -42,7 +55,7 @@ public partial class DocumentoAnexoEdit
     {
         documentoAnexo!.Ficha = null;
         documentoAnexo.Documento = null;
-        var responseHttp = await Repository.PutAsync("api/documentosAnexos", documentoAnexo);
+        var responseHttp = await Repository.PutAsync<DocumentoAnexo>("api/documentosAnexos", documentoAnexo);
 
         if (responseHttp.Error)
         {
@@ -51,12 +64,27 @@ public partial class DocumentoAnexoEdit
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro guardado.", Severity.Success);
+        Snackbar.Add("Documento Anexo guardado exitosamente.", Severity.Success);
+
+        if (IsEmbedded)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+        }
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+        if (IsEmbedded)
+        {
+            MudDialog.Cancel();
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
+        }
     }
 }

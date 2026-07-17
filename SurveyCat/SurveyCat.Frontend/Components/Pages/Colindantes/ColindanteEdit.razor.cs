@@ -24,7 +24,7 @@ public partial class ColindanteEdit
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("colindantes");
+                NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=3");
             }
             else
             {
@@ -46,7 +46,7 @@ public partial class ColindanteEdit
         colindante.Conflicto = null;
         colindante.ViaGestion = null;
 
-        var responseHttp = await Repository.PutAsync("api/colindantes", colindante);
+        var responseHttp = await Repository.PutAsync<Colindante>("api/colindantes", colindante);
 
         if (responseHttp.Error)
         {
@@ -55,12 +55,13 @@ public partial class ColindanteEdit
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro guardado.", Severity.Success);
+        // Volver a la ficha con la pestaña de Colindantes activa (tab=3)
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=3");
+        Snackbar.Add("Colindante guardado exitosamente.", Severity.Success);
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/colindantes/details/{FichaId}");
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=3");
     }
 }

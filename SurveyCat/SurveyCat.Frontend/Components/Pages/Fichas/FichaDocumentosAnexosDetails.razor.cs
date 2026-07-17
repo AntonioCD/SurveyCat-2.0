@@ -21,7 +21,7 @@ public partial class FichaDocumentosAnexosDetails
     private const string baseUrl = "api/documentosAnexos";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
-    [Parameter] public int FichaId { get; set; }
+    [Parameter] public long FichaId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -125,36 +125,106 @@ public partial class FichaDocumentosAnexosDetails
             CloseOnEscapeKey = true,
             CloseButton = true,
             NoHeader = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
         };
+
         IDialogReference? dialog;
         if (isEdit)
         {
             var parameters = new DialogParameters
-            {
-                { "Id", id },
-                { "FichaId", FichaId }
-            }; dialog = await DialogService.ShowAsync<DocumentoAnexoEdit>("Editar Documento Anexo", parameters, options);
+        {
+            { "Id", id },
+            { "FichaId", FichaId },
+            { "IsEmbedded", true }
+        };
+            dialog = await DialogService.ShowAsync<DocumentoAnexoEdit>("Editar Documento Anexo", parameters, options);
         }
         else
         {
             var parameters = new DialogParameters
-                {
-                    { "FichaId", FichaId }
-                };
+        {
+            { "FichaId", FichaId },
+            { "IsEmbedded", true }
+        };
             dialog = await DialogService.ShowAsync<DocumentoAnexoCreate>("Nuevo Documento Anexo", parameters, options);
         }
 
         var result = await dialog.Result;
-        if (result!.Canceled!)
-        {
-            await LoadTotalRecordsAsync();
-            await table.ReloadServerData();
-        }
+        await LoadTotalRecordsAsync();
+        await table.ReloadServerData();
     }
+
+    private async Task ShowAdjuntosModalAsync(DocumentoAnexo documentoAnexo)
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true,
+            NoHeader = true
+        };
+
+        var parameters = new DialogParameters
+    {
+        { "DocumentoAnexoId", documentoAnexo.Id },
+        { "FichaId", FichaId },
+        { "IsEmbedded", true }
+    };
+
+        var dialog = await DialogService.ShowAsync<DocumentoAnexoDetails>($"Adjuntos - {documentoAnexo.Documento?.Nombre}", parameters, options);
+        var result = await dialog.Result;
+
+        // Recargar la tabla después de cerrar el diálogo
+        await LoadTotalRecordsAsync();
+        await table.ReloadServerData();
+    }
+
+    //private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    //{
+    //    var options = new DialogOptions
+    //    {
+    //        CloseOnEscapeKey = true,
+    //        CloseButton = true,
+    //        NoHeader = true,
+    //    };
+    //    IDialogReference? dialog;
+    //    if (isEdit)
+    //    {
+    //        var parameters = new DialogParameters
+    //        {
+    //            { "Id", id },
+    //            { "FichaId", FichaId }
+    //        }; dialog = await DialogService.ShowAsync<DocumentoAnexoEdit>("Editar Documento Anexo", parameters, options);
+    //    }
+    //    else
+    //    {
+    //        var parameters = new DialogParameters
+    //            {
+    //                { "FichaId", FichaId }
+    //            };
+    //        dialog = await DialogService.ShowAsync<DocumentoAnexoCreate>("Nuevo Documento Anexo", parameters, options);
+    //    }
+
+    //    var result = await dialog.Result;
+    //    if (result!.Canceled!)
+    //    {
+    //        await LoadTotalRecordsAsync();
+    //        await table.ReloadServerData();
+    //    }
+    //}
+
+    //private void AdjuntosAction(DocumentoAnexo documentoAnexo)
+    //{
+    //    NavigationManager.NavigateTo($"/documentoAnexo/details/{documentoAnexo.Id}");
+    //}
 
     private void AdjuntosAction(DocumentoAnexo documentoAnexo)
     {
-        NavigationManager.NavigateTo($"/documentoAnexo/details/{documentoAnexo.Id}");
+        // Navegar dentro del contexto de la ficha
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=5");
+        // Abrir el diálogo de adjuntos - Podrías modificar esto para usar un diálogo en lugar de navegar
     }
 
     private async Task SetFilterValue(string value)
@@ -162,11 +232,6 @@ public partial class FichaDocumentosAnexosDetails
         Filter = value;
         await LoadAsync();
         await table.ReloadServerData();
-    }
-
-    private void ReturnAction()
-    {
-        NavigationManager.NavigateTo($"/fichas");
     }
 
     private void NoFicha()

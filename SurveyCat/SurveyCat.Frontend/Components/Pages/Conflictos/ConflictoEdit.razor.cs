@@ -12,9 +12,11 @@ public partial class ConflictoEdit
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int Id { get; set; }
     [Parameter] public int FichaId { get; set; }
+    [Parameter] public bool IsEmbedded { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,12 +26,23 @@ public partial class ConflictoEdit
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("conflictos");
+                if (IsEmbedded)
+                {
+                    MudDialog.Cancel();
+                }
+                else
+                {
+                    NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
+                }
             }
             else
             {
                 var messageError = await responseHttp.GetErrorMessageAsync();
                 Snackbar.Add(messageError!, Severity.Error);
+                if (IsEmbedded)
+                {
+                    MudDialog.Cancel();
+                }
             }
         }
         else
@@ -40,7 +53,11 @@ public partial class ConflictoEdit
 
     private async Task EditAsync()
     {
-        var responseHttp = await Repository.PutAsync("api/conflictos", conflicto);
+        conflicto!.Ficha = null;
+        conflicto.TipoConflicto = null;
+        conflicto.ViaGestion = null;
+
+        var responseHttp = await Repository.PutAsync<Conflicto>("api/conflictos", conflicto);
 
         if (responseHttp.Error)
         {
@@ -49,12 +66,29 @@ public partial class ConflictoEdit
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro guardado.", Severity.Success);
+        Snackbar.Add("Conflicto guardado exitosamente.", Severity.Success);
+
+        if (IsEmbedded)
+        {
+            // Si viene de la ficha, cerrar el diálogo y recargar
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            // Si es página independiente, navegar
+            NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
+        }
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
+        if (IsEmbedded)
+        {
+            MudDialog.Cancel();
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
+        }
     }
 }

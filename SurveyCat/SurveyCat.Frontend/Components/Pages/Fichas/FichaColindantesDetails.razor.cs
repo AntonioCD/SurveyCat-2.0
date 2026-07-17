@@ -19,7 +19,7 @@ public partial class FichaColindantesDetails
     private const string baseUrl = "api/colindantes";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
-    [Parameter] public int FichaId { get; set; }
+    [Parameter] public long FichaId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -128,11 +128,6 @@ public partial class FichaColindantesDetails
         await table.ReloadServerData();
     }
 
-    private void ReturnAction()
-    {
-        NavigationManager.NavigateTo($"/fichas");
-    }
-
     private void RedirectToColindanteForm(long id = 0, bool isEdit = false)
     {
         if (isEdit)
@@ -179,5 +174,10 @@ public partial class FichaColindantesDetails
         await LoadAsync();
         await table.ReloadServerData();
         Snackbar.Add("Colindante eliminado.", Severity.Success);
+    }
+
+    private void NavigateBackToFicha()
+    {
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=3");
     }
 }

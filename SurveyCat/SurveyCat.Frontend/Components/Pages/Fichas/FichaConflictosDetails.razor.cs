@@ -22,7 +22,7 @@ public partial class FichaConflictosDetails
     private const string baseUrl = "api/conflictos";
     private string infoFormat = "{first_item}-{last_item} de {all_items}";
 
-    [Parameter] public int FichaId { get; set; }
+    [Parameter] public long FichaId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -131,11 +131,7 @@ public partial class FichaConflictosDetails
         await table.ReloadServerData();
     }
 
-    private void ReturnAction()
-    {
-        NavigationManager.NavigateTo($"/fichas");
-    }
-
+    // El método ShowModalAsync permanece igual, pero los diálogos ahora cerrarán y volverán a la ficha
     private async Task ShowModalAsync(long id = 0, bool isEdit = false)
     {
         var options = new DialogOptions
@@ -143,32 +139,70 @@ public partial class FichaConflictosDetails
             CloseOnEscapeKey = true,
             CloseButton = true,
             NoHeader = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
         };
+
         IDialogReference? dialog;
         if (isEdit)
         {
             var parameters = new DialogParameters
-            {
-                { "Id", id },
-                { "FichaId", FichaId }
-            }; dialog = await DialogService.ShowAsync<ConflictoEdit>("Editar Conflicto", parameters, options);
+        {
+            { "Id", id },
+            { "FichaId", FichaId },
+            { "IsEmbedded", true } // Nuevo parámetro para saber que viene de la ficha
+        };
+            dialog = await DialogService.ShowAsync<ConflictoEdit>("Editar Conflicto", parameters, options);
         }
         else
         {
             var parameters = new DialogParameters
-                {
-                    { "FichaId", FichaId }
-                };
+        {
+            { "FichaId", FichaId },
+            { "IsEmbedded", true } // Nuevo parámetro para saber que viene de la ficha
+        };
             dialog = await DialogService.ShowAsync<ConflictoCreate>("Nuevo Conflicto", parameters, options);
         }
 
         var result = await dialog.Result;
-        if (result!.Canceled!)
-        {
-            await LoadTotalRecordsAsync();
-            await table.ReloadServerData();
-        }
+        // Siempre recargar la tabla cuando se cierra el diálogo
+        await LoadTotalRecordsAsync();
+        await table.ReloadServerData();
     }
+
+    //private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    //{
+    //    var options = new DialogOptions
+    //    {
+    //        CloseOnEscapeKey = true,
+    //        CloseButton = true,
+    //        NoHeader = true,
+    //    };
+    //    IDialogReference? dialog;
+    //    if (isEdit)
+    //    {
+    //        var parameters = new DialogParameters
+    //        {
+    //            { "Id", id },
+    //            { "FichaId", FichaId }
+    //        }; dialog = await DialogService.ShowAsync<ConflictoEdit>("Editar Conflicto", parameters, options);
+    //    }
+    //    else
+    //    {
+    //        var parameters = new DialogParameters
+    //            {
+    //                { "FichaId", FichaId }
+    //            };
+    //        dialog = await DialogService.ShowAsync<ConflictoCreate>("Nuevo Conflicto", parameters, options);
+    //    }
+
+    //    var result = await dialog.Result;
+    //    if (result!.Canceled!)
+    //    {
+    //        await LoadTotalRecordsAsync();
+    //        await table.ReloadServerData();
+    //    }
+    //}
 
     private void CaseriosAction(Conflicto conflicto)
     {

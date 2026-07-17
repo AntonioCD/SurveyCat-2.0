@@ -83,27 +83,33 @@ public partial class FichasIndex
 
     private void PropietariosAction(Ficha ficha)
     {
-        NavigationManager.NavigateTo($"/fichas/propietarios/details/{ficha.Id}");
+        //NavigationManager.NavigateTo($"/fichas/propietarios/details/{ficha.Id}");
+        NavigationManager.NavigateTo($"/fichas/edit/{ficha.Id}?tab=1");
     }
 
     private void NucleoFamiliarAction(Ficha ficha)
     {
-        NavigationManager.NavigateTo($"/fichas/familias/details/{ficha.Id}");
+        //NavigationManager.NavigateTo($"/fichas/familias/details/{ficha.Id}");
+        NavigationManager.NavigateTo($"/fichas/edit/{ficha.Id}?tab=2");
     }
 
     private void ColindantesAction(Ficha ficha)
     {
-        NavigationManager.NavigateTo($"/fichas/colindantes/details/{ficha.Id}");
+        //NavigationManager.NavigateTo($"/fichas/colindantes/details/{ficha.Id}");
+        // Desde el index de fichas
+        NavigationManager.NavigateTo($"/fichas/edit/{ficha.Id}?tab=3");
     }
 
     private void ConflictosAction(Ficha ficha)
     {
-        NavigationManager.NavigateTo($"/fichas/conflictos/details/{ficha.Id}");
+        //NavigationManager.NavigateTo($"/fichas/conflictos/details/{ficha.Id}");
+        NavigationManager.NavigateTo($"/fichas/edit/{ficha.Id}?tab=4");
     }
 
     private void DocumentosAnexosAction(Ficha ficha)
     {
-        NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{ficha.Id}");
+        //NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{ficha.Id}");
+        NavigationManager.NavigateTo($"/fichas/edit/{ficha.Id}?tab=5");
     }
 
     private async Task SetFilterValue(string value)

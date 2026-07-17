@@ -46,8 +46,8 @@ else
             <MudTd DataLabel="Estado">@(context.Estado?.Nombre ?? "SD")</MudTd>
             <MudTd DataLabel="Propietarios">
                 <MudTooltip Text="Ver Propietarios">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Transparent"
                                Size="Size.Medium"
                                OnClick="@(() => PropietariosAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
@@ -63,8 +63,8 @@ else
             </MudTd>
             <MudTd DataLabel="Nucleo Familiar">
                 <MudTooltip Text="Ver Nucleo Familiar">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Transparent"
                                Size="Size.Medium"
                                OnClick="@(() => NucleoFamiliarAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
@@ -80,8 +80,8 @@ else
             </MudTd>
             <MudTd DataLabel="Colindantes">
                 <MudTooltip Text="Ver Colindantes">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Transparent"
                                Size="Size.Medium"
                                OnClick="@(() => ColindantesAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
@@ -97,11 +97,11 @@ else
             </MudTd>
             <MudTd DataLabel="Conflictos">
                 <MudTooltip Text="Ver Conflictos">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Transparent"
                                Size="Size.Medium"
                                OnClick="@(() => ConflictosAction(@context))"
-                               Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
+                               Style="width: 70px; min-width: 70px; color: #607D8B; "
                                Class="d-flex justify-space-between px-2">
 
                         <span>@context.ConflictosNumber</span>
@@ -114,11 +114,11 @@ else
             </MudTd>
             <MudTd DataLabel="Documentos Anexos">
                 <MudTooltip Text="Ver Doc. Anexos">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Transparent"
                                Size="Size.Medium"
                                OnClick="@(() => DocumentosAnexosAction(@context))"
-                               Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
+                               Style="width: 70px; min-width: 70px; color: #607D8B; "
                                Class="d-flex justify-space-between px-2">
 
                         <span>@context.DocumentosAnexosNumber</span>

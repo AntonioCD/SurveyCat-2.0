@@ -24,7 +24,7 @@ public partial class FamiliaEdit
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                NavigationManager.NavigateTo("familias");
+                NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
             }
             else
             {
@@ -44,7 +44,7 @@ public partial class FamiliaEdit
         familia.Persona = null;
         familia.Parentesco = null;
 
-        var responseHttp = await Repository.PutAsync("api/familias", familia);
+        var responseHttp = await Repository.PutAsync<Familia>("api/familias", familia);
 
         if (responseHttp.Error)
         {
@@ -53,12 +53,13 @@ public partial class FamiliaEdit
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro guardado.", Severity.Success);
+        // Volver a la ficha con la pestaña de Núcleo Familiar activa (tab=2)
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
+        Snackbar.Add("Familiar guardado exitosamente.", Severity.Success);
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/familias/details/{FichaId}");
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
     }
 }

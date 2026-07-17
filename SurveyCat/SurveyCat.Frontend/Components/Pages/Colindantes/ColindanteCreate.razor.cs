@@ -18,7 +18,7 @@ public partial class ColindanteCreate
     private async Task CreateAsync()
     {
         colindante.FichaId = FichaId;
-        var responseHttp = await Repository.PostAsync("/api/colindantes", colindante);
+        var responseHttp = await Repository.PostAsync<Colindante>("/api/colindantes", colindante);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -26,12 +26,13 @@ public partial class ColindanteCreate
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro creado", Severity.Success);
+        // Volver a la ficha con la pestaña de Colindantes activa (tab=3)
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=3");
+        Snackbar.Add("Colindante creado exitosamente.", Severity.Success);
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/fichas/colindantes/details/{FichaId}");
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=3");
     }
 }

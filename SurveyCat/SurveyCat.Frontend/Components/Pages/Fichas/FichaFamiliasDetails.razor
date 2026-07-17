@@ -18,7 +18,7 @@ else
                 @* Cabecera Superior del Módulo *@
                 <div class="d-flex align-center mud-paper pa-4 mb-4 mud-elevation-1">
                     <MudText Typo="Typo.h6" Class="mr-4">NUCLEO FAMILIAR (@ficha?.CodEncuesta)</MudText>
-                    <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
+                    <!-- QUITAMOS el botón Regresar -->
                     <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToFamiliarForm())">Crear</MudButton>
                     <MudSpacer />
                     <FilterComponent ApplyFilter="SetFilterValue" />

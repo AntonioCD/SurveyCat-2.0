@@ -14,6 +14,8 @@ public partial class PropietarioCreate
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     [Parameter] public int FichaId { get; set; }
+    [Parameter] public EventCallback OnPropietarioChanged { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
 
     private async Task CreateAsync()
     {
@@ -26,22 +28,15 @@ public partial class PropietarioCreate
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro creado", Severity.Success);
+        Snackbar.Add("Registro creado con éxito.", Severity.Success);
+
+        // Notificar al padre y dejar que él maneje el cierre y refresco
+        await OnPropietarioChanged.InvokeAsync();
+        await OnCancel.InvokeAsync();
     }
 
-    // En PropietarioCreate.razor.cs y PropietarioEdit.razor.cs
-    private void Return()
+    private async Task Return()
     {
-        // Si viene de la ficha, vuelve a la ficha
-        if (NavigationManager.Uri.Contains("/fichas/edit/"))
-        {
-            NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=1");
-        }
-        else
-        {
-            // Si viene de la vista independiente, va a la lista de propietarios
-            NavigationManager.NavigateTo($"/fichas/propietarios/details/{FichaId}");
-        }
+        await OnCancel.InvokeAsync();
     }
 }

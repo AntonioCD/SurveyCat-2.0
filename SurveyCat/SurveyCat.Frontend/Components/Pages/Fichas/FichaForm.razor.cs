@@ -1,22 +1,19 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Pages.Personas;
-using SurveyCat.Frontend.Components.Shared;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Constants;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Enums;
-using System.Buffers.Text;
-using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
 public partial class FichaForm
 {
     private EditContext editContext = null!;
+    private bool loading = true;
+    private bool isInitialized = false;
     private List<Diccionario>? diccionarios;
     private List<Diccionario> listaUnidadMedida = new();
     private List<Diccionario> listaEstado = new();
@@ -62,9 +59,11 @@ public partial class FichaForm
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
     [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        // Lee el parámetro tab de la URL
+        if (isInitialized)
+            return;
+
         var uri = new Uri(NavigationManager.Uri);
         var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
         if (int.TryParse(query.Get("tab"), out int tabIndex))
@@ -77,74 +76,87 @@ public partial class FichaForm
             Ficha = new Ficha();
         }
 
-        // Recrear el EditContext si el modelo cambió
         if (editContext == null || editContext.Model != Ficha)
         {
             editContext = new EditContext(Ficha);
         }
 
-        //editContext = new(Ficha);
+        // Disparar carga asíncrona sin bloquear el render
+        _ = LoadDataAsync();
+    }
 
-        // Cargamos lo básico que siempre debe estar (Catálogos y Deptos)
-        await LoadDiccionariosAsync();
-        await LoadPersonalEncuestaAsync();
-        await LoadDepartamentosAsync();
+    private async Task LoadDataAsync()
+    {
+        loading = true;
 
-        if (Ficha.Id != 0)
+        try
         {
-            // 1. Cargas en cascada condicionales
-            if (Ficha.MunicipioId != 0)
-            {
-                await LoadMunicipiosAsync(Ficha.MunicipioId);
-                selectedMunicipio = Ficha.Municipio;
+            // Cargar en paralelo las 3 llamadas independientes
+            var tareaDiccionarios = LoadDiccionariosAsync();
+            var tareaPersonal = LoadPersonalEncuestaAsync();
+            var tareaDepartamentos = LoadDepartamentosAsync();
 
-                // Cargamos el depto desde el municipio si existe
-                selectedDepartamento = Ficha.Municipio?.Departamento;
+            await Task.WhenAll(tareaDiccionarios, tareaPersonal, tareaDepartamentos);
+
+            if (Ficha.Id != 0)
+            {
+                if (Ficha.MunicipioId != 0)
+                {
+                    await LoadMunicipiosAsync(Ficha.MunicipioId);
+                    selectedMunicipio = Ficha.Municipio;
+                    selectedDepartamento = Ficha.Municipio?.Departamento;
+                }
+
+                if (Ficha.SectorId != 0)
+                {
+                    await LoadSectoresAsync(Ficha.SectorId);
+                    selectedSector = Ficha.Sector;
+                }
+
+                if (Ficha.BarrioComarcaId.HasValue)
+                {
+                    await LoadBarriosComarcasAsync(Ficha.BarrioComarcaId.Value);
+                    selectedBarrioComarca = Ficha.BarrioComarca;
+                }
+
+                if (Ficha.CaserioId.HasValue)
+                {
+                    await LoadCaseriosAsync(Ficha.CaserioId.Value);
+                    selectedCaserio = Ficha.Caserio;
+                }
+
+                Ficha.Consecutivo = Ficha.CodEncuesta.Substring(Ficha.CodEncuesta.Length - 4);
+
+                selectedEncuestador = Ficha.Encuestador!;
+                selectedTecnicoCatastral = Ficha.TecnicoCatastral!;
+                selectedSupervisor = Ficha.Coordinador!;
+                selectedUnidadMedida = Ficha.UnidadMedida;
+                selectedOrigenTierra = Ficha.OrigenTierra;
+                selectedServidumbreAgua = Ficha.ServidumbreAgua;
+                selectedServidumbrePase = Ficha.ServidumbrePase;
+                selectedServidumbreOtra = Ficha.ServidumbreOtra;
+                selectedEstado = Ficha.Estado;
+                selectedRelacionInformanteParcela = Ficha.RelacionInformanteParcela;
+                selectedRelacionInformantePropietario = Ficha.RelacionInformantePropietario;
+
+                if (informante == null || informante.Id != Ficha.InformanteId)
+                {
+                    informante = await GetPersonaDetails(Ficha.InformanteId);
+                }
             }
-
-            if (Ficha.SectorId != 0)
+            else
             {
-                await LoadSectoresAsync(Ficha.SectorId);
-                selectedSector = Ficha.Sector;
-            }
-
-            if (Ficha.BarrioComarcaId.HasValue)
-            {
-                await LoadBarriosComarcasAsync(Ficha.BarrioComarcaId.Value);
-                selectedBarrioComarca = Ficha.BarrioComarca;
-            }
-
-            if (Ficha.CaserioId.HasValue)
-            {
-                await LoadCaseriosAsync(Ficha.CaserioId.Value);
-                selectedCaserio = Ficha.Caserio;
-            }
-
-            Ficha.Consecutivo = Ficha.CodEncuesta.Substring(Ficha.CodEncuesta.Length - 4);
-
-            selectedEncuestador = Ficha.Encuestador!;
-            selectedTecnicoCatastral = Ficha.TecnicoCatastral!;
-            selectedSupervisor = Ficha.Coordinador!;
-            selectedUnidadMedida = Ficha.UnidadMedida;
-            selectedOrigenTierra = Ficha.OrigenTierra;
-            selectedServidumbreAgua = Ficha.ServidumbreAgua;
-            selectedServidumbrePase = Ficha.ServidumbrePase;
-            selectedServidumbreOtra = Ficha.ServidumbreOtra;
-            selectedEstado = Ficha.Estado;
-            selectedRelacionInformanteParcela = Ficha.RelacionInformanteParcela;
-            selectedRelacionInformantePropietario = Ficha.RelacionInformantePropietario;
-
-            if (informante == null || informante.Id != Ficha.InformanteId)
-            {
-                informante = await GetPersonaDetails(Ficha.InformanteId);
+                Ficha.EstadoId = listaEstado
+                    .Where(e => e.Nombre.Contains("Digitado"))
+                    .Select(e => e.Id)
+                    .FirstOrDefault();
             }
         }
-        else
+        finally
         {
-            Ficha.EstadoId = listaEstado
-                .Where(e => e.Nombre.Contains("Digitado"))
-                .Select(e => e.Id)
-                .FirstOrDefault();
+            loading = false;
+            isInitialized = true;
+            StateHasChanged();
         }
     }
 
@@ -263,7 +275,6 @@ public partial class FichaForm
     {
         selectedTecnicoCatastral = tecnicoCatastral;
         Ficha.TecnicoCatastralId = tecnicoCatastral.Id;
-
         GenerarCodigoEncuesta();
     }
 
@@ -388,9 +399,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaEncuestadores!;
-        }
 
         return listaEncuestadores!
             .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -401,9 +410,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaTecnicosCatastrales!;
-        }
 
         return listaTecnicosCatastrales!
             .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -414,9 +421,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaSupervisores!;
-        }
 
         return listaSupervisores!
             .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -427,9 +432,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaUnidadMedida!;
-        }
 
         return listaUnidadMedida!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -440,9 +443,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaEstado!;
-        }
 
         return listaEstado!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -453,9 +454,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaOrigenTierra!;
-        }
 
         return listaOrigenTierra!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -466,9 +465,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaRelacionInformanteParcela!;
-        }
 
         return listaRelacionInformanteParcela!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -479,9 +476,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaRelacionInformantePropietario!;
-        }
 
         return listaRelacionInformantePropietario!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -492,9 +487,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaServidumbre!;
-        }
 
         return listaServidumbre!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -505,9 +498,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaServidumbre!;
-        }
 
         return listaServidumbre!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -518,9 +509,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaServidumbre!;
-        }
 
         return listaServidumbre!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -531,9 +520,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return departamentos!;
-        }
 
         return departamentos!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -544,9 +531,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return municipios!;
-        }
 
         return municipios!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -557,9 +542,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return sectores!;
-        }
 
         return sectores!
             .Where(c => c.NumeroSector.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -570,9 +553,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return barriosComarcas!;
-        }
 
         return barriosComarcas!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -583,9 +564,7 @@ public partial class FichaForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return caserios!;
-        }
 
         return caserios!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -605,27 +584,18 @@ public partial class FichaForm
         var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", options);
         var result = await dialog.Result;
 
-        // Verificamos si el usuario seleccionó un registro en el modal
         if (!result.Canceled && result.Data is Persona personaSeleccionada)
         {
-            // 1. LLAMADO ASÍNCRONO: Esperamos a que la API traiga los detalles completos
             var informanteResult = await GetPersonaDetails(personaSeleccionada.Id);
 
-            // 2. VALIDACIÓN: Evaluamos si devolvió a la persona o si falló (null)
             if (informanteResult != null)
             {
-                // Asignamos el resultado a la variable que maneja tu formulario
                 informante = informanteResult;
                 Ficha.InformanteId = informante.Id;
-
-                // Si necesitas refrescar cascadas asociadas al informante (municipios, depto, etc.), este es el lugar:
-                // await CargarCascadasDelInformanteAsync(informante);
-
                 Snackbar.Add("Datos del entrevistado cargados con éxito.", Severity.Success);
             }
             else
             {
-                // Opcional: Lógica en caso de que no se haya podido recuperar la data completa
                 Snackbar.Add("No se pudieron cargar los datos del entrevistado.", Severity.Warning);
             }
 
@@ -641,30 +611,27 @@ public partial class FichaForm
         {
             var messageError = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(messageError!, Severity.Error);
-            return null; // Retorna null en caso de error
+            return null;
         }
 
         if (responseHttp.Response == null)
         {
             Snackbar.Add("No se encontraron los detalles de la persona.", Severity.Warning);
-            return null; // Retorna null si la API respondió vacío
+            return null;
         }
 
-        return responseHttp.Response; // Retorna la Persona encontrada con éxito
+        return responseHttp.Response;
     }
 
     private void GenerarCodigoEncuesta()
     {
-        // 1. Validar que tengamos las selecciones y el consecutivo relleno con texto válido
         if (selectedTecnicoCatastral.Id != 0 &&
             selectedMunicipio!.Id != 0 &&
             selectedSector!.Id != 0 &&
             (!string.IsNullOrWhiteSpace(Ficha.Consecutivo) && Ficha.Consecutivo.Length == 4))
         {
-            // Extraemos la inicial de forma segura
             string inicial = selectedSector?.NumeroSector?.Substring(0, 1).ToUpper() ?? "";
 
-            // Evaluamos con un switch expression moderno
             string sector = inicial switch
             {
                 "R" => "RUR",
@@ -675,12 +642,10 @@ public partial class FichaForm
             string codTecnico = selectedTecnicoCatastral.Codigo;
             string consecutivo = Ficha.Consecutivo;
 
-            // 2. Asignar el valor final combinado
             Ficha.CodEncuesta = $"{sector}{codMuni}{codTecnico}{codTecnico}{consecutivo}";
         }
         else
         {
-            // Si el usuario limpia un campo o no ha terminado, el código superior permanece vacío
             Ficha.CodEncuesta = string.Empty;
         }
     }

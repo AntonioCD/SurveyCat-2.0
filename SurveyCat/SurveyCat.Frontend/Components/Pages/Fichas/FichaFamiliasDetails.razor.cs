@@ -18,7 +18,7 @@ public partial class FichaFamiliasDetails
     private bool loading;
     private const string baseUrl = "api/familias";
 
-    [Parameter] public int FichaId { get; set; }
+    [Parameter] public long FichaId { get; set; }
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -154,11 +154,6 @@ public partial class FichaFamiliasDetails
         await LoadAsync();
     }
 
-    private void ReturnAction()
-    {
-        NavigationManager.NavigateTo($"/fichas");
-    }
-
     private void RedirectToFamiliarForm(long id = 0, bool isEdit = false)
     {
         if (isEdit)
@@ -202,5 +197,10 @@ public partial class FichaFamiliasDetails
         // Al recargar mediante LoadAsync(), se ejecutan el conteo y la re-indexación automática del Backend
         await LoadAsync();
         Snackbar.Add("Familiar eliminado correctamente.", Severity.Success);
+    }
+
+    private void NavigateBackToFicha()
+    {
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
     }
 }

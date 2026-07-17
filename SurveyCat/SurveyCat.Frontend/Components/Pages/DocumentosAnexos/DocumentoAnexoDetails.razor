@@ -1,70 +1,83 @@
 ﻿@page "/documentoAnexo/details/{DocumentoAnexoId:int}"
 
-@if (loading)
-{
-    <Loading />
-}
-else
-{
-    <MudTable Items="@adjuntos"
-              @ref="table"
-              ServerData="LoadListAsync"
-              Dense="true"
-              Hover="true"
-              Striped="true"
-              FixedHeader="true"
-              FixedFooter="true">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6" Class="mr-4"><i class="bi bi-globe-americas"></i> @documentoAnexo?.Documento?.Nombre</MudText>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Tertiary" OnClick="ReturnAction">Regresar</MudButton>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => ShowModalAsync())">Crear</MudButton>
-            <MudSpacer />
-            <FilterComponent ApplyFilter="SetFilterValue" />
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh Style="width: 10%;">Item</MudTh>
-            <MudTh Style="width: 30%;">Nombre de Archivo</MudTh>
-            <MudTh Style="width: 59%;">Ubicación</MudTh>
-            <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Item">@context.ItemPagina</MudTd>
-            <MudTd DataLabel="Nombre de Archivo">@context.NombreArchivo</MudTd>
-            <MudTd DataLabel="Ubicación">@context.Ruta</MudTd>
-            <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
-                <div class="d-flex justify-center">
-                    @* ACCIÓN PARA VER ARCHIVO COMPLETO *@
-                    <MudTooltip Text="Visualizar Documento">
-                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
-                                       Variant="Variant.Outlined"
-                                       Color="Color.Info"
-                                       OnClick="@(() => VerDocumentoCompletoAsync(context))"
-                                       Size="Size.Medium"
-                                       Class="mr-2" />
-                    </MudTooltip>
-                    <MudTooltip Text="Borrar">
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                       Variant="Variant.Outlined"
-                                       Color="Color.Error"
-                                       OnClick="@(() => DeleteAsync(context))"
-                                       Size="Size.Medium" />
-                    </MudTooltip>
+<MudDialog>
+    <DialogContent>
+        @if (loading)
+        {
+            <Loading />
+        }
+        else
+        {
+            <div class="pa-2">
+                <!-- Título -->
+                <div class="d-flex align-center mb-4">
+                    <MudText Typo="Typo.h6" Class="mr-4">
+                        <MudIcon Icon="@Icons.Material.Filled.AttachFile" Class="mr-2" Color="Color.Primary" />
+                        <b>ADJUNTOS - @documentoAnexo?.Documento?.Nombre</b>
+                    </MudText>
+                    <MudSpacer />
+                    @if (documentoAnexo?.Ficha?.CodEncuesta != null)
+                    {
+                        <MudButton Variant="Variant.Outlined"
+                                   EndIcon="@Icons.Material.Filled.Add"
+                                   Color="Color.Info"
+                                   OnClick="@(() => ShowModalAsync())">
+                            Crear Adjunto
+                        </MudButton>
+                    }
+                    <FilterComponent ApplyFilter="SetFilterValue" Class="ml-2" />
                 </div>
-            </MudTd>
-        </RowTemplate>
-        <NoRecordsContent>
-            <MudText>No se encontraron registros.</MudText>
-        </NoRecordsContent>
-        <PagerContent>
-            <MudTablePager RowsPerPageString="Numero de Registros:"
-                           PageSizeOptions="pageSizeOptions"
-                           AllItemsText="Todos"
-                           InfoFormat="@infoFormat" />
-        </PagerContent>
-    </MudTable>
-}
 
-
-
-
-
+                <!-- Tabla de adjuntos -->
+                <MudTable Items="@adjuntos"
+                          @ref="table"
+                          ServerData="LoadListAsync"
+                          Dense="true"
+                          Hover="true"
+                          Striped="true"
+                          FixedHeader="true"
+                          FixedFooter="true">
+                    <HeaderContent>
+                        <MudTh Style="width: 10%;">Item</MudTh>
+                        <MudTh Style="width: 30%;">Nombre de Archivo</MudTh>
+                        <MudTh Style="width: 50%;">Ubicación</MudTh>
+                        <MudTh Style="width: 10%; white-space: nowrap; text-align: center;">Acciones</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Item">@context.ItemPagina</MudTd>
+                        <MudTd DataLabel="Nombre de Archivo">@context.NombreArchivo</MudTd>
+                        <MudTd DataLabel="Ubicación">@context.Ruta</MudTd>
+                        <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
+                            <div class="d-flex justify-center">
+                                <MudTooltip Text="Visualizar Documento">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                                   Variant="Variant.Outlined"
+                                                   Color="Color.Info"
+                                                   OnClick="@(() => VerDocumentoCompletoAsync(context))"
+                                                   Size="Size.Medium"
+                                                   Class="mr-2" />
+                                </MudTooltip>
+                                <MudTooltip Text="Borrar">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                   Variant="Variant.Outlined"
+                                                   Color="Color.Error"
+                                                   OnClick="@(() => DeleteAsync(context))"
+                                                   Size="Size.Medium" />
+                                </MudTooltip>
+                            </div>
+                        </MudTd>
+                    </RowTemplate>
+                    <NoRecordsContent>
+                        <MudText>No se encontraron adjuntos para este documento.</MudText>
+                    </NoRecordsContent>
+                    <PagerContent>
+                        <MudTablePager RowsPerPageString="Numero de Registros:"
+                                       PageSizeOptions="pageSizeOptions"
+                                       AllItemsText="Todos"
+                                       InfoFormat="@infoFormat" />
+                    </PagerContent>
+                </MudTable>
+            </div>
+        }
+    </DialogContent>
+</MudDialog>

@@ -9,14 +9,17 @@ namespace SurveyCat.Frontend.Components.Pages.Adjuntos;
 public partial class AdjuntoCreate
 {
     private Adjunto adjunto = new();
-    private IBrowserFile? selectedFile; // Guarda el archivo en memoria
+    private IBrowserFile? selectedFile;
 
-    [Inject] private HttpClient Http { get; set; } = null!; // Agregamos HttpClient directo para multipart
+    [Inject] private HttpClient Http { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int DocumentoAnexoId { get; set; }
     [Parameter] public string CodEncuesta { get; set; } = null!;
+    [Parameter] public bool IsEmbedded { get; set; } = false;
+    [Parameter] public int FichaId { get; set; }
 
     private void HandleFileSelected(IBrowserFile file)
     {
@@ -33,23 +36,17 @@ public partial class AdjuntoCreate
 
         adjunto.DocumentoAnexoId = DocumentoAnexoId;
 
-        // Construimos el MultipartFormDataContent
         using var content = new MultipartFormDataContent();
 
-        // 10MB máximo por archivo
         var streamContent = new StreamContent(selectedFile.OpenReadStream(1024 * 1024 * 10));
         streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
 
-        // Agregamos el binario
         content.Add(streamContent, "archivo", adjunto.NombreArchivo);
-
-        // Agregamos propiedades del modelo
         content.Add(new StringContent(adjunto.DocumentoAnexoId.ToString()), "DocumentoAnexoId");
         content.Add(new StringContent(adjunto.ItemPagina.ToString()), "ItemPagina");
         content.Add(new StringContent(adjunto.NombreArchivo), "NombreArchivo");
         content.Add(new StringContent(CodEncuesta), "CodEncuesta");
 
-        // Hacemos el POST directo a la API usando multipart/form-data
         var response = await Http.PostAsync("api/adjuntos/cargar", content);
 
         if (!response.IsSuccessStatusCode)
@@ -59,12 +56,27 @@ public partial class AdjuntoCreate
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro creado", Severity.Success);
+        Snackbar.Add("Adjunto creado exitosamente.", Severity.Success);
+
+        if (IsEmbedded)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/documentoAnexo/details/{DocumentoAnexoId}");
+        }
     }
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/documentoAnexo/details/{DocumentoAnexoId}");
+        if (IsEmbedded)
+        {
+            MudDialog.Cancel();
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/documentoAnexo/details/{DocumentoAnexoId}");
+        }
     }
 }
