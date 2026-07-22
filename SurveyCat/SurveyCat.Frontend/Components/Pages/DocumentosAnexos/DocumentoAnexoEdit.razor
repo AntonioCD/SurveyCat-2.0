@@ -1,12 +1,10 @@
-﻿@if (documentoAnexo is null)
+﻿@page "/documentosAnexos/edit/{Id:long}/{FichaId:int}/{CodEncuesta}"
+
+@if (documentoAnexo is null)
 {
     <Loading />
 }
 else
 {
-    <MudDialog>
-        <DialogContent>
-            <DocumentoAnexoForm DocumentoAnexo="documentoAnexo" OnValidSubmit="EditAsync" ReturnAction="Return" />
-        </DialogContent>
-    </MudDialog>
+    <DocumentoAnexoForm CodEncuesta="@CodEncuesta" DocumentoAnexo="documentoAnexo" OnValidSubmit="EditAsync" ReturnAction="Return" />
 }

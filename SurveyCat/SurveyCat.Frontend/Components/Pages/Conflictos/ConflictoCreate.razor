@@ -1,5 +1,3 @@
-﻿<MudDialog>
-    <DialogContent>
-        <ConflictoForm Conflicto="conflicto" OnValidSubmit="CreateAsync" ReturnAction="Return" />
-    </DialogContent>
-</MudDialog>
+﻿@page "/conflictos/create/{FichaId:int}"
+
+<ConflictoForm Conflicto="conflicto" OnValidSubmit="CreateAsync" ReturnAction="Return" />

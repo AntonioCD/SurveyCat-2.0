@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using SurveyCat.Frontend.Components.Pages.Personas;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Constants;
 using SurveyCat.Shared.Entities;
@@ -11,6 +10,8 @@ namespace SurveyCat.Frontend.Components.Pages.Conflictos;
 public partial class ConflictoForm
 {
     private EditContext editContext = null!;
+    private bool loading = true;
+    private bool isInitialized = false;
     private List<Diccionario>? diccionarios;
     private List<Diccionario> listaConflictos = new();
     private List<Diccionario> listaViasGestion = new();
@@ -26,25 +27,49 @@ public partial class ConflictoForm
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
     [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
+        if (isInitialized)
+            return;
+
         if (Conflicto == null)
         {
             Conflicto = new Conflicto();
         }
 
-        // Recrear el EditContext si el modelo cambió
         if (editContext == null || editContext.Model != Conflicto)
         {
             editContext = new EditContext(Conflicto);
         }
 
-        await LoadDiccionariosAsync();
+        // Disparar carga asíncrona sin bloquear el render
+        _ = LoadDataAsync();
+    }
 
-        if (Conflicto.Id != 0)
+    private async Task LoadDataAsync()
+    {
+        loading = true;
+
+        try
         {
-            selectedConflicto = listaConflictos.Where(x => x.Id == Conflicto.TipoConflictoId).FirstOrDefault();
-            selectedViaGestion = listaViasGestion.Where(x => x.Id == Conflicto.ViaGestionId).FirstOrDefault();
+            await LoadDiccionariosAsync();
+
+            if (Conflicto.Id != 0)
+            {
+                selectedConflicto = listaConflictos
+                    .Where(x => x.Id == Conflicto.TipoConflictoId)
+                    .FirstOrDefault();
+
+                selectedViaGestion = listaViasGestion
+                    .Where(x => x.Id == Conflicto.ViaGestionId)
+                    .FirstOrDefault();
+            }
+        }
+        finally
+        {
+            loading = false;
+            isInitialized = true;
+            StateHasChanged();
         }
     }
 
@@ -63,8 +88,13 @@ public partial class ConflictoForm
 
         if (diccionarios != null)
         {
-            listaConflictos = diccionarios.Where(x => x.Catalogo == Catalogos.ClaseConflicto).ToList();
-            listaViasGestion = diccionarios.Where(x => x.Catalogo == Catalogos.GestionConflicto).ToList();
+            listaConflictos = diccionarios
+                .Where(x => x.Catalogo == Catalogos.ClaseConflicto)
+                .ToList();
+
+            listaViasGestion = diccionarios
+                .Where(x => x.Catalogo == Catalogos.GestionConflicto)
+                .ToList();
         }
     }
 
@@ -90,9 +120,7 @@ public partial class ConflictoForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaConflictos!;
-        }
 
         return listaConflictos!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
@@ -103,9 +131,7 @@ public partial class ConflictoForm
     {
         await Task.Delay(5);
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return listaViasGestion!;
-        }
 
         return listaViasGestion!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))

@@ -31,6 +31,7 @@
                                    Color="Color.Secondary"
                                    OnClick="ReturnAction"
                                    Title="Regresar"
+                                   Size="Size.Large"
                                    Class="mr-1" />
                     <MudIcon Icon="@Icons.Material.Filled.CreateNewFolder" Color="Color.Primary" Size="Size.Large" />
                     <div class="d-flex flex-column">
@@ -65,7 +66,7 @@
                 <!-- TAB 1: Datos de la Ficha -->
                 <MudTabPanel Text="Datos de la Ficha"
                              Icon="@Icons.Material.Filled.Description"
-                             IconColor="Color.Primary">
+                             IconColor="Color.Default">
                     <div class="pa-10">
                         <MudGrid>
                             <!-- Datos del Personal -->
@@ -731,111 +732,102 @@
                 <!-- TAB 2: Propietarios -->
                 <MudTabPanel Text="Propietarios"
                              Icon="@Icons.Material.Filled.People"
-                             IconColor="Color.Primary">
-                    <div class="pa-4 propietarios-container">
-                        @if (Ficha.Id > 0)
-                        {
-                            <FichaPropietariosDetails FichaId="Ficha.Id" />
-                        }
-                        else
-                        {
-                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-                                <MudText>
-                                    <b>⚠️ Guarda la ficha primero</b>
-                                    <br />
-                                    Los propietarios solo pueden gestionarse después de guardar la ficha.
-                                </MudText>
-                            </MudAlert>
-                        }
-                    </div>
+                             IconColor="Color.Default"
+                             Class="pa-0">
+                    @if (Ficha.Id > 0)
+                    {
+                        <FichaPropietariosDetails FichaId="Ficha.Id" />
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="ma-4">
+                            <MudText>
+                                <b>⚠️ Guarda la ficha primero</b>
+                                <br />
+                                Los propietarios solo pueden gestionarse después de guardar la ficha.
+                            </MudText>
+                        </MudAlert>
+                    }
                 </MudTabPanel>
 
                 <!-- TAB 3: Núcleo Familiar -->
                 <MudTabPanel Text="Núcleo Familiar"
                              Icon="@Icons.Material.Filled.FamilyRestroom"
-                             IconColor="Color.Primary">
-                    <div class="pa-4 familia-container">
-                        @if (Ficha.Id > 0)
-                        {
-                            <FichaFamiliasDetails FichaId="Ficha.Id" />
-                        }
-                        else
-                        {
-                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-                                <MudText>
-                                    <b>⚠️ Guarda la ficha primero</b>
-                                    <br />
-                                    El núcleo familiar solo puede gestionarse después de guardar la ficha.
-                                </MudText>
-                            </MudAlert>
-                        }
-                    </div>
+                             IconColor="Color.Default">
+                    @if (Ficha.Id > 0)
+                    {
+                        <FichaFamiliasDetails FichaId="Ficha.Id" />
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                            <MudText>
+                                <b>⚠️ Guarda la ficha primero</b>
+                                <br />
+                                El núcleo familiar solo puede gestionarse después de guardar la ficha.
+                            </MudText>
+                        </MudAlert>
+                    }
                 </MudTabPanel>
 
                 <!-- TAB 4: Colindantes -->
                 <MudTabPanel Text="Colindantes"
                              Icon="@Icons.Material.Filled.BorderAll"
-                             IconColor="Color.Primary">
-                    <div class="pa-4 colindantes-container">
-                        @if (Ficha.Id > 0)
-                        {
-                            <FichaColindantesDetails FichaId="Ficha.Id" />
-                        }
-                        else
-                        {
-                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-                                <MudText>
-                                    <b>⚠️ Guarda la ficha primero</b>
-                                    <br />
-                                    Los colindantes solo pueden gestionarse después de guardar la ficha.
-                                </MudText>
-                            </MudAlert>
-                        }
-                    </div>
+                             IconColor="Color.Default">
+                    @if (Ficha.Id > 0)
+                    {
+                        <FichaColindantesDetails FichaId="Ficha.Id" />
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                            <MudText>
+                                <b>⚠️ Guarda la ficha primero</b>
+                                <br />
+                                Los colindantes solo pueden gestionarse después de guardar la ficha.
+                            </MudText>
+                        </MudAlert>
+                    }
                 </MudTabPanel>
 
                 <!-- TAB 5: Conflictos -->
                 <MudTabPanel Text="Conflictos"
                              Icon="@Icons.Material.Filled.WarningAmber"
-                             IconColor="Color.Primary">
-                    <div class="pa-4 conflictos-container">
-                        @if (Ficha.Id > 0)
-                        {
-                            <FichaConflictosDetails FichaId="Ficha.Id" />
-                        }
-                        else
-                        {
-                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-                                <MudText>
-                                    <b>⚠️ Guarda la ficha primero</b>
-                                    <br />
-                                    Los conflictos solo pueden gestionarse después de guardar la ficha.
-                                </MudText>
-                            </MudAlert>
-                        }
-                    </div>
+                             IconColor="Color.Default">
+                    @if (Ficha.Id > 0)
+                    {
+                        <FichaConflictosDetails FichaId="Ficha.Id" />
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                            <MudText>
+                                <b>⚠️ Guarda la ficha primero</b>
+                                <br />
+                                Los conflictos solo pueden gestionarse después de guardar la ficha.
+                            </MudText>
+                        </MudAlert>
+                    }
                 </MudTabPanel>
 
                 <!-- TAB 6: Documentos Anexos -->
                 <MudTabPanel Text="Documentos Anexos"
                              Icon="@Icons.Material.Filled.AttachFile"
-                             IconColor="Color.Primary">
-                    <div class="pa-4 documentos-container">
-                        @if (Ficha.Id > 0)
-                        {
-                            <FichaDocumentosAnexosDetails FichaId="Ficha.Id" />
-                        }
-                        else
-                        {
-                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
-                                <MudText>
-                                    <b>⚠️ Guarda la ficha primero</b>
-                                    <br />
-                                    Los documentos anexos solo pueden gestionarse después de guardar la ficha.
-                                </MudText>
-                            </MudAlert>
-                        }
-                    </div>
+                             IconColor="Color.Default">
+                    @if (Ficha.Id > 0)
+                    {
+                        <FichaDocumentosAnexosDetails FichaId="Ficha.Id" />
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-4">
+                            <MudText>
+                                <b>⚠️ Guarda la ficha primero</b>
+                                <br />
+                                Los documentos anexos solo pueden gestionarse después de guardar la ficha.
+                            </MudText>
+                        </MudAlert>
+                    }
                 </MudTabPanel>
             </MudTabs>
         </MudItem>

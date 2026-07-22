@@ -19,6 +19,7 @@ public class AdjuntosRepository : GenericRepository<Adjunto>, IAdjuntosRepositor
     public override async Task<ActionResponse<IEnumerable<Adjunto>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Adjuntos
+            .Where(a => a.DocumentoAnexoId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -39,6 +40,7 @@ public class AdjuntosRepository : GenericRepository<Adjunto>, IAdjuntosRepositor
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
     {
         var queryable = _context.Adjuntos
+            .Where(a => a.DocumentoAnexoId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))

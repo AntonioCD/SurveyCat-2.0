@@ -8,14 +8,14 @@ namespace SurveyCat.Frontend.Components.Pages.DocumentosAnexos;
 public partial class DocumentoAnexoCreate
 {
     private DocumentoAnexo documentoAnexo = new();
+    private DocumentoAnexoForm? documentoAnexoForm;
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
-    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int FichaId { get; set; }
-    [Parameter] public bool IsEmbedded { get; set; } = false;
+    [Parameter] public string CodEncuesta { get; set; } = string.Empty;
 
     private async Task CreateAsync()
     {
@@ -28,27 +28,21 @@ public partial class DocumentoAnexoCreate
             return;
         }
 
-        Snackbar.Add("Documento Anexo creado exitosamente.", Severity.Success);
+        // Actualizar el ID con el que devuelve el servidor
+        var creado = responseHttp.Response as DocumentoAnexo;
+        if (creado != null)
+        {
+            documentoAnexo.Id = creado.Id;
+        }
 
-        if (IsEmbedded)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
-        }
+        Snackbar.Add("Documento Anexo creado. Ahora puede agregar adjuntos.", Severity.Success);
+
+        // Activar el modo adjuntos en el formulario
+        documentoAnexoForm?.ActivarModoAdjuntos();
     }
 
     private void Return()
     {
-        if (IsEmbedded)
-        {
-            MudDialog.Cancel();
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
-        }
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=5");
     }
 }

@@ -12,10 +12,8 @@ public partial class ConflictoCreate
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
-    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int FichaId { get; set; }
-    [Parameter] public bool IsEmbedded { get; set; } = false;
 
     private async Task CreateAsync()
     {
@@ -28,29 +26,13 @@ public partial class ConflictoCreate
             return;
         }
 
+        // Primero el Snackbar, luego navegar
         Snackbar.Add("Conflicto creado exitosamente.", Severity.Success);
-
-        if (IsEmbedded)
-        {
-            // Si viene de la ficha, cerrar el diálogo y recargar
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            // Si es página independiente, navegar
-            NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
-        }
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=4");
     }
 
     private void Return()
     {
-        if (IsEmbedded)
-        {
-            MudDialog.Cancel();
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
-        }
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=4");
     }
 }

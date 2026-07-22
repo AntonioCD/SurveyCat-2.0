@@ -1,12 +1,3 @@
-﻿@if (conflicto is null)
-{
-    <Loading />
-}
-else
-{
-    <MudDialog>
-        <DialogContent>
-            <ConflictoForm Conflicto="conflicto" OnValidSubmit="EditAsync" ReturnAction="Return" />
-        </DialogContent>
-    </MudDialog>
-}
+﻿@page "/conflictos/edit/{Id:int}/{FichaId:int}"
+
+<ConflictoForm Conflicto="conflicto" OnValidSubmit="EditAsync" ReturnAction="Return" />

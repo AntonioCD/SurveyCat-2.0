@@ -10,10 +10,7 @@ namespace SurveyCat.Frontend.Components.Pages.Fichas;
 public partial class FichaFamiliasDetails
 {
     private Ficha? ficha;
-
-    // CORRECCIÓN CLAVE: Inicializada de inmediato para evitar errores de renderizado (ArgumentNullException)
     private List<Familia> familias = new();
-
     private int totalRecords = 0;
     private bool loading;
     private const string baseUrl = "api/familias";
@@ -35,42 +32,47 @@ public partial class FichaFamiliasDetails
     private async Task LoadAsync()
     {
         loading = true;
+        StateHasChanged(); // Mostrar loading inmediatamente
 
-        // 1. Cargamos la Ficha si no existe
-        if (ficha is null)
+        try
         {
-            var ok = await LoadFichaAsync();
-            if (!ok)
+            // 1. Cargamos la Ficha si no existe
+            if (ficha is null)
             {
-                NoFicha();
-                loading = false;
-                return;
+                var ok = await LoadFichaAsync();
+                if (!ok)
+                {
+                    NoFicha();
+                    return;
+                }
+            }
+
+            // 2. Traemos la lista completa del backend
+            var urlList = $"{baseUrl}/paginated?id={FichaId}&page=1&recordsnumber=100";
+            if (!string.IsNullOrWhiteSpace(Filter))
+            {
+                urlList += $"&filter={Filter}";
+            }
+
+            var responseHttp = await Repository.GetAsync<List<Familia>>(urlList);
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add(message!, Severity.Error);
+                familias = new List<Familia>();
+            }
+            else if (responseHttp.Response != null)
+            {
+                familias = responseHttp.Response.OrderBy(f => f.Item).ToList();
+                totalRecords = familias.Count;
             }
         }
-
-        // 2. Traemos la lista completa del backend (para el drag-and-drop es óptimo manejar el set completo de la ficha)
-        var urlList = $"{baseUrl}/paginated?id={FichaId}&page=1&recordsnumber=100"; // Ajusta el recordsnumber según tus necesidades
-        if (!string.IsNullOrWhiteSpace(Filter))
+        finally
         {
-            urlList += $"&filter={Filter}";
+            loading = false;
+            StateHasChanged(); // Forzar re-renderizado al terminar
         }
-
-        var responseHttp = await Repository.GetAsync<List<Familia>>(urlList);
-
-        if (responseHttp.Error)
-        {
-            var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
-            familias = new List<Familia>();
-        }
-        else if (responseHttp.Response != null)
-        {
-            // Forzamos el ordenamiento por Item de manera ascendente al mapearlo en la UI
-            familias = responseHttp.Response.OrderBy(f => f.Item).ToList();
-            totalRecords = familias.Count;
-        }
-
-        loading = false;
     }
 
     private async Task<bool> LoadFichaAsync()
@@ -94,47 +96,34 @@ public partial class FichaFamiliasDetails
 
     private async Task OnItemDropped(MudItemDropInfo<Familia> dropInfo)
     {
-        // Si no hay item o se soltó en un lugar indefinido, abortamos
         if (dropInfo.Item == null || string.IsNullOrEmpty(dropInfo.DropzoneIdentifier)) return;
-
-        // Convertimos el identificador de la zona de destino a número entero
         if (!int.TryParse(dropInfo.DropzoneIdentifier, out int itemDestino)) return;
 
         var itemMovido = dropInfo.Item;
-
-        // Si lo soltó en la misma posición en la que ya estaba, no gastamos recursos ni llamamos al API
         if (itemMovido.Item == itemDestino) return;
 
-        // 1. Extraemos todos los demás elementos ordenados excluyendo al que se está moviendo
         var listaModificada = familias.Where(f => f.Id != itemMovido.Id).OrderBy(f => f.Item).ToList();
 
-        // 2. Calculamos el índice exacto de inserción en la lista basado en el número de Item destino
-        // Restamos 1 porque los Items van de 1 a N, pero los índices de la lista van de 0 a N-1
         int nuevoIndice = itemDestino - 1;
-
         if (nuevoIndice < 0) nuevoIndice = 0;
         if (nuevoIndice > listaModificada.Count) nuevoIndice = listaModificada.Count;
 
-        // 3. Insertamos el elemento en su lugar exacto
         listaModificada.Insert(nuevoIndice, itemMovido);
 
-        // 4. Regeneramos los consecutivos (1, 2, 3...) de los objetos clonados para romper referencias
         var listaParaEnviar = listaModificada.Select((f, index) => new Familia
         {
             Id = f.Id,
             FichaId = f.FichaId,
-            Item = index + 1, // Asigna la secuencia limpia corregida
+            Item = index + 1,
             PersonaId = f.PersonaId,
             Persona = f.Persona,
             ParentescoId = f.ParentescoId,
             Parentesco = f.Parentesco
         }).ToList();
 
-        // 5. Refrescamos la UI localmente
         familias = listaParaEnviar;
         StateHasChanged();
 
-        // 6. Persistimos los cambios en la base de datos a través de tu arquitectura de capas
         var responseHttp = await Repository.PostAsync($"{baseUrl}/reorder", familias);
         if (responseHttp.Error)
         {
@@ -194,9 +183,10 @@ public partial class FichaFamiliasDetails
             return;
         }
 
-        // Al recargar mediante LoadAsync(), se ejecutan el conteo y la re-indexación automática del Backend
-        await LoadAsync();
         Snackbar.Add("Familiar eliminado correctamente.", Severity.Success);
+
+        // Recargar la lista después de mostrar el mensaje
+        await LoadAsync();
     }
 
     private void NavigateBackToFicha()

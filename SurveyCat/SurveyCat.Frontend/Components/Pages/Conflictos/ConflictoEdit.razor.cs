@@ -12,11 +12,9 @@ public partial class ConflictoEdit
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
-    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int Id { get; set; }
     [Parameter] public int FichaId { get; set; }
-    [Parameter] public bool IsEmbedded { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,23 +24,12 @@ public partial class ConflictoEdit
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                if (IsEmbedded)
-                {
-                    MudDialog.Cancel();
-                }
-                else
-                {
-                    NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
-                }
+                NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=4");
             }
             else
             {
                 var messageError = await responseHttp.GetErrorMessageAsync();
                 Snackbar.Add(messageError!, Severity.Error);
-                if (IsEmbedded)
-                {
-                    MudDialog.Cancel();
-                }
             }
         }
         else
@@ -53,11 +40,14 @@ public partial class ConflictoEdit
 
     private async Task EditAsync()
     {
-        conflicto!.Ficha = null;
+        if (conflicto == null) return;
+
+        // Limpiar propiedades de navegación antes de enviar (igual que en FamiliaEdit)
+        conflicto.Ficha = null;
         conflicto.TipoConflicto = null;
         conflicto.ViaGestion = null;
 
-        var responseHttp = await Repository.PutAsync<Conflicto>("api/conflictos", conflicto);
+        var responseHttp = await Repository.PutAsync<Conflicto>("/api/conflictos", conflicto);
 
         if (responseHttp.Error)
         {
@@ -66,29 +56,12 @@ public partial class ConflictoEdit
             return;
         }
 
-        Snackbar.Add("Conflicto guardado exitosamente.", Severity.Success);
-
-        if (IsEmbedded)
-        {
-            // Si viene de la ficha, cerrar el diálogo y recargar
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            // Si es página independiente, navegar
-            NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
-        }
+        Snackbar.Add("Conflicto actualizado exitosamente.", Severity.Success);
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=4");
     }
 
     private void Return()
     {
-        if (IsEmbedded)
-        {
-            MudDialog.Cancel();
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/fichas/conflictos/details/{FichaId}");
-        }
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=4");
     }
 }

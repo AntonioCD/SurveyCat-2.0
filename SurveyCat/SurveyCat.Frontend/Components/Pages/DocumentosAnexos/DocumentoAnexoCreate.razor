@@ -1,5 +1,7 @@
-﻿<MudDialog>
-    <DialogContent>
-        <DocumentoAnexoForm DocumentoAnexo="documentoAnexo" OnValidSubmit="CreateAsync" ReturnAction="Return" />
-    </DialogContent>
-</MudDialog>
+﻿@page "/documentosAnexos/create/{FichaId:int}/{CodEncuesta}"
+
+<DocumentoAnexoForm @ref="documentoAnexoForm"
+                    CodEncuesta="@CodEncuesta"
+                    DocumentoAnexo="documentoAnexo"
+                    OnValidSubmit="CreateAsync"
+                    ReturnAction="Return" />

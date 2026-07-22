@@ -29,7 +29,6 @@ public partial class FichaPropietariosDetails
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     [Parameter, SupplyParameterFromQuery] public string Filter { get; set; } = string.Empty;
-    [Parameter] public EventCallback OnPropietarioChanged { get; set; } // Para notificar cambios
 
     protected override async Task OnInitializedAsync()
     {
@@ -186,7 +185,7 @@ public partial class FichaPropietariosDetails
         await table.ReloadServerData();
         Snackbar.Add("Propietario eliminado.", Severity.Success);
 
-        // Notificar cambio
-        await OnPropietarioChanged.InvokeAsync();
+        //// Notificar cambio
+        //await OnPropietarioChanged.InvokeAsync();
     }
 }

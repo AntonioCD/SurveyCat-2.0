@@ -16,16 +16,15 @@ else
                           Class="d-flex flex-column gap-2">
             <ChildContent>
                 @* Cabecera Superior del Módulo *@
-                <div class="d-flex align-center mud-paper pa-4 mb-4 mud-elevation-1">
+                <div class="d-flex align-center mud-paper pa-2 mb-0">
                     <MudText Typo="Typo.h6" Class="mr-4">NUCLEO FAMILIAR (@ficha?.CodEncuesta)</MudText>
-                    <!-- QUITAMOS el botón Regresar -->
                     <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToFamiliarForm())">Crear</MudButton>
                     <MudSpacer />
                     <FilterComponent ApplyFilter="SetFilterValue" />
                 </div>
 
                 @* Encabezado de la Tabla de Arrastre *@
-                <div class="d-flex pa-3 mud-theme-primary mud-elevation-1 align-center" style="border-radius: 4px; font-weight: bold;">
+                <div class="d-flex pa-3 mud-theme-dark mud-elevation-1 align-center" style="border-radius: 4px; font-weight: bold;">
                     <div style="width: 8%; text-align: center;">N°</div>
                     <div style="width: 22%;">Parentesco</div>
                     <div style="width: 35%;">Nombre Completo</div>

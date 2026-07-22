@@ -31,23 +31,7 @@ else
             <MudTd DataLabel="Documento">@context.Documento?.Nombre</MudTd>
             <MudTd DataLabel="Documento">@context.Documento?.Codigo</MudTd>
             <MudTd DataLabel="# Páginas">@context.NumeroPaginas</MudTd>
-            <MudTd DataLabel="Adjuntos">
-                <MudTooltip Text="Gestionar Adjuntos">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
-                               Size="Size.Medium"
-                               OnClick="@(() => ShowAdjuntosModalAsync(@context))"
-                               Style="width: 70px; min-width: 70px; color: #607D8B; border-color: #607D8B;"
-                               Class="d-flex justify-space-between px-2">
-
-                        <span>@context.AdjuntosNumber</span>
-
-                        <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
-                                 Size="Size.Small"
-                                 Class="ml-2" />
-                    </MudButton>
-                </MudTooltip>
-            </MudTd>
+            <MudTd DataLabel="# Adjuntos">@context.AdjuntosNumber</MudTd>
             <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
                 <div class="d-flex justify-center">
                     <MudTooltip Text="Editar">

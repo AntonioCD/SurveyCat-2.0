@@ -8,19 +8,23 @@
     <ValidationSummary />
 
     <MudGrid>
+        @* HEADER *@
         <MudItem xs="12" Class="mb-2">
-            @* d-flex y justify-space-between empujan el título a la izquierda y el input a la derecha *@
             <div class="d-flex align-center justify-space-between gap-3 pl-1">
-
-                @* BLOQUE IZQUIERDO: Icono + Título y Subtítulo *@
                 <div class="d-flex align-center gap-3">
-                    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
+                    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                                   Color="Color.Secondary"
+                                   OnClick="ReturnAction"
+                                   Title="Regresar"
+                                   Size="Size.Large"
+                                   Class="mr-1" />
+                    <MudIcon Icon="@Icons.Material.Filled.AttachFile" Color="Color.Primary" Size="Size.Large" />
                     <div class="d-flex flex-column">
                         <MudText Typo="Typo.h5" Color="Color.Primary">
                             <b>@(DocumentoAnexo?.Id != 0 ? "Editar Documento Anexo" : "Nuevo Documento Anexo")</b>
                         </MudText>
                         <MudText Typo="Typo.caption" Color="Color.Secondary">
-                            Complete los datos requeridos para registrar/editar un documento anexo.
+                            Complete los datos del documento y agregue sus adjuntos.
                         </MudText>
                     </div>
                 </div>
@@ -28,38 +32,222 @@
             <MudDivider Class="mt-3 mb-2" DividerType="DividerType.FullWidth" />
         </MudItem>
 
+        @* ================= SECCIÓN 1: DATOS DEL DOCUMENTO ANEXO ================= *@
         <MudItem xs="12">
-            <MudAutocomplete T="Diccionario"
-                             Label="Tipo de Documento"
-                             Placeholder="-- Seleccione un Documento --"
-                             SearchFunc="SearchDocumento"
-                             Value="selectedDocumento"
-                             ValueChanged="DocumentoChanged"
-                             Variant="Variant.Outlined" Margin="Margin.Dense"
-                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
-                <ItemTemplate Context="itemContext">
-                    @itemContext.Nombre
-                </ItemTemplate>
-            </MudAutocomplete>
+            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
+                <div class="section-header">
+                    <MudIcon Icon="@Icons.Material.Filled.Description" Color="Color.Primary" Size="Size.Small" />
+                    <MudText><b>Datos del Documento Anexo</b></MudText>
+                    @if (loading)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Primary" Class="ml-3" />
+                    }
+                </div>
+                <div class="pa-4">
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudAutocomplete T="Diccionario"
+                                             Label="Tipo de Documento"
+                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Documento --")"
+                                             SearchFunc="SearchDocumento"
+                                             Value="selectedDocumento"
+                                             ValueChanged="DocumentoChanged"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Disabled="@(loading || documentoGuardado)"
+                                             Required="true"
+                                             RequiredError="El tipo de documento es requerido."
+                                             For="@(() => selectedDocumento)"
+                                             ToStringFunc="@(e => e == null ? null : $"{e.Codigo} - {e.Nombre}")">
+                                <ItemTemplate Context="item">
+                                    @item.Codigo - @item.Nombre
+                                </ItemTemplate>
+                            </MudAutocomplete>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudNumericField Label="# Páginas"
+                                             @bind-Value="DocumentoAnexo.NumeroPaginas"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Disabled="@(loading || documentoGuardado)"
+                                             Required="true"
+                                             RequiredError="El número de páginas es requerido."
+                                             For="@(() => DocumentoAnexo.NumeroPaginas)" />
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudTextField Label="Descripción"
+                                          @bind-Value="DocumentoAnexo.Descripcion"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          ReadOnly="true"
+                                          Disabled="@(loading || documentoGuardado)" />
+                        </MudItem>
+
+                        @* <MudItem xs="12" sm="6">
+                            <MudTextField Label="Código"
+                                          @bind-Value="DocumentoAnexo.Codigo"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Disabled="@(loading || documentoGuardado)" />
+                        </MudItem> *@
+                    </MudGrid>
+
+                    @if (!documentoGuardado)
+                    {
+                        <div class="d-flex justify-end gap-2 mt-4">
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       ButtonType="ButtonType.Submit"
+                                       Disabled="loading">
+                                Guardar Documento
+                            </MudButton>
+                        </div>
+                    }
+                </div>
+            </MudPaper>
         </MudItem>
 
-        <MudItem xs="12">
-            <MudTextField Label="Descripción" @bind-Value="DocumentoAnexo.Descripcion" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        </MudItem>
+        @* ================= SECCIÓN 2: ADJUNTOS ================= *@
+        @if (documentoGuardado)
+        {
+            <MudItem xs="12">
+                <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
+                    <div class="section-header">
+                        <MudIcon Icon="@Icons.Material.Filled.Collections" Color="Color.Primary" Size="Size.Small" />
+                        <MudText><b>Adjuntos del Documento</b></MudText>
+                        <MudSpacer />
+                        @if (!mostrandoFormularioAdjunto)
+                        {
+                            <MudButton Variant="Variant.Outlined"
+                                       StartIcon="@Icons.Material.Filled.Add"
+                                       Color="Color.Info"
+                                       Size="Size.Small"
+                                       OnClick="@(() => AbrirFormularioAdjunto())">
+                                Agregar Adjunto
+                            </MudButton>
+                        }
+                    </div>
+                    <div class="pa-4">
+                        @if (mostrandoFormularioAdjunto)
+                        {
+                            <MudPaper Class="pa-4 mb-4" Elevation="1" Outlined="true" Style="border-radius: 8px; border-left: 4px solid var(--mud-palette-info);">
+                                <div class="d-flex align-center gap-2 mb-3">
+                                    <MudIcon Icon="@Icons.Material.Filled.CloudUpload" Color="Color.Info" Size="Size.Small" />
+                                    <MudText Typo="Typo.subtitle2" Color="Color.Info">
+                                        <b>Nuevo Adjunto</b>
+                                    </MudText>
+                                </div>
 
-        <MudItem xs="12" sm="6">
-            <MudNumericField Label="# Paginas" @bind-Value="DocumentoAnexo.NumeroPaginas"
-                             Variant="Variant.Outlined" Margin="Margin.Dense" />
-        </MudItem>
+                                <MudGrid>
+                                    <MudItem xs="12">
+                                        <MudFileUpload T="IBrowserFile" OnFilesChanged="OnFilesChangedHandler">
+                                            <ActivatorContent>
+                                                <MudButton Variant="Variant.Outlined"
+                                                           Color="@(string.IsNullOrEmpty(ArchivoOriginalName) ? Color.Primary : Color.Success)"
+                                                           StartIcon="@Icons.Material.Filled.AttachFile"
+                                                           Size="Size.Large"
+                                                           FullWidth="true"
+                                                           Style="height: 40px; border-style: dashed; border-width: 2px;">
+                                                    @(string.IsNullOrEmpty(ArchivoOriginalName) ? "SELECCIONAR ARCHIVO" : $"{ArchivoOriginalName}")
+                                                </MudButton>
+                                            </ActivatorContent>
+                                        </MudFileUpload>
+                                    </MudItem>
 
-        <MudItem xs="12" sm="6">
-            <MudTextField Label="Código" @bind-Value="DocumentoAnexo.Codigo" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        </MudItem>
+                                    <MudItem xs="12" sm="4">
+                                        <MudNumericField Label="Número de Página"
+                                                         @bind-Value="nuevoAdjunto.ItemPagina"
+                                                         @bind-Value:after="GenerarNombreArchivoAdjunto"
+                                                         Variant="Variant.Outlined"
+                                                         Margin="Margin.Dense"
+                                                         Min="1"
+                                                         Max="@(DocumentoAnexo.NumeroPaginas)" />
+                                    </MudItem>
 
-        <MudItem xs="12" class="d-flex justify-end gap-2 mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
-        </MudItem>
+                                    <MudItem xs="12" sm="8">
+                                        <MudTextField Label="Nombre Final (Automático)"
+                                                      Value="@nuevoAdjunto.NombreArchivo"
+                                                      Variant="Variant.Filled"
+                                                      Margin="Margin.Dense"
+                                                      ReadOnly="true" />
+                                    </MudItem>
+                                </MudGrid>
 
+                                <div class="d-flex justify-end gap-2 mt-3">
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Secondary"
+                                               OnClick="@(() => CancelarAdjunto())">
+                                        Cancelar
+                                    </MudButton>
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               OnClick="@(async () => await GuardarAdjuntoAsync())"
+                                               Disabled="@(!adjuntoListoParaGuardar)">
+                                        Guardar Adjunto
+                                    </MudButton>
+                                </div>
+                            </MudPaper>
+                        }
+
+                        @if (adjuntos != null && adjuntos.Any())
+                        {
+                            <MudTable Items="@adjuntos"
+                                      Dense="true"
+                                      Hover="true"
+                                      Striped="true"
+                                      FixedHeader="true">
+                                <HeaderContent>
+                                    <MudTh Style="width: 10%;">Página</MudTh>
+                                    <MudTh Style="width: 50%;">Nombre de Archivo</MudTh>
+                                    <MudTh Style="width: 10%; white-space: nowrap; text-align: center;">Acciones</MudTh>
+                                </HeaderContent>
+                                <RowTemplate Context="adjuntoRow">
+                                    <MudTd DataLabel="Página">@adjuntoRow.ItemPagina</MudTd>
+                                    <MudTd DataLabel="Nombre de Archivo">@adjuntoRow.NombreArchivo</MudTd>
+                                    <MudTd DataLabel="Acciones" Style="text-align: center; white-space: nowrap;">
+                                        <div class="d-flex justify-center">
+                                            <MudTooltip Text="Visualizar">
+                                                <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                                               Variant="Variant.Outlined"
+                                                               Color="Color.Info"
+                                                               OnClick="@(() => VerDocumentoAsync(adjuntoRow))"
+                                                               Size="Size.Medium"
+                                                               Class="mr-2" />
+                                            </MudTooltip>
+                                            <MudTooltip Text="Borrar">
+                                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                               Variant="Variant.Outlined"
+                                                               Color="Color.Error"
+                                                               OnClick="@(() => EliminarAdjuntoAsync(adjuntoRow))"
+                                                               Size="Size.Medium" />
+                                            </MudTooltip>
+                                        </div>
+                                    </MudTd>
+                                </RowTemplate>
+                                <NoRecordsContent>
+                                    <MudText>No hay adjuntos registrados para este documento.</MudText>
+                                </NoRecordsContent>
+                            </MudTable>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                                <MudText>No hay adjuntos registrados. Haga clic en <b>"Agregar Adjunto"</b> para comenzar.</MudText>
+                            </MudAlert>
+                        }
+                    </div>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" class="d-flex justify-end gap-2 mt-4">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           OnClick="@(() => Finalizar())">
+                    Finalizar
+                </MudButton>
+            </MudItem>
+        }
     </MudGrid>
 </EditForm>

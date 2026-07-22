@@ -19,9 +19,10 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
     public override async Task<ActionResponse<IEnumerable<Familia>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Familias
-            .Include(p => p.Persona)
-            .ThenInclude(p => p.TipoIdentificacion)
-            .Include(p => p.Parentesco)
+            .Include(f => f.Persona!)
+            .ThenInclude(f => f.TipoIdentificacion)
+            .Include(f => f.Parentesco)
+            .Where(f => f.FichaId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -43,6 +44,7 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
     {
         var queryable = _context.Familias
             .Include(p => p.Persona)
+            .Where(f => f.FichaId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))

@@ -19,8 +19,10 @@ public class DocumentosAnexosRepository : GenericRepository<DocumentoAnexo>, IDo
     public override async Task<ActionResponse<IEnumerable<DocumentoAnexo>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.DocumentosAnexos
+            .Include(d => d.Ficha)
             .Include(d => d.Documento)
             .Include(d => d.Adjuntos)
+            .Where(d => d.FichaId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -42,6 +44,7 @@ public class DocumentosAnexosRepository : GenericRepository<DocumentoAnexo>, IDo
     {
         var queryable = _context.DocumentosAnexos
             .Include(p => p.Documento)
+            .Where(d => d.FichaId == pagination.Id)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))

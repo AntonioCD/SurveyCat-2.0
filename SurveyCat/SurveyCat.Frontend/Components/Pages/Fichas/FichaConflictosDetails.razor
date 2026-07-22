@@ -16,7 +16,7 @@ else
               FixedFooter="true">
         <ToolBarContent>
             <MudText Typo="Typo.h6" Class="mr-4">CONFLICTOS (@ficha?.CodEncuesta)</MudText>
-            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => ShowModalAsync())">Crear</MudButton>
+            <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToConflictoForm())">Crear</MudButton>
             <MudSpacer />
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
@@ -40,7 +40,7 @@ else
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Variant="Variant.Outlined"
                                        Color="Color.Warning"
-                                       OnClick="@(() => ShowModalAsync(context.Id, true))"
+                                       OnClick="@(() => RedirectToConflictoForm(context.Id, true))"
                                        Size="Size.Medium"
                                        Class="mr-2" />
                     </MudTooltip>

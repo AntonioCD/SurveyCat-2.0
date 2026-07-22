@@ -12,11 +12,10 @@ public partial class DocumentoAnexoEdit
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
-    [Inject] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public long Id { get; set; }
     [Parameter] public int FichaId { get; set; }
-    [Parameter] public bool IsEmbedded { get; set; } = false;
+    [Parameter] public string CodEncuesta { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,23 +25,12 @@ public partial class DocumentoAnexoEdit
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                if (IsEmbedded)
-                {
-                    MudDialog.Cancel();
-                }
-                else
-                {
-                    NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
-                }
+                NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=5");
             }
             else
             {
                 var messageError = await responseHttp.GetErrorMessageAsync();
                 Snackbar.Add(messageError!, Severity.Error);
-                if (IsEmbedded)
-                {
-                    MudDialog.Cancel();
-                }
             }
         }
         else
@@ -53,8 +41,12 @@ public partial class DocumentoAnexoEdit
 
     private async Task EditAsync()
     {
-        documentoAnexo!.Ficha = null;
+        if (documentoAnexo == null) return;
+
+        // Limpiar propiedades de navegación antes de enviar
+        documentoAnexo.Ficha = null;
         documentoAnexo.Documento = null;
+
         var responseHttp = await Repository.PutAsync<DocumentoAnexo>("api/documentosAnexos", documentoAnexo);
 
         if (responseHttp.Error)
@@ -65,26 +57,11 @@ public partial class DocumentoAnexoEdit
         }
 
         Snackbar.Add("Documento Anexo guardado exitosamente.", Severity.Success);
-
-        if (IsEmbedded)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
-        }
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=5");
     }
 
     private void Return()
     {
-        if (IsEmbedded)
-        {
-            MudDialog.Cancel();
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/fichas/documentosAnexos/details/{FichaId}");
-        }
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=5");
     }
 }

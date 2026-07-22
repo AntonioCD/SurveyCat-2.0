@@ -31,11 +31,12 @@
         <MudItem xs="12">
             <MudAutocomplete T="Diccionario"
                              Label="Tipo de Conflicto"
-                             Placeholder="-- Seleccione un Conflicto --"
+                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Conflicto --")"
                              SearchFunc="SearchConflicto"
                              Value="selectedConflicto"
                              ValueChanged="ConflictoChanged"
                              Variant="Variant.Outlined" Margin="Margin.Dense"
+                             Disabled="loading"
                              ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
                 <ItemTemplate Context="itemContext">
                     @itemContext.Nombre
@@ -46,11 +47,12 @@
         <MudItem xs="12">
             <MudAutocomplete T="Diccionario"
                              Label="Gestion del Conflicto"
-                             Placeholder="-- Seleccione una Vía de Gestión --"
+                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione una Vía de Gestión --")"
                              SearchFunc="SearchViaGestion"
                              Value="selectedViaGestion"
                              ValueChanged="ViaGestionChanged"
                              Variant="Variant.Outlined" Margin="Margin.Dense"
+                             Disabled="loading"
                              ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
                 <ItemTemplate Context="itemContext">
                     @itemContext.Nombre
@@ -70,8 +72,12 @@
         </MudItem>
 
         <MudItem xs="12" class="d-flex justify-end gap-2 mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       ButtonType="ButtonType.Submit"
+                       Disabled="loading">
+                Guardar
+            </MudButton>
         </MudItem>
 
     </MudGrid>

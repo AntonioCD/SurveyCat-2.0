@@ -14,8 +14,6 @@ public partial class PropietarioCreate
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     [Parameter] public int FichaId { get; set; }
-    [Parameter] public EventCallback OnPropietarioChanged { get; set; }
-    [Parameter] public EventCallback OnCancel { get; set; }
 
     private async Task CreateAsync()
     {
@@ -28,15 +26,12 @@ public partial class PropietarioCreate
             return;
         }
 
-        Snackbar.Add("Registro creado con éxito.", Severity.Success);
-
-        // Notificar al padre y dejar que él maneje el cierre y refresco
-        await OnPropietarioChanged.InvokeAsync();
-        await OnCancel.InvokeAsync();
+        Return();
+        Snackbar.Add("Registro creado", Severity.Success);
     }
 
-    private async Task Return()
+    private void Return()
     {
-        await OnCancel.InvokeAsync();
+        NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=1");
     }
 }

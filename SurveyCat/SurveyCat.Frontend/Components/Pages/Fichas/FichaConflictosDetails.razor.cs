@@ -131,44 +131,56 @@ public partial class FichaConflictosDetails
         await table.ReloadServerData();
     }
 
-    // El método ShowModalAsync permanece igual, pero los diálogos ahora cerrarán y volverán a la ficha
-    private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    private void RedirectToConflictoForm(long id = 0, bool isEdit = false)
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            CloseButton = true,
-            NoHeader = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true
-        };
-
-        IDialogReference? dialog;
         if (isEdit)
         {
-            var parameters = new DialogParameters
-        {
-            { "Id", id },
-            { "FichaId", FichaId },
-            { "IsEmbedded", true } // Nuevo parámetro para saber que viene de la ficha
-        };
-            dialog = await DialogService.ShowAsync<ConflictoEdit>("Editar Conflicto", parameters, options);
+            NavigationManager.NavigateTo($"/conflictos/edit/{id}/{FichaId}");
         }
         else
         {
-            var parameters = new DialogParameters
-        {
-            { "FichaId", FichaId },
-            { "IsEmbedded", true } // Nuevo parámetro para saber que viene de la ficha
-        };
-            dialog = await DialogService.ShowAsync<ConflictoCreate>("Nuevo Conflicto", parameters, options);
+            NavigationManager.NavigateTo($"/conflictos/create/{FichaId}");
         }
-
-        var result = await dialog.Result;
-        // Siempre recargar la tabla cuando se cierra el diálogo
-        await LoadTotalRecordsAsync();
-        await table.ReloadServerData();
     }
+
+    // El método ShowModalAsync permanece igual, pero los diálogos ahora cerrarán y volverán a la ficha
+    //private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    //{
+    //    var options = new DialogOptions
+    //    {
+    //        CloseOnEscapeKey = true,
+    //        CloseButton = true,
+    //        NoHeader = true,
+    //        MaxWidth = MaxWidth.Medium,
+    //        FullWidth = true
+    //    };
+
+    //    IDialogReference? dialog;
+    //    if (isEdit)
+    //    {
+    //        var parameters = new DialogParameters
+    //    {
+    //        { "Id", id },
+    //        { "FichaId", FichaId },
+    //        { "IsEmbedded", true } // Nuevo parámetro para saber que viene de la ficha
+    //    };
+    //        dialog = await DialogService.ShowAsync<ConflictoEdit>("Editar Conflicto", parameters, options);
+    //    }
+    //    else
+    //    {
+    //        var parameters = new DialogParameters
+    //    {
+    //        { "FichaId", FichaId },
+    //        { "IsEmbedded", true } // Nuevo parámetro para saber que viene de la ficha
+    //    };
+    //        dialog = await DialogService.ShowAsync<ConflictoCreate>("Nuevo Conflicto", parameters, options);
+    //    }
+
+    //    var result = await dialog.Result;
+    //    // Siempre recargar la tabla cuando se cierra el diálogo
+    //    await LoadTotalRecordsAsync();
+    //    await table.ReloadServerData();
+    //}
 
     //private async Task ShowModalAsync(long id = 0, bool isEdit = false)
     //{
