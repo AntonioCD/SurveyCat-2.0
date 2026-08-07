@@ -69,92 +69,8 @@
                              IconColor="Color.Default">
                     <div class="pa-10">
                         <MudGrid>
-                            <!-- Datos del Personal -->
-                            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
-                                <div class="section-header">
-                                    <MudIcon Icon="@Icons.Material.Filled.AccessibilityNew" Color="Color.Primary" Size="Size.Small" />
-                                    <MudText>Datos del Personal</MudText>
-                                    @if (loading)
-                                    {
-                                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Primary" Class="ml-3" />
-                                    }
-                                </div>
-                                <div class="pa-4">
-                                    <MudGrid>
-                                        <MudItem xs="12" sm="6">
-                                            <MudAutocomplete T="PersonalEncuesta"
-                                                             Label="Encuestador"
-                                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Encuestador --")"
-                                                             SearchFunc="SearchEncuestador"
-                                                             Value="selectedEncuestador"
-                                                             ValueChanged="EncuestadorChanged"
-                                                             Variant="Variant.Outlined"
-                                                             Margin="Margin.Dense"
-                                                             Disabled="loading"
-                                                             Required="true"
-                                                             RequiredError="El Encuestador es requerido."
-                                                             For="@(() => selectedEncuestador)"
-                                                             ResetValueOnEmptyText="true"
-                                                             CoerceText="false"
-                                                             CoerceValue="false"
-                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
-                                                <ItemTemplate Context="itemContext">
-                                                    @itemContext.Persona?.NombreCompleto
-                                                </ItemTemplate>
-                                            </MudAutocomplete>
-                                        </MudItem>
-
-                                        <MudItem xs="12" sm="6">
-                                            <MudAutocomplete T="PersonalEncuesta"
-                                                             Label="Técnico Catastral"
-                                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Técnico Catastral --")"
-                                                             SearchFunc="SearchTecnicoCatastral"
-                                                             Value="selectedTecnicoCatastral"
-                                                             ValueChanged="TecnicoCatastralChanged"
-                                                             Variant="Variant.Outlined"
-                                                             Margin="Margin.Dense"
-                                                             Disabled="loading"
-                                                             Required="true"
-                                                             RequiredError="El Técnico es requerido."
-                                                             For="@(() => selectedTecnicoCatastral)"
-                                                             ResetValueOnEmptyText="true"
-                                                             CoerceText="false"
-                                                             CoerceValue="false"
-                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
-                                                <ItemTemplate Context="itemContext">
-                                                    @itemContext.Persona?.NombreCompleto
-                                                </ItemTemplate>
-                                            </MudAutocomplete>
-                                        </MudItem>
-
-                                        <MudItem xs="12" sm="6">
-                                            <MudAutocomplete T="PersonalEncuesta"
-                                                             Label="Jefe de Campo"
-                                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Jefe de Campo --")"
-                                                             SearchFunc="SearchSupervisor"
-                                                             Value="selectedSupervisor"
-                                                             ValueChanged="SupervisorChanged"
-                                                             Variant="Variant.Outlined"
-                                                             Margin="Margin.Dense"
-                                                             Disabled="loading"
-                                                             Required="true"
-                                                             RequiredError="El Jefe de Campo es requerido."
-                                                             For="@(() => selectedSupervisor)"
-                                                             ResetValueOnEmptyText="true"
-                                                             CoerceText="false"
-                                                             CoerceValue="false"
-                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
-                                                <ItemTemplate Context="itemContext">
-                                                    @itemContext.Persona?.NombreCompleto
-                                                </ItemTemplate>
-                                            </MudAutocomplete>
-                                        </MudItem>
-                                    </MudGrid>
-                                </div>
-                            </MudPaper>
-
                             <!-- Datos Generales -->
-                            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden;">
+                            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden; width: 100%;">
                                 <div class="section-header">
                                     <MudIcon Icon="@Icons.Material.Filled.Assignment" Color="Color.Primary" Size="Size.Small" />
                                     <MudText>Datos Generales</MudText>
@@ -247,6 +163,90 @@
                                                           InputType="InputType.Number"
                                                           MaxLength="4"
                                                           Placeholder="Ej: 0001" />
+                                        </MudItem>
+                                    </MudGrid>
+                                </div>
+                            </MudPaper>
+
+                            <!-- Datos del Personal -->
+                            <MudPaper Class="mb-4" Elevation="0" Outlined="true" Style="border-radius: 8px; overflow: hidden; width: 100%;">
+                                <div class="section-header">
+                                    <MudIcon Icon="@Icons.Material.Filled.AccessibilityNew" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText>Datos del Personal</MudText>
+                                    @if (loading)
+                                    {
+                                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Primary" Class="ml-3" />
+                                    }
+                                </div>
+                                <div class="pa-4">
+                                    <MudGrid>
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="PersonalEncuesta"
+                                                             Label="Encuestador"
+                                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Encuestador --")"
+                                                             SearchFunc="SearchEncuestador"
+                                                             Value="selectedEncuestador"
+                                                             ValueChanged="EncuestadorChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Disabled="loading"
+                                                             Required="true"
+                                                             RequiredError="El Encuestador es requerido."
+                                                             For="@(() => selectedEncuestador)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Persona?.NombreCompleto
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+
+                                        <MudItem xs="12" sm="6">
+                                            <MudAutocomplete T="PersonalEncuesta"
+                                                             Label="Técnico Catastral"
+                                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Técnico Catastral --")"
+                                                             SearchFunc="SearchTecnicoCatastral"
+                                                             Value="selectedTecnicoCatastral"
+                                                             ValueChanged="TecnicoCatastralChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Disabled="loading"
+                                                             Required="true"
+                                                             RequiredError="El Técnico es requerido."
+                                                             For="@(() => selectedTecnicoCatastral)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Persona?.NombreCompleto
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
+                                        </MudItem>
+
+                                        <MudItem xs="12">
+                                            <MudAutocomplete T="PersonalEncuesta"
+                                                             Label="Jefe de Campo"
+                                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Jefe de Campo --")"
+                                                             SearchFunc="SearchSupervisor"
+                                                             Value="selectedSupervisor"
+                                                             ValueChanged="SupervisorChanged"
+                                                             Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense"
+                                                             Disabled="loading"
+                                                             Required="true"
+                                                             RequiredError="El Jefe de Campo es requerido."
+                                                             For="@(() => selectedSupervisor)"
+                                                             ResetValueOnEmptyText="true"
+                                                             CoerceText="false"
+                                                             CoerceValue="false"
+                                                             ToStringFunc="@(e => e == null ? null : $"{e.Persona?.NombreCompleto}")">
+                                                <ItemTemplate Context="itemContext">
+                                                    @itemContext.Persona?.NombreCompleto
+                                                </ItemTemplate>
+                                            </MudAutocomplete>
                                         </MudItem>
                                     </MudGrid>
                                 </div>

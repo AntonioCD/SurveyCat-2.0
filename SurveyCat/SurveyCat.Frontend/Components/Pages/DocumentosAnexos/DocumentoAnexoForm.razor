@@ -58,7 +58,7 @@
                                              Required="true"
                                              RequiredError="El tipo de documento es requerido."
                                              For="@(() => selectedDocumento)"
-                                             ToStringFunc="@(e => e == null ? null : $"{e.Codigo} - {e.Nombre}")">
+                                             ToStringFunc="@(e => e == null ? null : $"{e.Codigo} {e.Nombre}")">
                                 <ItemTemplate Context="item">
                                     @item.Codigo - @item.Nombre
                                 </ItemTemplate>

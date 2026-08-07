@@ -24,7 +24,6 @@ public class DiccionariosRepository : GenericRepository<Diccionario>, IDiccionar
             .ToListAsync();
     }
 
-
     public override async Task<ActionResponse<IEnumerable<Diccionario>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Diccionarios

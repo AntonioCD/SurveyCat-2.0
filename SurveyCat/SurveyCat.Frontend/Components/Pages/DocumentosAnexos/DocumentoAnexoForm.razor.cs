@@ -140,7 +140,7 @@ public partial class DocumentoAnexoForm
             return listaDocumentos!;
 
         return listaDocumentos!
-            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) || c.Codigo!.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
             .ToList();
     }
 

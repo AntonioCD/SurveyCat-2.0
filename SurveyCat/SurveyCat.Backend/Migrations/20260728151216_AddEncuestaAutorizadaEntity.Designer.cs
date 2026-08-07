@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyCat.Backend.Data;
 
@@ -11,9 +12,11 @@ using SurveyCat.Backend.Data;
 namespace SurveyCat.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260728151216_AddEncuestaAutorizadaEntity")]
+    partial class AddEncuestaAutorizadaEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -465,6 +468,9 @@ namespace SurveyCat.Backend.Migrations
                     b.Property<int>("TipoSector")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UsuarioCargaId")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -481,7 +487,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("MunicipioId");
 
-                    b.HasIndex("UsuarioCargaId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("EncuestasAutorizadas");
                 });
@@ -1256,9 +1262,8 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasOne("SurveyCat.Shared.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UsuarioCargaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("BarrioComarca");
 

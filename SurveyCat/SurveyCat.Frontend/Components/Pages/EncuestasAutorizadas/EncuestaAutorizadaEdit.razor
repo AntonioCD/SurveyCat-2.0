@@ -1,0 +1,15 @@
+﻿@if (encuestaAutorizada is null)
+{
+    <Loading />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <EncuestaAutorizadaForm 
+                EncuestaAutorizada="encuestaAutorizada" 
+                OnValidSubmit="EditAsync" 
+                ReturnAction="Return" />
+        </DialogContent>
+    </MudDialog>
+}

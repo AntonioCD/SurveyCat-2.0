@@ -33,22 +33,22 @@ public partial class FichaForm
 
     private Persona? informante = new();
 
-    private Diccionario? selectedUnidadMedida = new();
-    private Diccionario? selectedEstado = new();
-    private Diccionario? selectedOrigenTierra = new();
-    private Diccionario? selectedRelacionInformanteParcela = new();
-    private Diccionario? selectedRelacionInformantePropietario = new();
-    private Diccionario? selectedServidumbreAgua = new();
-    private Diccionario? selectedServidumbrePase = new();
-    private Diccionario? selectedServidumbreOtra = new();
-    private Departamento? selectedDepartamento = new();
-    private Municipio? selectedMunicipio = new();
-    private Sector? selectedSector = new();
-    private BarrioComarca? selectedBarrioComarca = new();
-    private Caserio? selectedCaserio = new();
-    private PersonalEncuesta selectedEncuestador = new();
-    private PersonalEncuesta selectedTecnicoCatastral = new();
-    private PersonalEncuesta selectedSupervisor = new();
+    private Diccionario? selectedUnidadMedida;
+    private Diccionario? selectedEstado;
+    private Diccionario? selectedOrigenTierra;
+    private Diccionario? selectedRelacionInformanteParcela;
+    private Diccionario? selectedRelacionInformantePropietario;
+    private Diccionario? selectedServidumbreAgua;
+    private Diccionario? selectedServidumbrePase;
+    private Diccionario? selectedServidumbreOtra;
+    private Departamento? selectedDepartamento;
+    private Municipio? selectedMunicipio;
+    private Sector? selectedSector;
+    private BarrioComarca? selectedBarrioComarca;
+    private Caserio? selectedCaserio;
+    private PersonalEncuesta? selectedEncuestador;
+    private PersonalEncuesta? selectedTecnicoCatastral;
+    private PersonalEncuesta? selectedSupervisor;
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -91,7 +91,7 @@ public partial class FichaForm
 
         try
         {
-            // Cargar en paralelo las 3 llamadas independientes
+            // Cargar en paralelo las llamadas independientes
             var tareaDiccionarios = LoadDiccionariosAsync();
             var tareaPersonal = LoadPersonalEncuestaAsync();
             var tareaDepartamentos = LoadDepartamentosAsync();
@@ -100,36 +100,13 @@ public partial class FichaForm
 
             if (Ficha.Id != 0)
             {
-                if (Ficha.MunicipioId != 0)
-                {
-                    await LoadMunicipiosAsync(Ficha.MunicipioId);
-                    selectedMunicipio = Ficha.Municipio;
-                    selectedDepartamento = Ficha.Municipio?.Departamento;
-                }
+                // Cargar todos los datos relacionados para edición
+                await LoadRelatedDataForEditAsync();
 
-                if (Ficha.SectorId != 0)
-                {
-                    await LoadSectoresAsync(Ficha.SectorId);
-                    selectedSector = Ficha.Sector;
-                }
-
-                if (Ficha.BarrioComarcaId.HasValue)
-                {
-                    await LoadBarriosComarcasAsync(Ficha.BarrioComarcaId.Value);
-                    selectedBarrioComarca = Ficha.BarrioComarca;
-                }
-
-                if (Ficha.CaserioId.HasValue)
-                {
-                    await LoadCaseriosAsync(Ficha.CaserioId.Value);
-                    selectedCaserio = Ficha.Caserio;
-                }
-
-                Ficha.Consecutivo = Ficha.CodEncuesta.Substring(Ficha.CodEncuesta.Length - 4);
-
-                selectedEncuestador = Ficha.Encuestador!;
-                selectedTecnicoCatastral = Ficha.TecnicoCatastral!;
-                selectedSupervisor = Ficha.Coordinador!;
+                // Asignar valores seleccionados
+                selectedEncuestador = Ficha.Encuestador;
+                selectedTecnicoCatastral = Ficha.TecnicoCatastral;
+                selectedSupervisor = Ficha.Coordinador;
                 selectedUnidadMedida = Ficha.UnidadMedida;
                 selectedOrigenTierra = Ficha.OrigenTierra;
                 selectedServidumbreAgua = Ficha.ServidumbreAgua;
@@ -139,13 +116,20 @@ public partial class FichaForm
                 selectedRelacionInformanteParcela = Ficha.RelacionInformanteParcela;
                 selectedRelacionInformantePropietario = Ficha.RelacionInformantePropietario;
 
-                if (informante == null || informante.Id != Ficha.InformanteId)
+                if (Ficha.InformanteId > 0 && (informante == null || informante.Id != Ficha.InformanteId))
                 {
                     informante = await GetPersonaDetails(Ficha.InformanteId);
+                }
+
+                // Extraer consecutivo del código de encuesta
+                if (!string.IsNullOrWhiteSpace(Ficha.CodEncuesta) && Ficha.CodEncuesta.Length >= 4)
+                {
+                    Ficha.Consecutivo = Ficha.CodEncuesta.Substring(Ficha.CodEncuesta.Length - 4);
                 }
             }
             else
             {
+                // Para nuevo registro, establecer estado inicial
                 Ficha.EstadoId = listaEstado
                     .Where(e => e.Nombre.Contains("Digitado"))
                     .Select(e => e.Id)
@@ -157,6 +141,75 @@ public partial class FichaForm
             loading = false;
             isInitialized = true;
             StateHasChanged();
+        }
+    }
+
+    private async Task LoadRelatedDataForEditAsync()
+    {
+        try
+        {
+            // 1. Cargar el Municipio completo
+            if (Ficha.MunicipioId > 0)
+            {
+                var municipioResponse = await Repository.GetAsync<Municipio>($"/api/municipios/{Ficha.MunicipioId}");
+                if (!municipioResponse.Error && municipioResponse.Response != null)
+                {
+                    var municipio = municipioResponse.Response;
+
+                    // 2. Cargar el Departamento del Municipio
+                    if (municipio.DepartamentoId > 0)
+                    {
+                        var deptoResponse = await Repository.GetAsync<Departamento>($"/api/departamentos/{municipio.DepartamentoId}");
+                        if (!deptoResponse.Error && deptoResponse.Response != null)
+                        {
+                            selectedDepartamento = deptoResponse.Response;
+
+                            // 3. Cargar los municipios del departamento
+                            await LoadMunicipiosAsync(selectedDepartamento.Id);
+
+                            // 4. Seleccionar el municipio correcto
+                            selectedMunicipio = municipios?.FirstOrDefault(m => m.Id == Ficha.MunicipioId);
+
+                            if (selectedMunicipio != null)
+                            {
+                                // 5. Cargar Sectores del municipio
+                                await LoadSectoresAsync(selectedMunicipio.Id);
+
+                                // 6. Seleccionar el sector correcto
+                                if (Ficha.SectorId > 0)
+                                {
+                                    selectedSector = sectores?.FirstOrDefault(s => s.Id == Ficha.SectorId);
+                                }
+
+                                // 7. Cargar Barrios/Comarcas del municipio
+                                await LoadBarriosComarcasAsync(selectedMunicipio.Id);
+
+                                // 8. Seleccionar el Barrio/Comarca correcto
+                                if (Ficha.BarrioComarcaId.HasValue && Ficha.BarrioComarcaId.Value > 0)
+                                {
+                                    selectedBarrioComarca = barriosComarcas?.FirstOrDefault(b => b.Id == Ficha.BarrioComarcaId.Value);
+
+                                    if (selectedBarrioComarca != null)
+                                    {
+                                        // 9. Cargar Caserios del Barrio/Comarca
+                                        await LoadCaseriosAsync(selectedBarrioComarca.Id);
+
+                                        // 10. Seleccionar el Caserio correcto
+                                        if (Ficha.CaserioId.HasValue && Ficha.CaserioId.Value > 0)
+                                        {
+                                            selectedCaserio = caserios?.FirstOrDefault(c => c.Id == Ficha.CaserioId.Value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al cargar datos relacionados: {ex.Message}", Severity.Error);
         }
     }
 
@@ -267,12 +320,14 @@ public partial class FichaForm
 
     private void EncuestadorChanged(PersonalEncuesta encuestador)
     {
+        if (encuestador == null) return;
         selectedEncuestador = encuestador;
         Ficha.EncuestadorId = encuestador.Id;
     }
 
     private void TecnicoCatastralChanged(PersonalEncuesta tecnicoCatastral)
     {
+        if (tecnicoCatastral == null) return;
         selectedTecnicoCatastral = tecnicoCatastral;
         Ficha.TecnicoCatastralId = tecnicoCatastral.Id;
         GenerarCodigoEncuesta();
@@ -280,54 +335,63 @@ public partial class FichaForm
 
     private void SupervisorChanged(PersonalEncuesta supervisor)
     {
+        if (supervisor == null) return;
         selectedSupervisor = supervisor;
         Ficha.CoordinadorId = supervisor.Id;
     }
 
     private void UnidadMedidaChanged(Diccionario unidadMedida)
     {
+        if (unidadMedida == null) return;
         selectedUnidadMedida = unidadMedida;
         Ficha.UnidadMedidaId = unidadMedida.Id;
     }
 
     private void EstadoChanged(Diccionario estado)
     {
+        if (estado == null) return;
         selectedEstado = estado;
         Ficha.EstadoId = estado.Id;
     }
 
     private void OrigenTierraChanged(Diccionario origenTierra)
     {
+        if (origenTierra == null) return;
         selectedOrigenTierra = origenTierra;
         Ficha.OrigenTierraId = origenTierra.Id;
     }
 
     private void RelacionInformanteParcelaChanged(Diccionario relacionInformanteParcela)
     {
+        if (relacionInformanteParcela == null) return;
         selectedRelacionInformanteParcela = relacionInformanteParcela;
         Ficha.RelacionInformanteParcelaId = relacionInformanteParcela.Id;
     }
 
     private void RelacionInformantePropietarioChanged(Diccionario relacionInformantePropietario)
     {
+        if (relacionInformantePropietario == null) return;
         selectedRelacionInformantePropietario = relacionInformantePropietario;
         Ficha.RelacionInformantePropietarioId = relacionInformantePropietario.Id;
     }
 
     private void ServidumbreAguaChanged(Diccionario servidumbreAgua)
     {
+        if (servidumbreAgua == null) return;
         selectedServidumbreAgua = servidumbreAgua;
         Ficha.ServidumbreAguaId = servidumbreAgua.Id;
     }
 
     private void ServidumbrePaseChanged(Diccionario servidumbrePase)
     {
+        if (servidumbrePase == null) return;
         selectedServidumbrePase = servidumbrePase;
         Ficha.ServidumbrePaseId = servidumbrePase.Id;
     }
 
     private void ServidumbreOtraChanged(Diccionario servidumbreOtra)
     {
+        if (servidumbreOtra == null) return;
         selectedServidumbreOtra = servidumbreOtra;
         Ficha.ServidumbreOtraId = servidumbreOtra.Id;
     }
@@ -338,12 +402,21 @@ public partial class FichaForm
             return;
 
         selectedDepartamento = departamento;
-        selectedMunicipio = new Municipio();
-        selectedBarrioComarca = new BarrioComarca();
-        selectedCaserio = new Caserio();
+        selectedMunicipio = null;
+        selectedSector = null;
+        selectedBarrioComarca = null;
+        selectedCaserio = null;
         municipios = null;
+        sectores = null;
         barriosComarcas = null;
         caserios = null;
+
+        // Limpiar los IDs
+        Ficha.MunicipioId = 0;
+        Ficha.SectorId = 0;
+        Ficha.BarrioComarcaId = null;
+        Ficha.CaserioId = null;
+
         await LoadMunicipiosAsync(departamento.Id);
     }
 
@@ -354,11 +427,18 @@ public partial class FichaForm
 
         selectedMunicipio = municipio;
         Ficha.MunicipioId = municipio.Id;
-        selectedSector = new Sector();
-        selectedBarrioComarca = new BarrioComarca();
-        selectedCaserio = new Caserio();
+        selectedSector = null;
+        selectedBarrioComarca = null;
+        selectedCaserio = null;
+        sectores = null;
         barriosComarcas = null;
-        caserios = null!;
+        caserios = null;
+
+        // Limpiar los IDs
+        Ficha.SectorId = 0;
+        Ficha.BarrioComarcaId = null;
+        Ficha.CaserioId = null;
+
         await LoadSectoresAsync(municipio.Id);
         await LoadBarriosComarcasAsync(municipio.Id);
         GenerarCodigoEncuesta();
@@ -370,7 +450,7 @@ public partial class FichaForm
             return;
 
         selectedSector = sector;
-        Ficha.SectorId = sector!.Id;
+        Ficha.SectorId = sector.Id;
         GenerarCodigoEncuesta();
     }
 
@@ -381,8 +461,12 @@ public partial class FichaForm
 
         selectedBarrioComarca = barrioComarca;
         Ficha.BarrioComarcaId = barrioComarca.Id;
-        selectedCaserio = new Caserio();
-        caserios = null!;
+        selectedCaserio = null;
+        caserios = null;
+
+        // Limpiar el ID
+        Ficha.CaserioId = null;
+
         await LoadCaseriosAsync(barrioComarca.Id);
     }
 
@@ -625,7 +709,7 @@ public partial class FichaForm
 
     private void GenerarCodigoEncuesta()
     {
-        if (selectedTecnicoCatastral.Id != 0 &&
+        if (selectedTecnicoCatastral!.Id != 0 &&
             selectedMunicipio!.Id != 0 &&
             selectedSector!.Id != 0 &&
             (!string.IsNullOrWhiteSpace(Ficha.Consecutivo) && Ficha.Consecutivo.Length == 4))

@@ -56,12 +56,12 @@ public class Ficha
     // =========================================
 
     [Display(Name = "Código de Parcela")]
-    [MaxLength(20)]
+    [MaxLength(25)]
     public string? CodParcela { get; set; }
 
     [Display(Name = "Código de Encuesta")]
     [Required(ErrorMessage = "El código de encuesta no ha sido generado.")]
-    [MaxLength(20)]
+    [MaxLength(25)]
     public string CodEncuesta { get; set; } = null!;
 
     [Display(Name = "Nombre de Finca")]
