@@ -21,8 +21,7 @@ public class EncuestasAutorizadasController : GenericController<EncuestaAutoriza
         _encuestasAutorizadasUnitOfWork = encuestasAutorizadasUnitOfWork;
     }
 
-    [AllowAnonymous]
-    [HttpGet("combo")]
+    [HttpGet("disponibles")]
     public async Task<IActionResult> GetComboAsync()
     {
         return Ok(await _encuestasAutorizadasUnitOfWork.GetComboAsync());

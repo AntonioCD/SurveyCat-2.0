@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Pages.Personas;
@@ -6,6 +7,7 @@ using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Constants;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Enums;
+using System.Security.Claims;
 
 namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
@@ -14,25 +16,29 @@ public partial class FichaForm
     private EditContext editContext = null!;
     private bool loading = true;
     private bool isInitialized = false;
-    private List<Diccionario>? diccionarios;
+    private List<EncuestaAutorizada>? encuestasAutorizadasDisponibles = new();
+    private List<Diccionario>? diccionarios = new();
     private List<Diccionario> listaUnidadMedida = new();
     private List<Diccionario> listaEstado = new();
     private List<Diccionario> listaOrigenTierra = new();
     private List<Diccionario> listaRelacionInformanteParcela = new();
     private List<Diccionario> listaRelacionInformantePropietario = new();
     private List<Diccionario> listaServidumbre = new();
-    private List<Departamento>? departamentos;
-    private List<Municipio>? municipios;
-    private List<Sector>? sectores;
-    private List<BarrioComarca>? barriosComarcas;
+    private List<Departamento>? departamentos = new();
+    private List<Municipio>? municipios = new();
+
+    //private List<Sector>? sectores;
+    private List<BarrioComarca>? barriosComarcas = new();
+
     private List<Caserio>? caserios;
-    private List<PersonalEncuesta>? personalEncuestas;
-    private List<PersonalEncuesta>? listaEncuestadores;
-    private List<PersonalEncuesta>? listaTecnicosCatastrales;
-    private List<PersonalEncuesta>? listaSupervisores;
+    private List<PersonalEncuesta>? personalEncuestas = new();
+    private List<PersonalEncuesta>? listaEncuestadores = new();
+    private List<PersonalEncuesta>? listaTecnicosCatastrales = new();
+    private List<PersonalEncuesta>? listaSupervisores = new();
 
     private Persona? informante = new();
 
+    private EncuestaAutorizada? selectedEncuestaAutorizada;
     private Diccionario? selectedUnidadMedida;
     private Diccionario? selectedEstado;
     private Diccionario? selectedOrigenTierra;
@@ -43,8 +49,10 @@ public partial class FichaForm
     private Diccionario? selectedServidumbreOtra;
     private Departamento? selectedDepartamento;
     private Municipio? selectedMunicipio;
-    private Sector? selectedSector;
+
+    //private Sector? selectedSector;
     private BarrioComarca? selectedBarrioComarca;
+
     private Caserio? selectedCaserio;
     private PersonalEncuesta? selectedEncuestador;
     private PersonalEncuesta? selectedTecnicoCatastral;
@@ -95,8 +103,9 @@ public partial class FichaForm
             var tareaDiccionarios = LoadDiccionariosAsync();
             var tareaPersonal = LoadPersonalEncuestaAsync();
             var tareaDepartamentos = LoadDepartamentosAsync();
+            var tareaEncuestas = LoadEncuestasAutorizadasDisponiblesAsync();
 
-            await Task.WhenAll(tareaDiccionarios, tareaPersonal, tareaDepartamentos);
+            await Task.WhenAll(tareaDiccionarios, tareaPersonal, tareaDepartamentos, tareaEncuestas);
 
             if (Ficha.Id != 0)
             {
@@ -173,13 +182,13 @@ public partial class FichaForm
                             if (selectedMunicipio != null)
                             {
                                 // 5. Cargar Sectores del municipio
-                                await LoadSectoresAsync(selectedMunicipio.Id);
+                                // await LoadSectoresAsync(selectedMunicipio.Id);
 
                                 // 6. Seleccionar el sector correcto
-                                if (Ficha.SectorId > 0)
-                                {
-                                    selectedSector = sectores?.FirstOrDefault(s => s.Id == Ficha.SectorId);
-                                }
+                                //if (Ficha.SectorId > 0)
+                                //{
+                                //    selectedSector = sectores?.FirstOrDefault(s => s.Id == Ficha.SectorId);
+                                //}
 
                                 // 7. Cargar Barrios/Comarcas del municipio
                                 await LoadBarriosComarcasAsync(selectedMunicipio.Id);
@@ -211,6 +220,20 @@ public partial class FichaForm
         {
             Snackbar.Add($"Error al cargar datos relacionados: {ex.Message}", Severity.Error);
         }
+    }
+
+    private async Task LoadEncuestasAutorizadasDisponiblesAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<EncuestaAutorizada>>("/api/encuestasAutorizadas/disponibles");
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+
+        encuestasAutorizadasDisponibles = responseHttp.Response;
     }
 
     private async Task LoadPersonalEncuestaAsync()
@@ -282,17 +305,17 @@ public partial class FichaForm
         municipios = responseHttp.Response;
     }
 
-    private async Task LoadSectoresAsync(int municipioId)
-    {
-        var responseHttp = await Repository.GetAsync<List<Sector>>($"/api/sectores/combo/{municipioId}");
-        if (responseHttp.Error)
-        {
-            var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
-            return;
-        }
-        sectores = responseHttp.Response;
-    }
+    //private async Task LoadSectoresAsync(int municipioId)
+    //{
+    //    var responseHttp = await Repository.GetAsync<List<Sector>>($"/api/sectores/combo/{municipioId}");
+    //    if (responseHttp.Error)
+    //    {
+    //        var message = await responseHttp.GetErrorMessageAsync();
+    //        Snackbar.Add(message!, Severity.Error);
+    //        return;
+    //    }
+    //    sectores = responseHttp.Response;
+    //}
 
     private async Task LoadBarriosComarcasAsync(int municipioId)
     {
@@ -318,6 +341,74 @@ public partial class FichaForm
         caserios = responseHttp.Response;
     }
 
+    private void EncuestaAutorizadaChanged(EncuestaAutorizada encuestaAutorizada)
+    {
+        if (encuestaAutorizada == null)
+            return;
+
+        selectedEncuestaAutorizada = encuestaAutorizada;
+
+        // Actualizar Departamento
+        selectedDepartamento = encuestaAutorizada.Municipio?.Departamento;
+
+        // Actualizar Municipio y su ID
+        selectedMunicipio = encuestaAutorizada.Municipio;
+        if (selectedMunicipio != null)
+        {
+            Ficha.MunicipioId = selectedMunicipio.Id;
+        }
+
+        // Actualizar Barrio/Comarca
+        selectedBarrioComarca = encuestaAutorizada.BarrioComarca;
+        if (selectedBarrioComarca != null)
+        {
+            Ficha.BarrioComarcaId = selectedBarrioComarca.Id;
+        }
+
+        // Actualizar Caserio
+        selectedCaserio = encuestaAutorizada.Caserio;
+        if (selectedCaserio != null)
+        {
+            Ficha.CaserioId = selectedCaserio.Id;
+        }
+
+        // Establecer el Tipo de Sector
+        Ficha.TipoSector = encuestaAutorizada.TipoSector;
+
+        // ASIGNAR EL CÓDIGO DE ENCUESTA A LA FICHA
+        Ficha.CodEncuesta = encuestaAutorizada.CodEncuesta;
+
+        // Determinar el Tipo de Encuesta según el código
+        if (encuestaAutorizada.CodEncuesta.Length == 17)
+        {
+            Ficha.TipoEncuesta = TipoEncuesta.Unificada;
+        }
+
+        // Notificar al formulario que hubo cambios
+        editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Ficha.MunicipioId));
+        editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Ficha.CodEncuesta));
+
+        StateHasChanged();
+    }
+
+    //private void EncuestaAutorizadaChanged(EncuestaAutorizada encuestaAutorizada)
+    //{
+    //    if (encuestaAutorizada == null)
+    //        return;
+
+    //    selectedEncuestaAutorizada = encuestaAutorizada;
+    //    selectedDepartamento = encuestaAutorizada.Municipio!.Departamento;
+    //    selectedMunicipio = encuestaAutorizada.Municipio;
+    //    selectedBarrioComarca = encuestaAutorizada.BarrioComarca;
+    //    selectedCaserio = encuestaAutorizada.Caserio;
+    //    Ficha.TipoSector = encuestaAutorizada.TipoSector;
+
+    //    if (encuestaAutorizada.CodEncuesta.Length == 17)
+    //    {
+    //        Ficha.TipoEncuesta = TipoEncuesta.Unificada;
+    //    }
+    //}
+
     private void EncuestadorChanged(PersonalEncuesta encuestador)
     {
         if (encuestador == null) return;
@@ -330,7 +421,7 @@ public partial class FichaForm
         if (tecnicoCatastral == null) return;
         selectedTecnicoCatastral = tecnicoCatastral;
         Ficha.TecnicoCatastralId = tecnicoCatastral.Id;
-        GenerarCodigoEncuesta();
+        //GenerarCodigoEncuesta();
     }
 
     private void SupervisorChanged(PersonalEncuesta supervisor)
@@ -403,11 +494,11 @@ public partial class FichaForm
 
         selectedDepartamento = departamento;
         selectedMunicipio = null;
-        selectedSector = null;
+        //selectedSector = null;
         selectedBarrioComarca = null;
         selectedCaserio = null;
         municipios = null;
-        sectores = null;
+        //sectores = null;
         barriosComarcas = null;
         caserios = null;
 
@@ -427,32 +518,36 @@ public partial class FichaForm
 
         selectedMunicipio = municipio;
         Ficha.MunicipioId = municipio.Id;
-        selectedSector = null;
+        //selectedSector = null;
         selectedBarrioComarca = null;
         selectedCaserio = null;
-        sectores = null;
+        //sectores = null;
         barriosComarcas = null;
         caserios = null;
 
         // Limpiar los IDs
-        Ficha.SectorId = 0;
+        //Ficha.SectorId = 0;
         Ficha.BarrioComarcaId = null;
         Ficha.CaserioId = null;
 
-        await LoadSectoresAsync(municipio.Id);
+        //await LoadSectoresAsync(municipio.Id);
         await LoadBarriosComarcasAsync(municipio.Id);
-        GenerarCodigoEncuesta();
+        //GenerarCodigoEncuesta();
+
+        editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Ficha.MunicipioId));
+
+        StateHasChanged();
     }
 
-    private void SectorChanged(Sector sector)
-    {
-        if (sector == null)
-            return;
+    //private void SectorChanged(Sector sector)
+    //{
+    //    if (sector == null)
+    //        return;
 
-        selectedSector = sector;
-        Ficha.SectorId = sector.Id;
-        GenerarCodigoEncuesta();
-    }
+    //    selectedSector = sector;
+    //    Ficha.SectorId = sector.Id;
+    //    GenerarCodigoEncuesta();
+    //}
 
     private async Task BarrioComarcaChangedAsync(BarrioComarca barrioComarca)
     {
@@ -477,6 +572,24 @@ public partial class FichaForm
 
         selectedCaserio = caserio;
         Ficha.CaserioId = caserio.Id;
+    }
+
+    private async Task<IEnumerable<EncuestaAutorizada>> SearchEncuestaAutorizada(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+
+        if (encuestasAutorizadasDisponibles == null || !encuestasAutorizadasDisponibles.Any())
+            return new List<EncuestaAutorizada>();
+
+        if (string.IsNullOrWhiteSpace(searchText))
+            return encuestasAutorizadasDisponibles.Take(10);
+
+        return encuestasAutorizadasDisponibles
+            .Where(e => e.CodEncuesta.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ||
+                       (e.Municipio?.Nombre?.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ?? false) ||
+                       (e.BarrioComarca?.Nombre?.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ?? false))
+            .Take(10)
+            .ToList();
     }
 
     private async Task<IEnumerable<PersonalEncuesta>> SearchEncuestador(string searchText, CancellationToken token)
@@ -603,6 +716,10 @@ public partial class FichaForm
     private async Task<IEnumerable<Departamento>> SearchDepartamento(string searchText, CancellationToken token)
     {
         await Task.Delay(5);
+
+        if (departamentos == null || !departamentos.Any())
+            return new List<Departamento>();
+
         if (string.IsNullOrWhiteSpace(searchText))
             return departamentos!;
 
@@ -614,6 +731,11 @@ public partial class FichaForm
     private async Task<IEnumerable<Municipio>> SearchMunicipio(string searchText, CancellationToken token)
     {
         await Task.Delay(5);
+
+        // Verificar si municipios es null o está vacío
+        if (municipios == null || !municipios.Any())
+            return new List<Municipio>();
+
         if (string.IsNullOrWhiteSpace(searchText))
             return municipios!;
 
@@ -622,20 +744,24 @@ public partial class FichaForm
             .ToList();
     }
 
-    private async Task<IEnumerable<Sector>> SearchSector(string searchText, CancellationToken token)
-    {
-        await Task.Delay(5);
-        if (string.IsNullOrWhiteSpace(searchText))
-            return sectores!;
+    //private async Task<IEnumerable<Sector>> SearchSector(string searchText, CancellationToken token)
+    //{
+    //    await Task.Delay(5);
+    //    if (string.IsNullOrWhiteSpace(searchText))
+    //        return sectores!;
 
-        return sectores!
-            .Where(c => c.NumeroSector.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
-            .ToList();
-    }
+    //    return sectores!
+    //        .Where(c => c.NumeroSector.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+    //        .ToList();
+    //}
 
     private async Task<IEnumerable<BarrioComarca>> SearchBarrioComarca(string searchText, CancellationToken token)
     {
         await Task.Delay(5);
+
+        if (barriosComarcas == null || !barriosComarcas.Any())
+            return new List<BarrioComarca>();
+
         if (string.IsNullOrWhiteSpace(searchText))
             return barriosComarcas!;
 
@@ -647,6 +773,10 @@ public partial class FichaForm
     private async Task<IEnumerable<Caserio>> SearchCaserio(string searchText, CancellationToken token)
     {
         await Task.Delay(5);
+
+        if (caserios == null || !caserios.Any())
+            return new List<Caserio>();
+
         if (string.IsNullOrWhiteSpace(searchText))
             return caserios!;
 
@@ -707,30 +837,30 @@ public partial class FichaForm
         return responseHttp.Response;
     }
 
-    private void GenerarCodigoEncuesta()
-    {
-        if (selectedTecnicoCatastral!.Id != 0 &&
-            selectedMunicipio!.Id != 0 &&
-            selectedSector!.Id != 0 &&
-            (!string.IsNullOrWhiteSpace(Ficha.Consecutivo) && Ficha.Consecutivo.Length == 4))
-        {
-            string inicial = selectedSector?.NumeroSector?.Substring(0, 1).ToUpper() ?? "";
+    //private void GenerarCodigoEncuesta()
+    //{
+    //    if (selectedTecnicoCatastral!.Id != 0 &&
+    //        selectedMunicipio!.Id != 0 &&
+    //        selectedSector!.Id != 0 &&
+    //        (!string.IsNullOrWhiteSpace(Ficha.Consecutivo) && Ficha.Consecutivo.Length == 4))
+    //    {
+    //        string inicial = selectedSector?.NumeroSector?.Substring(0, 1).ToUpper() ?? "";
 
-            string sector = inicial switch
-            {
-                "R" => "RUR",
-                "U" => "URB",
-                _ => "000"
-            };
-            string codMuni = selectedMunicipio.CodMuni;
-            string codTecnico = selectedTecnicoCatastral.Codigo;
-            string consecutivo = Ficha.Consecutivo;
+    //        string sector = inicial switch
+    //        {
+    //            "R" => "RUR",
+    //            "U" => "URB",
+    //            _ => "000"
+    //        };
+    //        string codMuni = selectedMunicipio.CodMuni;
+    //        string codTecnico = selectedTecnicoCatastral.Codigo;
+    //        string consecutivo = Ficha.Consecutivo;
 
-            Ficha.CodEncuesta = $"{sector}{codMuni}{codTecnico}{codTecnico}{consecutivo}";
-        }
-        else
-        {
-            Ficha.CodEncuesta = string.Empty;
-        }
-    }
+    //        Ficha.CodEncuesta = $"{sector}{codMuni}{codTecnico}{codTecnico}{consecutivo}";
+    //    }
+    //    else
+    //    {
+    //        Ficha.CodEncuesta = string.Empty;
+    //    }
+    //}
 }

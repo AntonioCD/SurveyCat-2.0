@@ -7,8 +7,9 @@ using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 using SurveyCat.Shared.Enums;
 using System;
-using System.Text;
+using System.Net;
 using System.Security.Claims;
+using System.Text;
 
 namespace SurveyCat.Frontend.Components.Pages.EncuestasAutorizadas;
 
@@ -27,7 +28,8 @@ public partial class EncuestasAutorizadasListUpload
     private Municipio? selectedMunicipio;
     private BarrioComarca? selectedBarrioComarca;
     private Caserio? selectedCaserio;
-    private string? usuarioId;
+    private User? user;
+    private string usuarioId = "SD";
     private IBrowserFile? selectedFile;
 
     private bool mostrarVistaPrevia = false;
@@ -43,20 +45,50 @@ public partial class EncuestasAutorizadasListUpload
 
     protected override async Task OnInitializedAsync()
     {
-        // Obtener el ID del usuario
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity is { IsAuthenticated: true })
-        {
-            usuarioId = user.FindFirst(ClaimTypes.Name)?.Value
-                ?? user.FindFirst("PrimerNombre")?.Value
-                ?? "Usuario Desconocido";
-        }
-
+        await LoadUserAsync();
         await LoadDepartamentosAsync();
         loading = false;
         StateHasChanged();
+    }
+
+    private async Task LoadUserAsync()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var authUser = authState.User;
+
+            if (authUser.Identity is { IsAuthenticated: true })
+            {
+                // Obtener el username correctamente
+                var userName = authUser.Identity?.Name
+                               ?? authUser.FindFirst(ClaimTypes.Name)?.Value;
+
+                if (!string.IsNullOrEmpty(userName))
+                {
+                    // Buscar el usuario por nombre de usuario
+                    var responseHttp = await Repository.GetAsync<User>($"/api/accounts");
+                    if (responseHttp.Error)
+                    {
+                        if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            Snackbar.Add("Usuario no encontrado", Severity.Error);
+                            return;
+                        }
+                        var messageError = await responseHttp.GetErrorMessageAsync();
+                        Snackbar.Add(messageError!, Severity.Error);
+                        return;
+                    }
+
+                    user = responseHttp.Response;
+                    usuarioId = user!.Id; // Asignar el ID del usuario
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al cargar usuario: {ex.Message}", Severity.Error);
+        }
     }
 
     private bool IsFormValid()
@@ -296,7 +328,7 @@ public partial class EncuestasAutorizadasListUpload
                 {
                     var jsonResponse = responseHttp.Response.ToString();
                     // Si es un objeto anónimo, podemos acceder a sus propiedades
-                    var success = jsonResponse.Contains("success") || jsonResponse.Contains("Success");
+                    var success = jsonResponse!.Contains("success") || jsonResponse.Contains("Success");
 
                     MudDialog?.Close(DialogResult.Ok(true));
                     Snackbar.Add($"? Se cargaron {encuestas.Count} encuestas autorizadas exitosamente", Severity.Success);

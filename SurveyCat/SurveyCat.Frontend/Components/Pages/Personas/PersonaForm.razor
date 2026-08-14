@@ -33,8 +33,7 @@
             <MudSelect T="TipoPersona" Label="Tipo de Persona"
                        @bind-Value="Persona.TipoPersona"
                        For="@(() => Persona.TipoPersona)"
-                       Variant="Variant.Outlined" Margin="Margin.Dense"
-                       AnchorOrigin="Origin.BottomCenter">
+                       Variant="Variant.Outlined" Margin="Margin.Dense">
                 @foreach (TipoPersona item in Enum.GetValues(typeof(TipoPersona)))
                 {
                     <MudSelectItem Value="@item">@item.ToString()</MudSelectItem>

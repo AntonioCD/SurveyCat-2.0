@@ -17,9 +17,21 @@ namespace SurveyCat.Backend.Repositories.Implementations
             _context = context;
         }
 
+        //public async Task<IEnumerable<EncuestaAutorizada>> GetComboAsync()
+        //{
+        //    return await _context.EncuestasAutorizadas
+        //        .Where(e => !_context.Fichas.Any(f => f.CodEncuesta == e.CodEncuesta))
+        //        .OrderBy(e => e.CodEncuesta)
+        //        .ToListAsync();
+        //}
+
         public async Task<IEnumerable<EncuestaAutorizada>> GetComboAsync()
         {
             return await _context.EncuestasAutorizadas
+                .Include(e => e.Municipio)
+                    .ThenInclude(m => m!.Departamento)
+                .Include(e => e.BarrioComarca)
+                .Include(e => e.Caserio)
                 .Where(e => !_context.Fichas.Any(f => f.CodEncuesta == e.CodEncuesta))
                 .OrderBy(e => e.CodEncuesta)
                 .ToListAsync();

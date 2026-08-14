@@ -43,16 +43,43 @@
                         </MudText>
                     </div>
                 </div>
-                <div style="width: 240px;">
-                    <MudTextField Label="CÓDIGO DE ENCUESTA"
-                                  @bind-Value="Ficha.CodEncuesta"
-                                  Immediate="true"
-                                  For="@(() => Ficha.CodEncuesta)"
-                                  Variant="Variant.Filled"
-                                  Margin="Margin.None"
-                                  ReadOnly="true"
-                                  Style="font-size: 1.3rem !important; color: #0B74F4 !important;" />
+                <div style="width: 280px;">
+                    <MudAutocomplete T="EncuestaAutorizada"
+                                     Label="CÓDIGO DE ENCUESTA"
+                                     Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un código --")"
+                                     SearchFunc="SearchEncuestaAutorizada"
+                                     Value="selectedEncuestaAutorizada"
+                                     ValueChanged="EncuestaAutorizadaChanged"
+                                     Variant="Variant.Filled"
+                                     Margin="Margin.None"
+                                     Disabled="loading || Ficha.Id != 0"
+                                     Required="true"
+                                     RequiredError="Debe seleccionar un código de encuesta autorizada."
+                                     For="@(() => selectedEncuestaAutorizada)"
+                                     ResetValueOnEmptyText="true"
+                                     CoerceText="false"
+                                     CoerceValue="false"
+                                     ToStringFunc="@(e => e == null ? null : $"{e.CodEncuesta}")"
+                                     Style="font-size: 1.1rem !important; color: #0B74F4 !important;">
+                        <ItemTemplate Context="itemContext">
+                            <div class="d-flex flex-column">
+                                <MudText Typo="Typo.body1">
+                                    <strong>@itemContext.CodEncuesta</strong>
+                                </MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @itemContext.Municipio?.Nombre - @(itemContext.BarrioComarca?.Nombre ?? "SD")
+                                </MudText>
+                            </div>
+                        </ItemTemplate>
+                        <NoItemsTemplate>
+                            <MudText Typo="Typo.body2" Color="Color.Warning">
+                                <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                                No hay códigos de encuesta disponibles
+                            </MudText>
+                        </NoItemsTemplate>
+                    </MudAutocomplete>
                 </div>
+
             </div>
             <MudDivider Class="mt-3 mb-0" DividerType="DividerType.FullWidth" />
         </MudItem>
@@ -81,6 +108,19 @@
                                 </div>
                                 <div class="pa-4">
                                     <MudGrid>
+                                        <MudItem xs="12">
+                                            <MudSelect T="TipoSector" Label="Tipo de Sector"
+                                                       @bind-Value="Ficha.TipoSector"
+                                                       For="@(() => Ficha.TipoSector)"
+                                                       Variant="Variant.Outlined" 
+                                                       Margin="Margin.Dense">
+                                                @foreach (TipoSector item in Enum.GetValues(typeof(TipoSector)))
+                                                {
+                                                    <MudSelectItem Value="@item">@item.ToString()</MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+
                                         <MudItem xs="12" sm="6">
                                             <MudAutocomplete T="Departamento"
                                                              Label="Departamento"
@@ -127,7 +167,7 @@
                                             </MudAutocomplete>
                                         </MudItem>
 
-                                        <MudItem xs="12" sm="6">
+                                       @*  <MudItem xs="12" sm="6">
                                             <MudAutocomplete T="Sector"
                                                              Label="Sector"
                                                              Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Sector --")"
@@ -163,7 +203,7 @@
                                                           InputType="InputType.Number"
                                                           MaxLength="4"
                                                           Placeholder="Ej: 0001" />
-                                        </MudItem>
+                                        </MudItem> *@
                                     </MudGrid>
                                 </div>
                             </MudPaper>
@@ -270,7 +310,6 @@
                                                        For="@(() => Ficha.TipoEncuesta)"
                                                        Variant="Variant.Outlined"
                                                        Margin="Margin.Dense"
-                                                       AnchorOrigin="Origin.BottomCenter"
                                                        Disabled="loading"
                                                        Required="true"
                                                        Validation="@(new RangeAttribute(1, int.MaxValue) { ErrorMessage = "Seleccione un Tipo de Parcela." })">
@@ -316,7 +355,7 @@
                                         <!-- Ubicación -->
                                         <MudItem xs="12">
                                             <MudPaper Class="pa-4" Elevation="0" Outlined="true" Style="border-radius: 8px;">
-                                                <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:center">
+                                                <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:left">
                                                     Ubicación
                                                 </MudText>
                                                 <MudGrid>
@@ -458,7 +497,7 @@
                                         <!-- Servidumbre -->
                                         <MudItem xs="12">
                                             <MudPaper Class="pa-4" Elevation="0" Outlined="true" Style="border-radius: 8px;">
-                                                <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:center">
+                                                <MudText Typo="Typo.subtitle2" Class="mb-3" Color="Color.Primary" Style="text-align:left">
                                                     Servidumbre
                                                 </MudText>
                                                 <MudGrid>

@@ -55,7 +55,7 @@ public partial class EncuestaAutorizadaCreate
                     }
 
                     user = responseHttp.Response;
-                    usuarioId = user?.Id; // Asignar el ID del usuario
+                    usuarioId = user!.Id; // Asignar el ID del usuario
                 }
             }
         }

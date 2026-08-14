@@ -22,7 +22,6 @@
                            For="@(() => tipoSectorSeleccionado)"
                            Variant="Variant.Outlined"
                            Margin="Margin.Dense"
-                           AnchorOrigin="Origin.BottomCenter"
                            Disabled="loading"
                            Required="true"
                            Validation="@(new RangeAttribute(1, int.MaxValue) { ErrorMessage = "Seleccione un Tipo de Sector." })">

@@ -17,6 +17,10 @@ public class Ficha
     // UBICACIÓN
     // =========================================
 
+    [Display(Name = "Tipo de Sector")]
+    [Range(1, 2, ErrorMessage = "El tipo de sector debe ser 1 (Urbano) o 2 (Rural).")]
+    public TipoSector TipoSector { get; set; }
+
     [Display(Name = "Municipio")]
     [Range(1, int.MaxValue, ErrorMessage = "Seleccione un Municipio.")]
     [Required]
@@ -25,9 +29,7 @@ public class Ficha
     public Municipio? Municipio { get; set; }
 
     [Display(Name = "Sector")]
-    [Range(1, int.MaxValue, ErrorMessage = "Seleccione un Sector.")]
-    [Required]
-    public int SectorId { get; set; }
+    public int? SectorId { get; set; }
 
     public Sector? Sector { get; set; }
 
