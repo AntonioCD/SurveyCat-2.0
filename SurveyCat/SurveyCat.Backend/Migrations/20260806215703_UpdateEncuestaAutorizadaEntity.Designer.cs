@@ -489,7 +489,7 @@ namespace SurveyCat.Backend.Migrations
                     b.ToTable("EncuestasAutorizadas");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Familia", b =>
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1272,7 +1272,7 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Familia", b =>
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
                 {
                     b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
                         .WithMany("Familias")

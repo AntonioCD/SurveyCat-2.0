@@ -17,10 +17,10 @@
                     <MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1" Color="Color.Primary" Size="Size.Large" />
                     <div class="d-flex flex-column">
                         <MudText Typo="Typo.h5" Color="Color.Primary">
-                            <b>@(Familia?.Id != 0 ? "Editar Familiar" : "Nuevo Familiar")</b>
+                            <b>@(Ocupante?.Id != 0 ? "Editar Ocupante" : "Nuevo Ocupante")</b>
                         </MudText>
                         <MudText Typo="Typo.caption" Color="Color.Secondary">
-                            Complete los datos requeridos para registrar/editar un familiar.
+                            Complete los datos requeridos para registrar/editar un ocupante.
                         </MudText>
                     </div>
                 </div>
@@ -35,10 +35,10 @@
                 Buscar Persona
             </MudButton>
 
-            @if (Familia.PersonaId == 0)
+            @if (Ocupante.PersonaId == 0)
             {
                 @* Si es 0, el input existe, está vacío y es 'required', disparando el globo *@
-                <input @key="Familia.PersonaId"
+                <input @key="Ocupante.PersonaId"
                        type="text"
                        value=""
                        required
@@ -49,9 +49,9 @@
             else
             {
                 @* Si es mayor a 0, renderizamos un input con valor lleno y SIN 'required' *@
-                <input @key="Familia.PersonaId"
+                <input @key="Ocupante.PersonaId"
                        type="text"
-                       value="@Familia.PersonaId"
+                       value="@Ocupante.PersonaId"
                        style="opacity: 0; width: 1px; height: 1px; position: absolute; pointer-events: none;" />
             }
         </MudItem>
@@ -168,7 +168,29 @@
                           ReadOnly="true" />
         </MudItem>
 
-        <MudItem xs="12">
+        <MudItem xs="12" sm="6"> 
+            <MudAutocomplete T="Diccionario"
+                             Label="Tipo de Ocupante"
+                             Placeholder="-- Seleccione un Tipo --"
+                             SearchFunc="SearchTipoOcupante"
+                             Value="selectedTipoOcupante"
+                             ValueChanged="TipoOcupanteChanged"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             Required="true"
+                             RequiredError="El Tipo es requerido."
+                             For="@(() => selectedTipoOcupante)"
+                             ResetValueOnEmptyText="true"
+                             CoerceText="false"
+                             CoerceValue="false"
+                             ToStringFunc="@(e=> e==null?null : $"{e.Nombre}")">
+                <ItemTemplate Context="itemContext">
+                    @itemContext.Nombre
+                </ItemTemplate>
+            </MudAutocomplete>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
             <MudAutocomplete T="Diccionario"
                              Label="Parentesco"
                              Placeholder="-- Seleccione un Parentesco --"
@@ -177,7 +199,7 @@
                              ValueChanged="ParentescoChanged"
                              Variant="Variant.Outlined"
                              Margin="Margin.Dense"
-                             Required="true"
+                             Required="false"
                              RequiredError="El Parentesco es requerido."
                              For="@(() => selectedParentesco)"
                              ResetValueOnEmptyText="true"

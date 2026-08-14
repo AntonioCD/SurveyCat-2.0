@@ -486,38 +486,6 @@ namespace SurveyCat.Backend.Migrations
                     b.ToTable("EncuestasAutorizadas");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Familia", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("FichaId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("Item")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParentescoId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("PersonaId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentescoId");
-
-                    b.HasIndex("PersonaId");
-
-                    b.HasIndex("FichaId", "PersonaId")
-                        .IsUnique();
-
-                    b.ToTable("Familias");
-                });
-
             modelBuilder.Entity("SurveyCat.Shared.Entities.Ficha", b =>
                 {
                     b.Property<long>("Id")
@@ -721,6 +689,43 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("DepartamentoId");
 
                     b.ToTable("Municipios");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("FichaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("Item")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentescoId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("PersonaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TipoOcupanteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentescoId");
+
+                    b.HasIndex("PersonaId");
+
+                    b.HasIndex("TipoOcupanteId");
+
+                    b.HasIndex("FichaId", "PersonaId")
+                        .IsUnique();
+
+                    b.ToTable("Ocupantes");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Persona", b =>
@@ -1272,33 +1277,6 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Familia", b =>
-                {
-                    b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
-                        .WithMany("Familias")
-                        .HasForeignKey("FichaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "Parentesco")
-                        .WithMany()
-                        .HasForeignKey("ParentescoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SurveyCat.Shared.Entities.Persona", "Persona")
-                        .WithMany()
-                        .HasForeignKey("PersonaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Ficha");
-
-                    b.Navigation("Parentesco");
-
-                    b.Navigation("Persona");
-                });
-
             modelBuilder.Entity("SurveyCat.Shared.Entities.Ficha", b =>
                 {
                     b.HasOne("SurveyCat.Shared.Entities.BarrioComarca", "BarrioComarca")
@@ -1434,6 +1412,40 @@ namespace SurveyCat.Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Departamento");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
+                {
+                    b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
+                        .WithMany("Ocupantes")
+                        .HasForeignKey("FichaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "Parentesco")
+                        .WithMany()
+                        .HasForeignKey("ParentescoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SurveyCat.Shared.Entities.Persona", "Persona")
+                        .WithMany()
+                        .HasForeignKey("PersonaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "TipoOcupante")
+                        .WithMany()
+                        .HasForeignKey("TipoOcupanteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ficha");
+
+                    b.Navigation("Parentesco");
+
+                    b.Navigation("Persona");
+
+                    b.Navigation("TipoOcupante");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Persona", b =>
@@ -1580,7 +1592,7 @@ namespace SurveyCat.Backend.Migrations
 
                     b.Navigation("DocumentosAnexos");
 
-                    b.Navigation("Familias");
+                    b.Navigation("Ocupantes");
 
                     b.Navigation("Propietarios");
                 });

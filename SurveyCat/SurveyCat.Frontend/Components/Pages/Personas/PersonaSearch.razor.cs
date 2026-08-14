@@ -97,6 +97,37 @@ public partial class PersonaSearch
         await tablePersonas.ReloadServerData();
     }
 
+    //private async Task ShowModalAsync(long id = 0, bool isEdit = false)
+    //{
+    //    var options = new DialogOptions
+    //    {
+    //        CloseOnEscapeKey = true,
+    //        CloseButton = true,
+    //        MaxWidth = MaxWidth.Medium,
+    //        FullWidth = true
+    //    };
+    //    IDialogReference? dialog;
+    //    if (isEdit)
+    //    {
+    //        var parameters = new DialogParameters
+    //    {
+    //        { "Id", id }
+    //    }; dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
+    //    }
+    //    else
+    //    {
+    //        dialog = await DialogService.ShowAsync<PersonaCreate>("Nueva Persona", options);
+    //    }
+
+    //    var result = await dialog.Result;
+    //    if (result!.Canceled!)
+    //    {
+    //        await LoadTotalRecordsPersonasAsync();
+
+    //        await tablePersonas.ReloadServerData();
+    //    }
+    //}
+
     private async Task ShowModalAsync(long id = 0, bool isEdit = false)
     {
         var options = new DialogOptions
@@ -106,13 +137,15 @@ public partial class PersonaSearch
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
         };
+
         IDialogReference? dialog;
         if (isEdit)
         {
             var parameters = new DialogParameters
         {
             { "Id", id }
-        }; dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
+        };
+            dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
         }
         else
         {
@@ -120,11 +153,22 @@ public partial class PersonaSearch
         }
 
         var result = await dialog.Result;
-        if (result!.Canceled!)
-        {
-            await LoadTotalRecordsPersonasAsync();
 
+        // CORRECCIÓN: Verificar si NO está cancelado y si hay datos
+        if (result != null && !result.Canceled && result.Data != null)
+        {
+            // Recargar la tabla
+            await LoadTotalRecordsPersonasAsync();
             await tablePersonas.ReloadServerData();
+
+            // Mostrar mensaje de éxito
+            var mensaje = isEdit ? "Persona actualizada exitosamente" : "Persona creada exitosamente";
+            Snackbar.Add(mensaje, Severity.Success);
+        }
+        else if (result != null && result.Canceled)
+        {
+            // El usuario canceló, no hacer nada
+            Console.WriteLine("Usuario canceló la operación");
         }
     }
 }

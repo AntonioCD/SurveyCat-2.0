@@ -240,7 +240,7 @@ public class Ficha
 
     public ICollection<Propietario>? Propietarios { get; set; }
 
-    public ICollection<Familia>? Familias { get; set; }
+    public ICollection<Ocupante>? Ocupantes { get; set; }
 
     public ICollection<Colindante>? Colindantes { get; set; }
 
@@ -254,7 +254,7 @@ public class Ficha
 
     public int PropietariosNumber => Propietarios == null ? 0 : Propietarios.Count;
 
-    public int FamiliasNumber => Familias == null ? 0 : Familias.Count;
+    public int OcupantesNumber => Ocupantes == null ? 0 : Ocupantes.Count;
 
     public int ColindantesNumber => Colindantes == null ? 0 : Colindantes.Count;
 

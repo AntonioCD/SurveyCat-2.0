@@ -12,8 +12,8 @@ using SurveyCat.Backend.Data;
 namespace SurveyCat.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260603170534_UpdateFamiliaEntityItemFieldAllowNull")]
-    partial class UpdateFamiliaEntityItemFieldAllowNull
+    [Migration("20260814211515_UpdateOcupanteEntityWithDiccionario")]
+    partial class UpdateOcupanteEntityWithDiccionario
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,38 @@ namespace SurveyCat.Backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Adjunto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<long>("DocumentoAnexoId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ItemPagina")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NombreArchivo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Ruta")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentoAnexoId", "ItemPagina")
+                        .IsUnique();
+
+                    b.ToTable("Adjuntos");
+                });
+
             modelBuilder.Entity("SurveyCat.Shared.Entities.BarrioComarca", b =>
                 {
                     b.Property<int>("Id")
@@ -219,6 +251,84 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("ComarcaId");
 
                     b.ToTable("Caserios");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Colindante", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("ConflictoId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("FichaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PersonaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("PresentaConflicto")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PuntoCardinalId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ViaGestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConflictoId");
+
+                    b.HasIndex("PersonaId");
+
+                    b.HasIndex("PuntoCardinalId");
+
+                    b.HasIndex("ViaGestionId");
+
+                    b.HasIndex("FichaId", "PuntoCardinalId", "PersonaId")
+                        .IsUnique();
+
+                    b.ToTable("Colindantes");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Conflicto", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("ConEstado")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<long>("FichaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TipoConflictoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ViaGestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FichaId");
+
+                    b.HasIndex("ViaGestionId");
+
+                    b.HasIndex("TipoConflictoId", "ViaGestionId", "ConEstado")
+                        .IsUnique();
+
+                    b.ToTable("Conflictos");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Departamento", b =>
@@ -293,7 +403,7 @@ namespace SurveyCat.Backend.Migrations
                     b.ToTable("Diccionarios");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
+            modelBuilder.Entity("SurveyCat.Shared.Entities.DocumentoAnexo", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -301,28 +411,82 @@ namespace SurveyCat.Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("Codigo")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("DocumentoId")
+                        .HasColumnType("int");
+
                     b.Property<long>("FichaId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("Item")
+                    b.Property<int>("NumeroPaginas")
                         .HasColumnType("int");
-
-                    b.Property<int>("ParentescoId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("PersonaId")
-                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentescoId");
+                    b.HasIndex("DocumentoId");
 
-                    b.HasIndex("PersonaId");
+                    b.HasIndex("FichaId");
 
-                    b.HasIndex("FichaId", "PersonaId")
+                    b.ToTable("DocumentosAnexos");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.EncuestaAutorizada", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("BarrioComarcaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CaserioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodEncuesta")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<DateTime>("FechaCarga")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MunicipioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Observacion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TipoSector")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UsuarioCargaId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BarrioComarcaId");
+
+                    b.HasIndex("CaserioId");
+
+                    b.HasIndex("CodEncuesta")
                         .IsUnique();
 
-                    b.ToTable("Familias");
+                    b.HasIndex("MunicipioId");
+
+                    b.HasIndex("UsuarioCargaId");
+
+                    b.ToTable("EncuestasAutorizadas");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Ficha", b =>
@@ -344,12 +508,12 @@ namespace SurveyCat.Backend.Migrations
 
                     b.Property<string>("CodEncuesta")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("CodParcela")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<int>("CoordinadorId")
                         .HasColumnType("int");
@@ -411,7 +575,7 @@ namespace SurveyCat.Backend.Migrations
                     b.Property<int?>("RelacionInformantePropietarioId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SectorId")
+                    b.Property<int?>("SectorId")
                         .HasColumnType("int");
 
                     b.Property<bool>("Servidumbre")
@@ -430,6 +594,9 @@ namespace SurveyCat.Backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("TipoEncuesta")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TipoSector")
                         .HasColumnType("int");
 
                     b.Property<int?>("TipoUso")
@@ -525,6 +692,43 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("DepartamentoId");
 
                     b.ToTable("Municipios");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("FichaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("Item")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentescoId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("PersonaId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TipoOcupanteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentescoId");
+
+                    b.HasIndex("PersonaId");
+
+                    b.HasIndex("TipoOcupanteId");
+
+                    b.HasIndex("FichaId", "PersonaId")
+                        .IsUnique();
+
+                    b.ToTable("Ocupantes");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Persona", b =>
@@ -923,6 +1127,17 @@ namespace SurveyCat.Backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Adjunto", b =>
+                {
+                    b.HasOne("SurveyCat.Shared.Entities.DocumentoAnexo", "DocumentoAnexo")
+                        .WithMany("Adjuntos")
+                        .HasForeignKey("DocumentoAnexoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DocumentoAnexo");
+                });
+
             modelBuilder.Entity("SurveyCat.Shared.Entities.BarrioComarca", b =>
                 {
                     b.HasOne("SurveyCat.Shared.Entities.Municipio", "Municipio")
@@ -945,17 +1160,16 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("Comarca");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Colindante", b =>
                 {
-                    b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
-                        .WithMany("Familias")
-                        .HasForeignKey("FichaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "Parentesco")
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "Conflicto")
                         .WithMany()
-                        .HasForeignKey("ParentescoId")
+                        .HasForeignKey("ConflictoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
+                        .WithMany("Colindantes")
+                        .HasForeignKey("FichaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -965,11 +1179,105 @@ namespace SurveyCat.Backend.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "PuntoCardinal")
+                        .WithMany()
+                        .HasForeignKey("PuntoCardinalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "ViaGestion")
+                        .WithMany()
+                        .HasForeignKey("ViaGestionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Conflicto");
+
                     b.Navigation("Ficha");
 
-                    b.Navigation("Parentesco");
-
                     b.Navigation("Persona");
+
+                    b.Navigation("PuntoCardinal");
+
+                    b.Navigation("ViaGestion");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Conflicto", b =>
+                {
+                    b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
+                        .WithMany("Conflictos")
+                        .HasForeignKey("FichaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "TipoConflicto")
+                        .WithMany()
+                        .HasForeignKey("TipoConflictoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "ViaGestion")
+                        .WithMany()
+                        .HasForeignKey("ViaGestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ficha");
+
+                    b.Navigation("TipoConflicto");
+
+                    b.Navigation("ViaGestion");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.DocumentoAnexo", b =>
+                {
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "Documento")
+                        .WithMany()
+                        .HasForeignKey("DocumentoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
+                        .WithMany("DocumentosAnexos")
+                        .HasForeignKey("FichaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Documento");
+
+                    b.Navigation("Ficha");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.EncuestaAutorizada", b =>
+                {
+                    b.HasOne("SurveyCat.Shared.Entities.BarrioComarca", "BarrioComarca")
+                        .WithMany()
+                        .HasForeignKey("BarrioComarcaId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SurveyCat.Shared.Entities.Caserio", "Caserio")
+                        .WithMany()
+                        .HasForeignKey("CaserioId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SurveyCat.Shared.Entities.Municipio", "Municipio")
+                        .WithMany()
+                        .HasForeignKey("MunicipioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UsuarioCargaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BarrioComarca");
+
+                    b.Navigation("Caserio");
+
+                    b.Navigation("Municipio");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Ficha", b =>
@@ -1032,8 +1340,7 @@ namespace SurveyCat.Backend.Migrations
                     b.HasOne("SurveyCat.Shared.Entities.Sector", "Sector")
                         .WithMany("Fichas")
                         .HasForeignKey("SectorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SurveyCat.Shared.Entities.Diccionario", "ServidumbreAgua")
                         .WithMany()
@@ -1108,6 +1415,40 @@ namespace SurveyCat.Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Departamento");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
+                {
+                    b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
+                        .WithMany("Ocupantes")
+                        .HasForeignKey("FichaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "Parentesco")
+                        .WithMany()
+                        .HasForeignKey("ParentescoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SurveyCat.Shared.Entities.Persona", "Persona")
+                        .WithMany()
+                        .HasForeignKey("PersonaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SurveyCat.Shared.Entities.Diccionario", "TipoOcupante")
+                        .WithMany()
+                        .HasForeignKey("TipoOcupanteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ficha");
+
+                    b.Navigation("Parentesco");
+
+                    b.Navigation("Persona");
+
+                    b.Navigation("TipoOcupante");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Persona", b =>
@@ -1241,9 +1582,20 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("Municipios");
                 });
 
+            modelBuilder.Entity("SurveyCat.Shared.Entities.DocumentoAnexo", b =>
+                {
+                    b.Navigation("Adjuntos");
+                });
+
             modelBuilder.Entity("SurveyCat.Shared.Entities.Ficha", b =>
                 {
-                    b.Navigation("Familias");
+                    b.Navigation("Colindantes");
+
+                    b.Navigation("Conflictos");
+
+                    b.Navigation("DocumentosAnexos");
+
+                    b.Navigation("Ocupantes");
 
                     b.Navigation("Propietarios");
                 });

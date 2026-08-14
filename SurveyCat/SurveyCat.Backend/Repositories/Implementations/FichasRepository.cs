@@ -23,7 +23,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
             .Include(f => f.Sector)
             .Include(f => f.Propietarios)
             .Include(f => f.Estado)
-            .Include(f => f.Familias)
+            .Include(f => f.Ocupantes)
             .Include(f => f.Conflictos)
             .Include(f => f.DocumentosAnexos)
             .AsQueryable();
@@ -84,7 +84,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
              .Include(f => f.ServidumbrePase)
              .Include(f => f.ServidumbreOtra)
              .Include(f => f.Propietarios)
-             .Include(f => f.Familias)
+             .Include(f => f.Ocupantes)
              .Include(f => f.Conflictos!)
              .ThenInclude(c => c.TipoConflicto)
              .Include(f => f.DocumentosAnexos)

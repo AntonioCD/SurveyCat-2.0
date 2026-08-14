@@ -21,6 +21,7 @@ public static class Catalogos
     public const string RelacionInformantePropietario = "RelacionInformantePropietario";
     public const string Servidumbre = "Servidumbre";
     public const string TipoIdentificacion = "TipoIdentificacion";
+    public const string TipoOcupante = "TipoOcupante";
     public const string TipoPersonaJuridica = "TipoPersonaJuridica";
-    public const string UnidadMedida = "UnidadMedida";
+    public const string UnidadMedida = "UnidadMedida"; 
 }

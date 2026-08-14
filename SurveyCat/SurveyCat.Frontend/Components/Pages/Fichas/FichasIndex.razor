@@ -32,7 +32,7 @@ else
             <MudTh Style="width: 13.5%;">CodEnc</MudTh>
             <MudTh Style="width: 13.5%;">Estado</MudTh>
             <MudTh Style="width: 9%;"># Propietarios</MudTh>
-            <MudTh Style="width: 9%;"># Familiares</MudTh>
+            <MudTh Style="width: 9%;"># Ocupantes</MudTh>
             <MudTh Style="width: 9%;"># Colindantes</MudTh>
             <MudTh Style="width: 9%;"># Conflictos</MudTh>
             <MudTh Style="width: 9%;"># Doc. Anexos</MudTh>
@@ -60,15 +60,15 @@ else
                     </MudButton>
                 </MudTooltip>
             </MudTd>
-            <MudTd DataLabel="Nucleo Familiar">
-                <MudTooltip Text="Ver Nucleo Familiar">
+            <MudTd DataLabel="Ocupantes">
+                <MudTooltip Text="Ver Ocupantes">
                     <MudButton Variant="Variant.Outlined" 
                                Size="Size.Medium"
-                               OnClick="@(() => NucleoFamiliarAction(@context))"
+                               OnClick="@(() => OcupantesAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
 
-                        <span>@context.FamiliasNumber</span>
+                        <span>@context.OcupantesNumber</span>
 
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"

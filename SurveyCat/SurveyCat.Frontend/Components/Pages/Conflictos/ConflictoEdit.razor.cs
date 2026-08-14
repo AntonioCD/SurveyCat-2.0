@@ -42,7 +42,7 @@ public partial class ConflictoEdit
     {
         if (conflicto == null) return;
 
-        // Limpiar propiedades de navegación antes de enviar (igual que en FamiliaEdit)
+        // Limpiar propiedades de navegación antes de enviar (igual que en OcupanteEdit)
         conflicto.Ficha = null;
         conflicto.TipoConflicto = null;
         conflicto.ViaGestion = null;

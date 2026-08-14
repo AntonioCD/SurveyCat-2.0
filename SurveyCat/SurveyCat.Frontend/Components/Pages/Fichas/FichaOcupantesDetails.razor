@@ -1,5 +1,5 @@
 ﻿@using SurveyCat.Shared.Entities
-@page "/fichas/familias/details/{FichaId:int}"
+@page "/fichas/ocupantes/details/{FichaId:int}"
 
 @if (loading)
 {
@@ -9,16 +9,16 @@ else
 {
     <div class="pa-4">
         @* Contenedor Principal de Arrastre *@
-        <MudDropContainer T="Familia"
-                          Items="@familias"
+        <MudDropContainer T="Ocupante"
+                          Items="@ocupantes"
                           ItemsSelector="@((item, zone) => item.Item.ToString() == zone)"
                           ItemDropped="OnItemDropped"
                           Class="d-flex flex-column gap-2">
             <ChildContent>
                 @* Cabecera Superior del Módulo *@
                 <div class="d-flex align-center mud-paper pa-2 mb-0">
-                    <MudText Typo="Typo.h6" Class="mr-4">NUCLEO FAMILIAR (@ficha?.CodEncuesta)</MudText>
-                    <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToFamiliarForm())">Crear</MudButton>
+                    <MudText Typo="Typo.h6" Class="mr-4">OCUPANTES (@ficha?.CodEncuesta)</MudText>
+                    <MudButton Variant="Variant.Outlined" Class="mr-4" EndIcon="@Icons.Material.Filled.Add" Color="Color.Info" OnClick="@(() => RedirectToOcupanteForm())">Crear</MudButton>
                     <MudSpacer />
                     <FilterComponent ApplyFilter="SetFilterValue" />
                 </div>
@@ -33,18 +33,18 @@ else
                 </div>
 
                 @* Zona de colocación de los elementos *@
-                @if (familias == null || !familias.Any())
+                @if (ocupantes == null || !ocupantes.Any())
                 {
                     <div class="d-flex justify-center pa-8 mud-paper mud-elevation-1 mt-2">
-                        <MudText Typo="Typo.body1">No se encontraron registros familiares para esta ficha.</MudText>
+                        <MudText Typo="Typo.body1">No se encontraron registros de ocupantes para esta ficha.</MudText>
                     </div>
                 }
                 else
                 {
                     @* Renderizamos una mini zona de arrastre por cada Item disponible *@
-                    @foreach (var fam in familias.OrderBy(f => f.Item))
+                    @foreach (var ocup in ocupantes.OrderBy(f => f.Item))
                     {
-                        <MudDropZone T="Familia" Identifier="@fam.Item.ToString()" Class="d-flex flex-column gap-2" />
+                        <MudDropZone T="Ocupante" Identifier="@ocup.Item.ToString()" Class="d-flex flex-column gap-2" />
                     }
                 }
             </ChildContent>
@@ -67,7 +67,7 @@ else
                                                Variant="Variant.Outlined"
                                                Color="Color.Warning"
                                                Size="Size.Small"
-                                               OnClick="@(() => RedirectToFamiliarForm(context.Id, true))"
+                                               OnClick="@(() => RedirectToOcupanteForm(context.Id, true))"
                                                Class="mr-2" />
                             </MudTooltip>
                             <MudTooltip Text="Borrar">

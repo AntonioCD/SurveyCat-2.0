@@ -19,7 +19,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<Diccionario> Diccionarios { get; set; }
         public DbSet<DocumentoAnexo> DocumentosAnexos { get; set; }
         public DbSet<EncuestaAutorizada> EncuestasAutorizadas { get; set; }
-        public DbSet<Familia> Familias { get; set; }
+        public DbSet<Ocupante> Ocupantes { get; set; }
         public DbSet<Ficha> Fichas { get; set; }
         public DbSet<Municipio> Municipios { get; set; }
         public DbSet<Persona> Personas { get; set; }
@@ -72,7 +72,7 @@ namespace SurveyCat.Backend.Data
                 e.HasIndex(x => x.CodEncuesta).IsUnique();
             });
 
-            modelBuilder.Entity<Familia>(e =>
+            modelBuilder.Entity<Ocupante>(e =>
             {
                 e.HasIndex(x => new { x.FichaId, x.PersonaId }).IsUnique();
             });

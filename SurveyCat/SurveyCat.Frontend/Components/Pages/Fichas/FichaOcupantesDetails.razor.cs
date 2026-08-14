@@ -7,13 +7,13 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.Fichas;
 
-public partial class FichaFamiliasDetails
+public partial class FichaOcupantesDetails
 {
     private Ficha? ficha;
-    private List<Familia> familias = new();
+    private List<Ocupante> ocupantes = new();
     private int totalRecords = 0;
     private bool loading;
-    private const string baseUrl = "api/familias";
+    private const string baseUrl = "api/ocupantes";
 
     [Parameter] public long FichaId { get; set; }
 
@@ -54,18 +54,18 @@ public partial class FichaFamiliasDetails
                 urlList += $"&filter={Filter}";
             }
 
-            var responseHttp = await Repository.GetAsync<List<Familia>>(urlList);
+            var responseHttp = await Repository.GetAsync<List<Ocupante>>(urlList);
 
             if (responseHttp.Error)
             {
                 var message = await responseHttp.GetErrorMessageAsync();
                 Snackbar.Add(message!, Severity.Error);
-                familias = new List<Familia>();
+                ocupantes = new List<Ocupante>();
             }
             else if (responseHttp.Response != null)
             {
-                familias = responseHttp.Response.OrderBy(f => f.Item).ToList();
-                totalRecords = familias.Count;
+                ocupantes = responseHttp.Response.OrderBy(f => f.Item).ToList();
+                totalRecords = ocupantes.Count;
             }
         }
         finally
@@ -94,7 +94,7 @@ public partial class FichaFamiliasDetails
         return true;
     }
 
-    private async Task OnItemDropped(MudItemDropInfo<Familia> dropInfo)
+    private async Task OnItemDropped(MudItemDropInfo<Ocupante> dropInfo)
     {
         if (dropInfo.Item == null || string.IsNullOrEmpty(dropInfo.DropzoneIdentifier)) return;
         if (!int.TryParse(dropInfo.DropzoneIdentifier, out int itemDestino)) return;
@@ -102,7 +102,7 @@ public partial class FichaFamiliasDetails
         var itemMovido = dropInfo.Item;
         if (itemMovido.Item == itemDestino) return;
 
-        var listaModificada = familias.Where(f => f.Id != itemMovido.Id).OrderBy(f => f.Item).ToList();
+        var listaModificada = ocupantes.Where(f => f.Id != itemMovido.Id).OrderBy(f => f.Item).ToList();
 
         int nuevoIndice = itemDestino - 1;
         if (nuevoIndice < 0) nuevoIndice = 0;
@@ -110,7 +110,7 @@ public partial class FichaFamiliasDetails
 
         listaModificada.Insert(nuevoIndice, itemMovido);
 
-        var listaParaEnviar = listaModificada.Select((f, index) => new Familia
+        var listaParaEnviar = listaModificada.Select((f, index) => new Ocupante
         {
             Id = f.Id,
             FichaId = f.FichaId,
@@ -121,10 +121,10 @@ public partial class FichaFamiliasDetails
             Parentesco = f.Parentesco
         }).ToList();
 
-        familias = listaParaEnviar;
+        ocupantes = listaParaEnviar;
         StateHasChanged();
 
-        var responseHttp = await Repository.PostAsync($"{baseUrl}/reorder", familias);
+        var responseHttp = await Repository.PostAsync($"{baseUrl}/reorder", ocupantes);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -133,7 +133,7 @@ public partial class FichaFamiliasDetails
         }
         else
         {
-            Snackbar.Add("Orden familiar actualizado con éxito.", Severity.Success);
+            Snackbar.Add("Orden de ocupantes actualizado con éxito.", Severity.Success);
         }
     }
 
@@ -143,15 +143,15 @@ public partial class FichaFamiliasDetails
         await LoadAsync();
     }
 
-    private void RedirectToFamiliarForm(long id = 0, bool isEdit = false)
+    private void RedirectToOcupanteForm(long id = 0, bool isEdit = false)
     {
         if (isEdit)
         {
-            NavigationManager.NavigateTo($"/familias/edit/{id}/{FichaId}");
+            NavigationManager.NavigateTo($"/ocupantes/edit/{id}/{FichaId}");
         }
         else
         {
-            NavigationManager.NavigateTo($"/familias/create/{FichaId}");
+            NavigationManager.NavigateTo($"/ocupantes/create/{FichaId}");
         }
     }
 
@@ -160,11 +160,11 @@ public partial class FichaFamiliasDetails
         NavigationManager.NavigateTo("/fichas");
     }
 
-    private async Task DeleteAsync(Familia familia)
+    private async Task DeleteAsync(Ocupante ocupante)
     {
         var parameters = new DialogParameters
         {
-            { "Message", $"¿Estás seguro de que quieres eliminar a {familia.Persona?.NombreCompleto}?" }
+            { "Message", $"¿Estás seguro de que quieres eliminar a {ocupante.Persona?.NombreCompleto}?" }
         };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmación", parameters, options);
@@ -175,7 +175,7 @@ public partial class FichaFamiliasDetails
             return;
         }
 
-        var responseHttp = await Repository.DeleteAsync($"api/familias/{familia.Id}");
+        var responseHttp = await Repository.DeleteAsync($"api/ocupantes/{ocupante.Id}");
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -183,7 +183,7 @@ public partial class FichaFamiliasDetails
             return;
         }
 
-        Snackbar.Add("Familiar eliminado correctamente.", Severity.Success);
+        Snackbar.Add("Ocupante eliminado correctamente.", Severity.Success);
 
         // Recargar la lista después de mostrar el mensaje
         await LoadAsync();

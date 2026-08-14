@@ -6,47 +6,51 @@ using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Constants;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Familias;
+namespace SurveyCat.Frontend.Components.Pages.Ocupantes;
 
-public partial class FamiliaForm
+public partial class OcupanteForm
 {
     private EditContext editContext = null!;
     private List<Diccionario>? diccionarios;
+    private List<Diccionario> listaTipoOcupante = new();
     private List<Diccionario> listaParentesco = new();
     private Persona? persona = new();
 
+    private Diccionario? selectedTipoOcupante = new();
     private Diccionario? selectedParentesco = new();
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
-    [EditorRequired, Parameter] public Familia Familia { get; set; } = null!;
+    [EditorRequired, Parameter] public Ocupante Ocupante { get; set; } = null!;
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
     [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Familia == null)
+        if (Ocupante == null)
         {
-            Familia = new Familia();
+            Ocupante = new Ocupante();
         }
 
         // Recrear el EditContext si el modelo cambió
-        if (editContext == null || editContext.Model != Familia)
+        if (editContext == null || editContext.Model != Ocupante)
         {
-            editContext = new EditContext(Familia);
+            editContext = new EditContext(Ocupante);
         }
 
         await LoadDiccionariosAsync();
 
-        if (Familia.Id != 0)
+        if (Ocupante.Id != 0)
         {
-            selectedParentesco = listaParentesco.Where(x => x.Id == Familia.ParentescoId).FirstOrDefault();
+            selectedParentesco = listaParentesco.Where(x => x.Id == Ocupante.ParentescoId).FirstOrDefault();
 
-            if (persona == null || persona.Id != Familia.PersonaId)
+            selectedTipoOcupante = listaTipoOcupante.Where(x => x.Id == Ocupante.TipoOcupanteId).FirstOrDefault();
+
+            if (persona == null || persona.Id != Ocupante.PersonaId)
             {
-                persona = await GetPersonaDetails(Familia.PersonaId);
+                persona = await GetPersonaDetails(Ocupante.PersonaId);
             }
         }
     }
@@ -67,6 +71,16 @@ public partial class FamiliaForm
         if (diccionarios != null)
         {
             listaParentesco = diccionarios.Where(x => x.Catalogo == Catalogos.Parentesco).ToList();
+            listaTipoOcupante = diccionarios.Where(x => x.Catalogo == Catalogos.TipoOcupante).ToList();
+        }
+    }
+
+    private void TipoOcupanteChanged(Diccionario tipoOcupante)
+    {
+        if (tipoOcupante != null)
+        {
+            selectedTipoOcupante = tipoOcupante;
+            Ocupante.TipoOcupanteId = tipoOcupante!.Id;
         }
     }
 
@@ -75,8 +89,21 @@ public partial class FamiliaForm
         if (parentesco != null)
         {
             selectedParentesco = parentesco;
-            Familia.ParentescoId = parentesco!.Id;
+            Ocupante.ParentescoId = parentesco!.Id;
         }
+    }
+
+    private async Task<IEnumerable<Diccionario>> SearchTipoOcupante(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return listaTipoOcupante!;
+        }
+
+        return listaTipoOcupante!
+            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
     }
 
     private async Task<IEnumerable<Diccionario>> SearchParentesco(string searchText, CancellationToken token)
@@ -116,7 +143,7 @@ public partial class FamiliaForm
             {
                 // Asignamos el resultado a la variable que maneja tu formulario
                 persona = personaResult;
-                Familia.PersonaId = persona.Id;
+                Ocupante.PersonaId = persona.Id;
 
                 // Si necesitas refrescar cascadas asociadas al informante (municipios, depto, etc.), este es el lugar:
                 // await CargarCascadasDelInformanteAsync(informante);

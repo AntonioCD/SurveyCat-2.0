@@ -376,7 +376,7 @@ namespace SurveyCat.Backend.Migrations
                     b.ToTable("Diccionarios");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Familia", b =>
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1095,7 +1095,7 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("ViaGestion");
                 });
 
-            modelBuilder.Entity("SurveyCat.Shared.Entities.Familia", b =>
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Ocupante", b =>
                 {
                     b.HasOne("SurveyCat.Shared.Entities.Ficha", "Ficha")
                         .WithMany("Familias")

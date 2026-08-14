@@ -7,18 +7,18 @@ using SurveyCat.Shared.Responses;
 
 namespace SurveyCat.Backend.Repositories.Implementations;
 
-public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepository
+public class OcupantesRepository : GenericRepository<Ocupante>, IOcupantesRepository
 {
     private readonly DataContext _context;
 
-    public FamiliasRepository(DataContext context) : base(context)
+    public OcupantesRepository(DataContext context) : base(context)
     {
         _context = context;
     }
 
-    public override async Task<ActionResponse<IEnumerable<Familia>>> GetAsync(PaginationDTO pagination)
+    public override async Task<ActionResponse<IEnumerable<Ocupante>>> GetAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Familias
+        var queryable = _context.Ocupantes
             .Include(f => f.Persona!)
             .ThenInclude(f => f.TipoIdentificacion)
             .Include(f => f.Parentesco)
@@ -30,7 +30,7 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
             queryable = queryable.Where(x => x.Persona!.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
-        return new ActionResponse<IEnumerable<Familia>>
+        return new ActionResponse<IEnumerable<Ocupante>>
         {
             WasSuccess = true,
             Result = await queryable
@@ -42,7 +42,7 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
 
     public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
     {
-        var queryable = _context.Familias
+        var queryable = _context.Ocupantes
             .Include(p => p.Persona)
             .Where(f => f.FichaId == pagination.Id)
             .AsQueryable();
@@ -60,56 +60,56 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
         };
     }
 
-    public async Task<ActionResponse<Familia>> GetAsync(long id)
+    public async Task<ActionResponse<Ocupante>> GetAsync(long id)
     {
-        var familia = await _context.Familias
+        var ocupante = await _context.Ocupantes
             .Include(p => p.Persona)
             .Include(p => p.Ficha)
             .Include(p => p.Parentesco)
             .FirstOrDefaultAsync(m => m.Id == id);
 
-        if (familia == null)
+        if (ocupante == null)
         {
-            return new ActionResponse<Familia>
+            return new ActionResponse<Ocupante>
             {
                 WasSuccess = false,
-                Message = "Familia no existe"
+                Message = "Ocupante no existe"
             };
         }
 
-        return new ActionResponse<Familia>
+        return new ActionResponse<Ocupante>
         {
             WasSuccess = true,
-            Result = familia
+            Result = ocupante
         };
     }
 
-    public override async Task<ActionResponse<Familia>> AddAsync(Familia familia)
+    public override async Task<ActionResponse<Ocupante>> AddAsync(Ocupante ocupante)
     {
         try
         {
             // 1. Buscamos cuál es el número de Item más alto asignado actualmente en esta Ficha.
             //    Usamos (int?) para evitar que falle si la ficha aún no tiene ningún miembro registrado.
-            int maxItem = await _context.Set<Familia>()
-                .Where(f => f.FichaId == familia.FichaId)
+            int maxItem = await _context.Set<Ocupante>()
+                .Where(f => f.FichaId == ocupante.FichaId)
                 .MaxAsync(f => (int?)f.Item) ?? 0;
 
             // 2. Asignamos el consecutivo automático (si maxItem era 0, el primero será 1)
-            familia.Item = maxItem + 1;
+            ocupante.Item = maxItem + 1;
 
             // 3. Procedemos con el guardado normal
-            _context.Add(familia);
+            _context.Add(ocupante);
 
             await _context.SaveChangesAsync();
-            return new ActionResponse<Familia>
+            return new ActionResponse<Ocupante>
             {
                 WasSuccess = true,
-                Result = familia
+                Result = ocupante
             };
         }
         catch (DbUpdateException)
         {
-            return new ActionResponse<Familia>
+            return new ActionResponse<Ocupante>
             {
                 WasSuccess = false,
                 Message = "Ya existe el registro que estas intentando crear."
@@ -117,7 +117,7 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
         }
         catch (Exception exception)
         {
-            return new ActionResponse<Familia>
+            return new ActionResponse<Ocupante>
             {
                 WasSuccess = false,
                 Message = exception.Message
@@ -125,30 +125,30 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
         }
     }
 
-    public async Task<ActionResponse<IEnumerable<Familia>>> ReorderAsync(List<Familia> familiasReordenadas)
+    public async Task<ActionResponse<IEnumerable<Ocupante>>> ReorderAsync(List<Ocupante> ocupantesReordenados)
     {
-        if (familiasReordenadas == null || !familiasReordenadas.Any())
+        if (ocupantesReordenados == null || !ocupantesReordenados.Any())
         {
-            return new ActionResponse<IEnumerable<Familia>>
+            return new ActionResponse<IEnumerable<Ocupante>>
             {
                 WasSuccess = false,
                 Message = "No se recibieron datos para reordenar."
             };
         }
 
-        long fichaId = familiasReordenadas.First().FichaId;
+        long fichaId = ocupantesReordenados.First().FichaId;
 
         try
         {
             // 1. Traemos los registros reales que están actualmente en la BD para esa Ficha
-            var familiasBD = await _context.Familias
+            var ocupantesBD = await _context.Ocupantes
                 .Where(f => f.FichaId == fichaId)
                 .ToListAsync();
 
             // 2. Sincronizamos los índices
-            foreach (var itemUI in familiasReordenadas)
+            foreach (var itemUI in ocupantesReordenados)
             {
-                var itemBD = familiasBD.FirstOrDefault(f => f.Id == itemUI.Id);
+                var itemBD = ocupantesBD.FirstOrDefault(f => f.Id == itemUI.Id);
                 if (itemBD != null)
                 {
                     itemBD.Item = itemUI.Item;
@@ -158,15 +158,15 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
             // 3. Guardamos los cambios
             await _context.SaveChangesAsync();
 
-            return new ActionResponse<IEnumerable<Familia>>
+            return new ActionResponse<IEnumerable<Ocupante>>
             {
                 WasSuccess = true,
-                Result = familiasBD.OrderBy(f => f.Item).ToList()
+                Result = ocupantesBD.OrderBy(f => f.Item).ToList()
             };
         }
         catch (Exception exception)
         {
-            return new ActionResponse<IEnumerable<Familia>>
+            return new ActionResponse<IEnumerable<Ocupante>>
             {
                 WasSuccess = false,
                 Message = $"Error al persistir el reordenamiento: {exception.Message}"
@@ -174,34 +174,34 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
         }
     }
 
-    public async Task<ActionResponse<Familia>> DeleteByLongAsync(long id)
+    public async Task<ActionResponse<Ocupante>> DeleteByLongAsync(long id)
     {
-        var familiaAEliminar = await _context.Familias
+        var ocupanteAEliminar = await _context.Ocupantes
             .FirstOrDefaultAsync(m => m.Id == id);
 
-        if (familiaAEliminar == null)
+        if (ocupanteAEliminar == null)
         {
-            return new ActionResponse<Familia>
+            return new ActionResponse<Ocupante>
             {
                 WasSuccess = false,
-                Message = "Familia no encontrada"
+                Message = "Ocupante no encontrada"
             };
         }
 
         try
         {
-            long fichaId = familiaAEliminar.FichaId;
+            long fichaId = ocupanteAEliminar.FichaId;
 
             // 1. CORRECCIÓN: Usamos el operador Value o la coalescencia (?? 0)
             // para asegurar al compilador que extraeremos un 'int' puro.
-            int itemBorrado = familiaAEliminar.Item ?? 0;
+            int itemBorrado = ocupanteAEliminar.Item ?? 0;
 
             // 2. Eliminamos el registro elegido
-            _context.Familias.Remove(familiaAEliminar);
+            _context.Ocupantes.Remove(ocupanteAEliminar);
 
             // 3. CORRECCIÓN: En el Where, como f.Item es int?, extraemos su valor con .Value
             // para poder hacer la comparación numéricas limpiamente.
-            var miembrosAActualizar = await _context.Familias
+            var miembrosAActualizar = await _context.Ocupantes
                 .Where(f => f.FichaId == fichaId && f.Item.HasValue && f.Item.Value > itemBorrado)
                 .OrderBy(f => f.Item)
                 .ToListAsync();
@@ -215,14 +215,14 @@ public class FamiliasRepository : GenericRepository<Familia>, IFamiliasRepositor
             // 5. Guardamos todo de forma atómica
             await _context.SaveChangesAsync();
 
-            return new ActionResponse<Familia>
+            return new ActionResponse<Ocupante>
             {
                 WasSuccess = true,
             };
         }
         catch
         {
-            return new ActionResponse<Familia>
+            return new ActionResponse<Ocupante>
             {
                 WasSuccess = false,
                 Message = "No se puede borrar, porque tiene registros relacionados"

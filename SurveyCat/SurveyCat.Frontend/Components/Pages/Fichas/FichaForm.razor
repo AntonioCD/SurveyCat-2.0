@@ -789,13 +789,13 @@
                     }
                 </MudTabPanel>
 
-                <!-- TAB 3: Núcleo Familiar -->
-                <MudTabPanel Text="Núcleo Familiar"
+                <!-- TAB 3: Ocupantes -->
+                <MudTabPanel Text="Ocupantes"
                              Icon="@Icons.Material.Filled.FamilyRestroom"
                              IconColor="Color.Default">
                     @if (Ficha.Id > 0)
                     {
-                        <FichaFamiliasDetails FichaId="Ficha.Id" />
+                        <FichaOcupantesDetails FichaId="Ficha.Id" />
                     }
                     else
                     {
@@ -803,7 +803,7 @@
                             <MudText>
                                 <b>⚠️ Guarda la ficha primero</b>
                                 <br />
-                                El núcleo familiar solo puede gestionarse después de guardar la ficha.
+                                Los ocupantes solo pueden gestionarse después de guardar la ficha.
                             </MudText>
                         </MudAlert>
                     }

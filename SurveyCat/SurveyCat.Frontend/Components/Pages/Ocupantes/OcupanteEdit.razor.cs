@@ -3,11 +3,11 @@ using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Familias;
+namespace SurveyCat.Frontend.Components.Pages.Ocupantes;
 
-public partial class FamiliaEdit
+public partial class OcupanteEdit
 {
-    private Familia? familia;
+    private Ocupante? ocupante;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -18,7 +18,7 @@ public partial class FamiliaEdit
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHttp = await Repository.GetAsync<Familia>($"api/familias/{Id}");
+        var responseHttp = await Repository.GetAsync<Ocupante>($"api/ocupantes/{Id}");
 
         if (responseHttp.Error)
         {
@@ -34,17 +34,17 @@ public partial class FamiliaEdit
         }
         else
         {
-            familia = responseHttp.Response;
+            ocupante = responseHttp.Response;
         }
     }
 
     private async Task EditAsync()
     {
-        familia!.Ficha = null;
-        familia.Persona = null;
-        familia.Parentesco = null;
+        ocupante!.Ficha = null;
+        ocupante.Persona = null;
+        ocupante.Parentesco = null;
 
-        var responseHttp = await Repository.PutAsync<Familia>("api/familias", familia);
+        var responseHttp = await Repository.PutAsync<Ocupante>("api/ocupantes", ocupante);
 
         if (responseHttp.Error)
         {
@@ -53,9 +53,9 @@ public partial class FamiliaEdit
             return;
         }
 
-        // Volver a la ficha con la pestaña de Núcleo Familiar activa (tab=2)
+        // Volver a la ficha con la pestaña de Núcleo Ocupante activa (tab=2)
         NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
-        Snackbar.Add("Familiar guardado exitosamente.", Severity.Success);
+        Snackbar.Add("Ocupante guardado exitosamente.", Severity.Success);
     }
 
     private void Return()

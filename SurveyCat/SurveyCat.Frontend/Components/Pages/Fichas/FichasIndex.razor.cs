@@ -87,9 +87,9 @@ public partial class FichasIndex
         NavigationManager.NavigateTo($"/fichas/edit/{ficha.Id}?tab=1");
     }
 
-    private void NucleoFamiliarAction(Ficha ficha)
+    private void OcupantesAction(Ficha ficha)
     {
-        //NavigationManager.NavigateTo($"/fichas/familias/details/{ficha.Id}");
+        //NavigationManager.NavigateTo($"/fichas/ocupantes/details/{ficha.Id}");
         NavigationManager.NavigateTo($"/fichas/edit/{ficha.Id}?tab=2");
     }
 

@@ -10,19 +10,19 @@ namespace SurveyCat.Backend.Controllers;
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Route("api/[controller]")]
-public class FamiliasController : GenericController<Familia>
+public class OcupantesController : GenericController<Ocupante>
 {
-    private readonly IFamiliasUnitOfWork _familiasUnitOfWork;
+    private readonly IOcupantesUnitOfWork _ocupantesUnitOfWork;
 
-    public FamiliasController(IGenericUnitOfWork<Familia> unitOfWork, IFamiliasUnitOfWork familiasUnitOfWork) : base(unitOfWork)
+    public OcupantesController(IGenericUnitOfWork<Ocupante> unitOfWork, IOcupantesUnitOfWork ocupantesUnitOfWork) : base(unitOfWork)
     {
-        _familiasUnitOfWork = familiasUnitOfWork;
+        _ocupantesUnitOfWork = ocupantesUnitOfWork;
     }
 
     [HttpGet("paginated")]
     public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
     {
-        var response = await _familiasUnitOfWork.GetAsync(pagination);
+        var response = await _ocupantesUnitOfWork.GetAsync(pagination);
         if (response.WasSuccess)
         {
             return Ok(response.Result);
@@ -33,7 +33,7 @@ public class FamiliasController : GenericController<Familia>
     [HttpGet("totalRecords")]
     public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
     {
-        var action = await _familiasUnitOfWork.GetTotalRecordsAsync(pagination);
+        var action = await _ocupantesUnitOfWork.GetTotalRecordsAsync(pagination);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
@@ -44,7 +44,7 @@ public class FamiliasController : GenericController<Familia>
     [HttpGet("{id:long}")]
     public async Task<IActionResult> GetAsync(long id)
     {
-        var response = await _familiasUnitOfWork.GetAsync(id);
+        var response = await _ocupantesUnitOfWork.GetAsync(id);
         if (response.WasSuccess)
         {
             return Ok(response.Result);
@@ -53,9 +53,9 @@ public class FamiliasController : GenericController<Familia>
     }
 
     [HttpPost]
-    public override async Task<IActionResult> PostAsync(Familia familia)
+    public override async Task<IActionResult> PostAsync(Ocupante ocupante)
     {
-        var action = await _familiasUnitOfWork.AddAsync(familia);
+        var action = await _ocupantesUnitOfWork.AddAsync(ocupante);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
@@ -64,9 +64,9 @@ public class FamiliasController : GenericController<Familia>
     }
 
     [HttpPost("reorder")]
-    public async Task<IActionResult> ReorderAsync([FromBody] List<Familia> familiasReordenadas)
+    public async Task<IActionResult> ReorderAsync([FromBody] List<Ocupante> ocupantesReordenados)
     {
-        var action = await _familiasUnitOfWork.ReorderAsync(familiasReordenadas);
+        var action = await _ocupantesUnitOfWork.ReorderAsync(ocupantesReordenados);
         if (action.WasSuccess)
         {
             return Ok(action.Result);
@@ -77,7 +77,7 @@ public class FamiliasController : GenericController<Familia>
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> DeleteByLongAsync(long id)
     {
-        var action = await _familiasUnitOfWork.DeleteByLongAsync(id);
+        var action = await _ocupantesUnitOfWork.DeleteByLongAsync(id);
         if (action.WasSuccess)
         {
             return NoContent();

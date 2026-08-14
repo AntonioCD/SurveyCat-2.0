@@ -3,11 +3,11 @@ using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
 
-namespace SurveyCat.Frontend.Components.Pages.Familias;
+namespace SurveyCat.Frontend.Components.Pages.Ocupantes;
 
-public partial class FamiliaCreate
+public partial class OcupanteCreate
 {
-    private Familia familia = new();
+    private Ocupante ocupante = new();
 
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -17,8 +17,8 @@ public partial class FamiliaCreate
 
     private async Task CreateAsync()
     {
-        familia.FichaId = FichaId;
-        var responseHttp = await Repository.PostAsync<Familia>("/api/familias", familia);
+        ocupante.FichaId = FichaId;
+        var responseHttp = await Repository.PostAsync<Ocupante>("/api/ocupantes", ocupante);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -26,9 +26,9 @@ public partial class FamiliaCreate
             return;
         }
 
-        // Volver a la ficha con la pestaña de Núcleo Familiar activa (tab=2)
+        // Volver a la ficha con la pestaña de Ocupantes activa (tab=2)
         NavigationManager.NavigateTo($"/fichas/edit/{FichaId}?tab=2");
-        Snackbar.Add("Familiar creado exitosamente.", Severity.Success);
+        Snackbar.Add("Ocupante creado exitosamente.", Severity.Success);
     }
 
     private void Return()
