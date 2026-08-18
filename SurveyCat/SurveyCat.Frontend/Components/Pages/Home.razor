@@ -4,141 +4,222 @@
 
 @if (cargando)
 {
-    <div class="d-flex justify-center align-center" style="height: 50vh;">
-        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+    <div class="d-flex flex-column justify-center align-center" style="height: 60vh;">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" Class="mb-3" />
+        <MudText Typo="Typo.body2" Color="Color.Secondary">Cargando métricas del sistema...</MudText>
     </div>
 }
 else if (dashboardData != null)
 {
-
-<AuthorizeView Roles="Administrador">
-    <Authorized>
-        <div class="d-flex align-center justify-space-between mb-6">
-            <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">Resumen general del sistema catastral SurveyCat.</MudText>
+    <AuthorizeView Roles="Administrador">
+        <Authorized>
+            <!-- ENCABEZADO COMPACTO -->
+            <div class="mb-5">
+                <MudText Typo="Typo.h5" Class="fw-bold" Color="Color.Primary">Panel de Control Catastral</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Estado actual de encuestas, avances de digitación y flujo de aprobación.
+                </MudText>
             </div>
-            <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.CheckCircle">Sistema En Línea</MudChip>
-        </div>
 
-        @* SECCIÓN 1: Tarjetas de Resumen Modernizadas *@
-        <MudGrid Class="mb-4">
-            <MudItem xs="12" sm="6" md="3">
-                <MudPaper Elevation="3" Class="pa-4 d-flex align-center rounded-lg border-l-4 border-solid mud-border-primary">
-                    <MudAvatar Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Large" Class="mr-4">
-                        <MudIcon Icon="@Icons.Material.Filled.Description" />
-                    </MudAvatar>
-                    <div>
-                        <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichas</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas Registradas</MudText>
-                    </div>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="3">
-                <MudPaper Elevation="3" Class="pa-4 d-flex align-center rounded-lg border-l-4 border-solid mud-border-secondary">
-                    <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Large" Class="mr-4">
-                        <MudIcon Icon="@Icons.Material.Filled.RemoveRedEye" />
-                    </MudAvatar>
-                    <div>
-                            <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichasControlCalidad</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas en Control de Calidad</MudText>
-                    </div>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="3">
-                <MudPaper Elevation="3" Class="pa-4 d-flex align-center rounded-lg border-l-4 border-solid mud-border-info">
-                    <MudAvatar Color="Color.Info" Variant="Variant.Outlined" Size="Size.Large" Class="mr-4">
-                            <MudIcon Icon="@Icons.Material.Filled.Error" />
-                    </MudAvatar>
-                    <div>
-                            <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichasEnCorrecion</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas en Corrección</MudText>
-                    </div>
-                </MudPaper>
-            </MudItem>
-            <MudItem xs="12" sm="6" md="3">
-                <MudPaper Elevation="3" Class="pa-4 d-flex align-center rounded-lg border-l-4 border-solid mud-border-success">
-                    <MudAvatar Color="Color.Success" Variant="Variant.Outlined" Size="Size.Large" Class="mr-4">
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" />
-                    </MudAvatar>
-                    <div>
-                            <MudText Typo="Typo.h5" Class="font-weight-bold">@dashboardData.TotalFichasAprobadas</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">Fichas Aprobadas</MudText>
-                    </div>
-                </MudPaper>
-            </MudItem>
-        </MudGrid>
+            <!-- SECCIÓN 1: TARJETAS KPI DENSAS Y COMPACTAS -->
+            <MudGrid Class="mb-5" Spacing="2">
+                <!-- Total Registradas -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="1" Class="pa-4 rounded-lg d-flex align-center justify-space-between mud-border-lines-default">
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-semibold text-uppercase" Color="Color.Secondary">Total Registradas</MudText>
+                            <MudText Typo="Typo.h4" Class="fw-bold my-1">@dashboardData.TotalFichas</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Primary" Class="fw-bold">100% del total</MudText>
+                        </div>
+                        <div class="pa-3 rounded-circle" style="background-color: var(--mud-palette-primary-hover);">
+                            <MudIcon Icon="@Icons.Material.Filled.FolderSpecial" Color="Color.Primary" Size="Size.Medium" />
+                        </div>
+                    </MudPaper>
+                </MudItem>
 
-        @* SECCIÓN 2: Gráficos y Accesos Rápidos *@
-        <MudGrid Class="mb-4">
-            <MudItem xs="12" md="8">
-                <MudPaper Elevation="3" Class="pa-5 rounded-lg" Style="height: 100%;">
-                    <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold">Fichas Levantadas (Últimos 6 meses)</MudText>
-                    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="300px" />
-                </MudPaper>
-            </MudItem>
+                <!-- Control de Calidad -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="1" Class="pa-4 rounded-lg d-flex align-center justify-space-between border-all mud-border-lines-default">
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-semibold text-uppercase" Color="Color.Secondary">Control Calidad</MudText>
+                            <MudText Typo="Typo.h4" Class="fw-bold my-1" Color="Color.Warning">@dashboardData.TotalFichasControlCalidad</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Warning" Class="fw-bold">Pendientes de revisión</MudText>
+                        </div>
+                        <div class="pa-3 rounded-circle" style="background-color: var(--mud-palette-warning-hover);">
+                            <MudIcon Icon="@Icons.Material.Filled.FactCheck" Color="Color.Warning" Size="Size.Medium" />
+                        </div>
+                    </MudPaper>
+                </MudItem>
 
-            <MudItem xs="12" md="4">
-                <MudPaper Elevation="3" Class="pa-5 rounded-lg d-flex flex-column" Style="height: 100%;">
-                    <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold">Accesos Rápidos</MudText>
+                <!-- En Corrección -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="1" Class="pa-4 rounded-lg d-flex align-center justify-space-between border-all mud-border-lines-default">
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-semibold text-uppercase" Color="Color.Secondary">En Corrección</MudText>
+                            <MudText Typo="Typo.h4" Class="fw-bold my-1" Color="Color.Error">@dashboardData.TotalFichasEnCorrecion</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Error" Class="fw-bold">Con observaciones</MudText>
+                        </div>
+                        <div class="pa-3 rounded-circle" style="background-color: var(--mud-palette-error-hover);">
+                            <MudIcon Icon="@Icons.Material.Filled.AssignmentReturn" Color="Color.Error" Size="Size.Medium" />
+                        </div>
+                    </MudPaper>
+                </MudItem>
 
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-md" Href="/fichas">
-                        Fichas Catastrales
+                <!-- Aprobadas -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudPaper Elevation="1" Class="pa-4 rounded-lg d-flex align-center justify-space-between border-all mud-border-lines-default">
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-semibold text-uppercase" Color="Color.Secondary">Aprobadas</MudText>
+                            <MudText Typo="Typo.h4" Class="fw-bold my-1" Color="Color.Success">@dashboardData.TotalFichasAprobadas</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Success" Class="fw-bold">Finalizadas</MudText>
+                        </div>
+                        <div class="pa-3 rounded-circle" style="background-color: var(--mud-palette-success-hover);">
+                            <MudIcon Icon="@Icons.Material.Filled.Verified" Color="Color.Success" Size="Size.Medium" />
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+            <!-- SECCIÓN 2: ANÁLISIS Y NAVEGACIÓN (DISTRIBUCIÓN OPTIMIZADA) -->
+            <MudGrid Class="mb-5" Spacing="3">
+                <!-- Gráfico de Rendimiento -->
+                <MudItem xs="12" md="7" lg="8">
+                    <MudPaper Elevation="1" Class="pa-4 rounded-lg border-all mud-border-lines-default h-100">
+                        <div class="d-flex align-center justify-space-between mb-3 pb-2 border-b-1 mud-border-lines-default">
+                            <MudText Typo="Typo.subtitle1" Class="fw-bold">Rendimiento Mensual</MudText>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" Class="fw-semibold">Últimos 6 meses</MudChip>
+                        </div>
+                        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="240px" />
+                    </MudPaper>
+                </MudItem>
+
+                <!-- Módulos de Acceso Directo (Rutas funcionales) -->
+                <MudItem xs="12" md="5" lg="4">
+                    <MudPaper Elevation="1" Class="pa-4 rounded-lg border-all mud-border-lines-default h-100 d-flex flex-column justify-space-between">
+                        <div>
+                            <MudText Typo="Typo.subtitle1" Class="fw-bold mb-3 pb-2 border-b-1 mud-border-lines-default">
+                                Módulos Principales
+                            </MudText>
+
+                            <MudList T="string" Clickable="true" Class="pa-0">
+                                <MudListItem Href="/fichas" Class="rounded-lg mb-2 pa-2 border-all mud-border-lines-default">
+                                    <AvatarContent>
+                                        <MudAvatar Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
+                                            <MudIcon Icon="@Icons.Material.Filled.Folder" Size="Size.Small" />
+                                        </MudAvatar>
+                                    </AvatarContent>
+                                    <ChildContent>
+                                        <MudText Typo="Typo.body2" Class="fw-bold">Gestión de Fichas</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Buscar y administrar encuestas</MudText>
+                                    </ChildContent>
+                                </MudListItem>
+
+                                <MudListItem Href="/personalEncuestas" Class="rounded-lg mb-2 pa-2 border-all mud-border-lines-default">
+                                    <AvatarContent>
+                                        <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Small">
+                                            <MudIcon Icon="@Icons.Material.Filled.People" Size="Size.Small" />
+                                        </MudAvatar>
+                                    </AvatarContent>
+                                    <ChildContent>
+                                        <MudText Typo="Typo.body2" Class="fw-bold">Personal Técnico</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Encuestadores y supervisores</MudText>
+                                    </ChildContent>
+                                </MudListItem>
+
+                                <MudListItem Href="/diccionarios" Class="rounded-lg pa-2 border-all mud-border-lines-default">
+                                    <AvatarContent>
+                                        <MudAvatar Color="Color.Info" Variant="Variant.Outlined" Size="Size.Small">
+                                            <MudIcon Icon="@Icons.Material.Filled.LibraryBooks" Size="Size.Small" />
+                                        </MudAvatar>
+                                    </AvatarContent>
+                                    <ChildContent>
+                                        <MudText Typo="Typo.body2" Class="fw-bold">Diccionarios</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Catálogos y variables del sistema</MudText>
+                                    </ChildContent>
+                                </MudListItem>
+                            </MudList>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+            <!-- SECCIÓN 3: ACTIVIDAD RECIENTE (TABLA DENSA) -->
+            <MudPaper Elevation="1" Class="rounded-lg border-all mud-border-lines-default overflow-hidden">
+                <div class="pa-4 d-flex align-center justify-space-between border-b-1 mud-border-lines-default" style="background-color: var(--mud-palette-background-grey);">
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="fw-bold">Últimas Fichas Registradas</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Fichas ingresadas recientemente al sistema</MudText>
+                    </div>
+                    <MudButton Color="Color.Primary"
+                               Variant="Variant.Outlined"
+                               Size="Size.Small"
+                               EndIcon="@Icons.Material.Filled.ArrowForward"
+                               Href="/fichas">
+                        Ver Lista Completa
                     </MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Dark" Size="Size.Large" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-sm" Href="/personalEncuestas">
-                        Personal de Encuestas
-                    </MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Large" FullWidth="true" Class="mb-4 rounded-lg py-3 shadow-sm" Href="/diccionarios">
-                        Diccionario de Catálogos
-                    </MudButton>
+                </div>
 
-                    <MudDivider Class="my-4" />
-                    <MudText Typo="Typo.caption" Class="mud-text-secondary d-flex align-center">
-                        <MudIcon Icon="@Icons.Material.Filled.Sync" Size="Size.Small" Class="mr-2"/>
-                        Actualizado hace unos instantes
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-        </MudGrid>
-
-        @* SECCIÓN 3: Actividad Reciente (Llena el espacio en blanco inferior) *@
-        <MudGrid>
-            <MudItem xs="12">
-                    <MudTable Items="@dashboardData.FichasRecientes" Elevation="3" Class="rounded-lg" Hover="true" Breakpoint="Breakpoint.Sm">
-                    <ToolBarContent>
-                        <MudText Typo="Typo.h6" Class="font-weight-bold">Últimas Fichas Registradas</MudText>
-                        <MudSpacer />
-                            <MudButton Color="Color.Primary" Variant="Variant.Text" EndIcon="@Icons.Material.Filled.ArrowForward" Href="/fichas">Ver todas</MudButton>
-                    </ToolBarContent>
+                <MudTable Items="@dashboardData.FichasRecientes" Elevation="0" Dense="true" Hover="true">
                     <HeaderContent>
-                        <MudTh>Código </MudTh>
-                        <MudTh>Municipio</MudTh>
-                        <MudTh>Fecha de Registro</MudTh>
-                        <MudTh>Estado</MudTh>
+                        <MudTh>CÓDIGO</MudTh>
+                        <MudTh>DEPARTAMENTO</MudTh>
+                        <MudTh>FECHA REGISTRO</MudTh>
+                        <MudTh>ESTADO</MudTh>
+                        <MudTh Class="text-center">ACCIÓN</MudTh>
                     </HeaderContent>
                     <RowTemplate Context="fila">
-                        <MudTd DataLabel="Código"><strong>@fila.Codigo</strong></MudTd>
+                        <MudTd DataLabel="Código">
+                            <MudText Typo="Typo.body2" Class="fw-bold" Color="Color.Primary">
+                                @fila.Codigo
+                            </MudText>
+                        </MudTd>
                         <MudTd DataLabel="Departamento">@fila.Departamento</MudTd>
                         <MudTd DataLabel="Fecha">@fila.FechaEncuesta</MudTd>
                         <MudTd DataLabel="Estado">
-                            <MudChip T="string" Color="@(fila.Estado == "Completada" ? Color.Success : Color.Warning)" Size="Size.Small" Variant="Variant.Filled">
+                            <MudChip T="string"
+                                     Color="@(fila.Estado == "Completada" || fila.Estado == "Aprobada" ? Color.Success : fila.Estado == "En Corrección" ? Color.Error : Color.Warning)"
+                                     Size="Size.Small"
+                                     Variant="Variant.Outlined">
                                 @fila.Estado
                             </MudChip>
                         </MudTd>
+                        <MudTd DataLabel="Acciones" Class="text-center">
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.Visibility"
+                                       Href="@($"/fichas/detalle/{fila.Codigo}")">
+                                Detalle
+                            </MudButton>
+                        </MudTd>
                     </RowTemplate>
                 </MudTable>
-            </MudItem>
-        </MudGrid>
-    </Authorized>
+            </MudPaper>
+        </Authorized>
 
-    <NotAuthorized>
-        <div class="d-flex flex-column align-center justify-center" style="height: 70vh;">
-            <MudIcon Icon="@Icons.Material.Filled.LockPerson" Color="Color.Primary" Style="font-size: 6rem;" Class="mb-4" />
-            <MudText Typo="Typo.h3" Class="mb-2 font-weight-bold">SurveyCat</MudText>
-            <MudText Typo="Typo.h6" Class="mud-text-secondary mb-6">Sistema de Gestión Catastral</MudText>
-            <MudText Typo="Typo.body1">No estás autenticado. Por favor, inicia sesión para acceder al sistema.</MudText>
-        </div>
-    </NotAuthorized>
-</AuthorizeView>
+        <!-- VISTA SI NO ES ADMINISTRADOR (CON IMAGEN TEMPORAL) -->
+        <NotAuthorized>
+            <div class="d-flex flex-column align-center justify-center py-10">
+                <MudPaper Elevation="1" Class="pa-8 rounded-xl text-center border-all mud-border-lines-default" Style="max-width: 480px;">
+                    <!-- Imagen Temporal para usuarios no administradores -->
+                    <MudImage Src="images/access-denied.svg"
+                              Alt="Acceso Denegado"
+                              Class="mb-4"
+                              Style="width: 100%; max-width: 200px; height: auto;" />
 
+                    <MudText Typo="Typo.h5" Class="fw-bold mb-2">Acceso Restringido</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-6">
+                        No posees permisos de administrador para visualizar la información del panel catastral.
+                    </MudText>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Href="/login"
+                               FullWidth="true"
+                               Class="rounded-lg">
+                        Iniciar Sesión con otra cuenta
+                    </MudButton>
+                </MudPaper>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 }
-

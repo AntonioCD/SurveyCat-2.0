@@ -19,6 +19,17 @@ public partial class OcupanteForm
     private Diccionario? selectedTipoOcupante = new();
     private Diccionario? selectedParentesco = new();
 
+    // NUEVO: Constante y variable para el ID de "Familiar"
+    private const string TIPO_FAMILIAR_NOMBRE = "Familiar";
+    private long? _tipoFamiliarId;
+
+    // NUEVO: Propiedades de validación condicional
+    private bool ParentescoEsRequerido =>
+        selectedTipoOcupante?.Id == _tipoFamiliarId;
+
+    private bool ParentescoHabilitado =>
+        selectedTipoOcupante != null && ParentescoEsRequerido;
+
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -34,7 +45,6 @@ public partial class OcupanteForm
             Ocupante = new Ocupante();
         }
 
-        // Recrear el EditContext si el modelo cambió
         if (editContext == null || editContext.Model != Ocupante)
         {
             editContext = new EditContext(Ocupante);
@@ -44,9 +54,8 @@ public partial class OcupanteForm
 
         if (Ocupante.Id != 0)
         {
-            selectedParentesco = listaParentesco.Where(x => x.Id == Ocupante.ParentescoId).FirstOrDefault();
-
-            selectedTipoOcupante = listaTipoOcupante.Where(x => x.Id == Ocupante.TipoOcupanteId).FirstOrDefault();
+            selectedParentesco = listaParentesco.FirstOrDefault(x => x.Id == Ocupante.ParentescoId);
+            selectedTipoOcupante = listaTipoOcupante.FirstOrDefault(x => x.Id == Ocupante.TipoOcupanteId);
 
             if (persona == null || persona.Id != Ocupante.PersonaId)
             {
@@ -72,15 +81,33 @@ public partial class OcupanteForm
         {
             listaParentesco = diccionarios.Where(x => x.Catalogo == Catalogos.Parentesco).ToList();
             listaTipoOcupante = diccionarios.Where(x => x.Catalogo == Catalogos.TipoOcupante).ToList();
+
+            // NUEVO: Obtener el ID del tipo "Familiar"
+            var familiar = listaTipoOcupante.FirstOrDefault(x => x.Nombre == TIPO_FAMILIAR_NOMBRE);
+            if (familiar != null)
+            {
+                _tipoFamiliarId = familiar.Id;
+            }
         }
     }
 
+    // MODIFICADO: Limpiar Parentesco si no es Familiar
     private void TipoOcupanteChanged(Diccionario tipoOcupante)
     {
         if (tipoOcupante != null)
         {
             selectedTipoOcupante = tipoOcupante;
-            Ocupante.TipoOcupanteId = tipoOcupante!.Id;
+            Ocupante.TipoOcupanteId = tipoOcupante.Id;
+
+            // Si NO es Familiar, limpiar Parentesco
+            if (!ParentescoEsRequerido)
+            {
+                selectedParentesco = null;
+                Ocupante.ParentescoId = null;
+            }
+
+            editContext?.Validate();
+            StateHasChanged();
         }
     }
 
@@ -89,8 +116,15 @@ public partial class OcupanteForm
         if (parentesco != null)
         {
             selectedParentesco = parentesco;
-            Ocupante.ParentescoId = parentesco!.Id;
+            Ocupante.ParentescoId = parentesco.Id;
         }
+        else
+        {
+            selectedParentesco = null;
+            Ocupante.ParentescoId = null;
+        }
+
+        editContext?.Validate();
     }
 
     private async Task<IEnumerable<Diccionario>> SearchTipoOcupante(string searchText, CancellationToken token)
@@ -106,9 +140,16 @@ public partial class OcupanteForm
             .ToList();
     }
 
+    // MODIFICADO: Solo muestra parentescos si está habilitado
     private async Task<IEnumerable<Diccionario>> SearchParentesco(string searchText, CancellationToken token)
     {
         await Task.Delay(5);
+
+        if (!ParentescoHabilitado)
+        {
+            return new List<Diccionario>();
+        }
+
         if (string.IsNullOrWhiteSpace(searchText))
         {
             return listaParentesco!;
@@ -132,27 +173,18 @@ public partial class OcupanteForm
         var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", options);
         var result = await dialog.Result;
 
-        // Verificamos si el usuario seleccionó un registro en el modal
         if (!result.Canceled && result.Data is Persona personaSeleccionada)
         {
-            // 1. LLAMADO ASÍNCRONO: Esperamos a que la API traiga los detalles completos
             var personaResult = await GetPersonaDetails(personaSeleccionada.Id);
 
-            // 2. VALIDACIÓN: Evaluamos si devolvió a la persona o si falló (null)
             if (personaResult != null)
             {
-                // Asignamos el resultado a la variable que maneja tu formulario
                 persona = personaResult;
                 Ocupante.PersonaId = persona.Id;
-
-                // Si necesitas refrescar cascadas asociadas al informante (municipios, depto, etc.), este es el lugar:
-                // await CargarCascadasDelInformanteAsync(informante);
-
                 Snackbar.Add("Datos de la persona cargados con éxito.", Severity.Success);
             }
             else
             {
-                // Opcional: Lógica en caso de que no se haya podido recuperar la data completa
                 Snackbar.Add("No se pudieron cargar los datos de la persona.", Severity.Warning);
             }
 
@@ -168,15 +200,15 @@ public partial class OcupanteForm
         {
             var messageError = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(messageError!, Severity.Error);
-            return null; // Retorna null en caso de error
+            return null;
         }
 
         if (responseHttp.Response == null)
         {
             Snackbar.Add("No se encontraron los detalles de la persona.", Severity.Warning);
-            return null; // Retorna null si la API respondió vacío
+            return null;
         }
 
-        return responseHttp.Response; // Retorna la Persona encontrada con éxito
+        return responseHttp.Response;
     }
 }

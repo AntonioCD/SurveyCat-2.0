@@ -97,10 +97,18 @@
                     @if (!documentoGuardado)
                     {
                         <div class="d-flex justify-end gap-2 mt-4">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       OnClick="ReturnAction"
+                                       StartIcon="@Icons.Material.Filled.Cancel">
+                                Cancelar
+                            </MudButton>
+
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Primary"
                                        ButtonType="ButtonType.Submit"
-                                       Disabled="loading">
+                                       Disabled="loading"
+                                       StartIcon="@Icons.Material.Filled.Save">
                                 Guardar Documento
                             </MudButton>
                         </div>

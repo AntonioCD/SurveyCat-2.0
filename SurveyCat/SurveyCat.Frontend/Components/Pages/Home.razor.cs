@@ -7,6 +7,7 @@ namespace SurveyCat.Frontend.Components.Pages;
 
 public partial class Home
 {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IRepository Repository { get; set; } = default!;
 
     // Variable para almacenar la respuesta de la API
