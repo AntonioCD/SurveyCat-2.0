@@ -25,7 +25,7 @@
             <MudDivider Class="mt-3 mb-0" DividerType="DividerType.FullWidth" />
         </MudItem>
 
-       
+        <!-- ================= SECCIÓN 1: DATOS DE LA PERSONA ================= -->
         <MudItem xs="12">
             <MudCard Elevation="1" Class="rounded-lg border-solid border-2 mud-border-lines-default">
                 <MudCardHeader>
@@ -34,11 +34,11 @@
                         <MudText Typo="Typo.body2" Color="Color.Secondary">Información vinculada a la persona seleccionada.</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
-                        <MudButton Variant="Variant.Filled"
-                                    StartIcon="@Icons.Material.Filled.PersonSearch"
-                                    Color="Color.Info"
-                                    OnClick="@(() => ShowModalPersonaSearchAsync())"
-                                    Class="mt-2 mr-2">
+                        <MudButton Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.PersonSearch"
+                                   Color="Color.Info"
+                                   OnClick="@(() => ShowModalPersonaSearchAsync())"
+                                   Class="mt-2 mr-2">
                             Buscar Persona
                         </MudButton>
                     </CardHeaderActions>
@@ -46,48 +46,89 @@
 
                 <MudCardContent>
                     <MudGrid Spacing="2">
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Primer Nombre" Value="@persona?.PrimerNombre" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Segundo Nombre" Value="@persona?.SegundoNombre" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Primer Apellido" Value="@persona?.PrimerApellido" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Segundo Apellido" Value="@persona?.SegundoApellido" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
+                        @if (persona?.TipoPersona == TipoPersona.Natural)
+                        {
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Primer Nombre" Value="@(persona?.PrimerNombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Segundo Nombre" Value="@(persona?.SegundoNombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Primer Apellido" Value="@(persona?.PrimerApellido ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Segundo Apellido" Value="@(persona?.SegundoApellido ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
 
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Identificación" Value="@persona?.Identificacion" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Género" Value="@persona?.Genero" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudNumericField Label="Edad" Value="@persona?.Edad" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Estado Civil" Value="@(persona?.EstadoCivil?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Identificación" Value="@(persona?.Identificacion ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Género" Value="@persona?.Genero" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudNumericField Label="Edad" Value="@persona?.Edad" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Estado Civil" Value="@(persona?.EstadoCivil?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
 
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Profesión u Oficio" Value="@(persona?.Profesion?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Departamento" Value="@(persona?.Municipio?.Departamento?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Municipio" Value="@(persona?.Municipio?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
-                        <MudItem xs="12" sm="6" md="3">
-                            <MudTextField Label="Barrio / Comarca" Value="@(persona?.BarrioComarca?.Nombre ?? persona?.Caserio?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
-                        </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Profesión u Oficio" Value="@(persona?.Profesion?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Departamento" Value="@(persona?.Municipio?.Departamento?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Municipio" Value="@(persona?.Municipio?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Barrio / Comarca" Value="@(persona?.BarrioComarca?.Nombre ?? persona?.Caserio?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
 
-                        <MudItem xs="12">
-                            <MudTextField Label="Dirección Domiciliar" Value="@persona?.Direccion" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" Multiline="true" Rows="1" ShrinkLabel="true" />
-                        </MudItem>
+                            <MudItem xs="12">
+                                <MudTextField Label="Dirección Domiciliar" Value="@(persona?.Direccion ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" Multiline="true" Rows="1" ShrinkLabel="true" />
+                            </MudItem>
+                        }
+                        else if (persona?.TipoPersona == TipoPersona.Juridica)
+                        {
+                            <MudItem xs="12" sm="12" md="6">
+                                <MudTextField Label="Razón Social" Value="@(persona?.NombreCompleto ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Tipo Persona Jurídica" Value="@(persona?.TipoPersonaJuridica?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="3">
+                                <MudTextField Label="Identificación / RUC" Value="@(persona?.Identificacion ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudTextField Label="Departamento" Value="@(persona?.Municipio?.Departamento?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudTextField Label="Municipio" Value="@(persona?.Municipio?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudTextField Label="Barrio / Comarca" Value="@(persona?.BarrioComarca?.Nombre ?? persona?.Caserio?.Nombre ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" ShrinkLabel="true" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudTextField Label="Dirección Domiciliar" Value="@(persona?.Direccion ?? "-")" Variant="Variant.Filled" Margin="Margin.Dense" ReadOnly="true" Multiline="true" Rows="1" ShrinkLabel="true" />
+                            </MudItem>
+                        }
+                        else
+                        {
+                            <MudItem xs="12">
+                                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="my-2 pa-3">
+                                    <div class="d-flex align-center gap-2">
+                                        <MudText Typo="Typo.body2">
+                                            No se ha seleccionado ningún propietario. Utilice el buscador para seleccionar una <b>Persona Natural</b> o <b>Jurídica</b>.
+                                        </MudText>
+                                    </div>
+                                </MudAlert>
+                            </MudItem>
+                        }
                     </MudGrid>
                 </MudCardContent>
             </MudCard>
@@ -126,6 +167,7 @@
                         <MudItem xs="12" sm="6" Class="d-flex align-center">
                             <MudCheckBox Label="¿Presenta Documento Soporte?"
                                          @bind-Value="Propietario.PresentaDocumento"
+                                         @bind-Value:after="OnPresentaDocumentoChanged"
                                          Color="Color.Primary"
                                          For="@(() => Propietario.PresentaDocumento)" />
                         </MudItem>
@@ -139,7 +181,8 @@
                                              ValueChanged="DocumentoChanged"
                                              Variant="Variant.Outlined"
                                              Margin="Margin.Dense"
-                                             ToStringFunc="@(e => e?.Nombre)" />
+                                             ToStringFunc="@(e => e?.Nombre)"
+                                             Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="6">
@@ -149,7 +192,8 @@
                                           Immediate="true"
                                           For="@(() => Propietario.AutorDocumento)"
                                           Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                                          Margin="Margin.Dense"
+                                          Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="4">
@@ -158,7 +202,8 @@
                                            For="@(() => Propietario.FechaDocumento)"
                                            Variant="Variant.Outlined"
                                            Margin="Margin.Dense"
-                                           Editable="true" />
+                                           Editable="true"
+                                           Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="4">
@@ -167,7 +212,8 @@
                                              For="@(() => Propietario.AreaTitulada)"
                                              Variant="Variant.Outlined"
                                              Margin="Margin.Dense"
-                                             HideSpinButtons="true" />
+                                             HideSpinButtons="true"
+                                             Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="4">
@@ -179,7 +225,8 @@
                                              ValueChanged="UnidadMedidaChanged"
                                              Variant="Variant.Outlined"
                                              Margin="Margin.Dense"
-                                             ToStringFunc="@(e => e?.Nombre)" />
+                                             ToStringFunc="@(e => e?.Nombre)"
+                                             Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -206,7 +253,8 @@
                                           Immediate="true"
                                           For="@(() => Propietario.Finca)"
                                           Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                                          Margin="Margin.Dense"
+                                          Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="6" md="3">
@@ -216,7 +264,8 @@
                                           Immediate="true"
                                           For="@(() => Propietario.Tomo)"
                                           Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                                          Margin="Margin.Dense"
+                                          Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="6" md="3">
@@ -226,7 +275,8 @@
                                           Immediate="true"
                                           For="@(() => Propietario.Folio)"
                                           Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                                          Margin="Margin.Dense"
+                                          Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="6" md="3">
@@ -236,7 +286,8 @@
                                           Immediate="true"
                                           For="@(() => Propietario.Asiento)"
                                           Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                                          Margin="Margin.Dense"
+                                          Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="6">
@@ -245,7 +296,8 @@
                                            For="@(() => Propietario.FechaAdquisicion)"
                                            Variant="Variant.Outlined"
                                            Margin="Margin.Dense"
-                                           Editable="true" />
+                                           Editable="true"
+                                           Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
 
                         <MudItem xs="12" sm="6">
@@ -254,7 +306,8 @@
                                            For="@(() => Propietario.FechaRegistro)"
                                            Variant="Variant.Outlined"
                                            Margin="Margin.Dense"
-                                           Editable="true" />
+                                           Editable="true"
+                                           Disabled="!Propietario.PresentaDocumento" />
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -263,7 +316,7 @@
 
         <!-- ================= BOTONES DE ACCIÓN ================= -->
         <MudItem xs="12" Class="d-flex justify-end gap-3 my-2">
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ReturnAction" StartIcon="@Icons.Material.Filled.Cancel">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction" StartIcon="@Icons.Material.Filled.Cancel">
                 Cancelar
             </MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" StartIcon="@Icons.Material.Filled.Save">

@@ -47,39 +47,50 @@
                 </div>
 
                 <div style="width: 280px;">
-                    <MudAutocomplete T="EncuestaAutorizada"
-                                     Label="CÓDIGO DE ENCUESTA"
-                                     Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un código --")"
-                                     SearchFunc="SearchEncuestaAutorizada"
-                                     Value="selectedEncuestaAutorizada"
-                                     ValueChanged="EncuestaAutorizadaChanged"
-                                     Variant="Variant.Outlined"
-                                     Margin="Margin.Dense"
-                                     Disabled="loading || Ficha.Id != 0"
-                                     Required="true"
-                                     RequiredError="Debe seleccionar un código de encuesta autorizada."
-                                     For="@(() => selectedEncuestaAutorizada)"
-                                     ResetValueOnEmptyText="true"
-                                     CoerceText="false"
-                                     CoerceValue="false"
-                                     ToStringFunc="@(e => e == null ? null : $"{e.CodEncuesta}")">
-                        <ItemTemplate Context="itemContext">
-                            <div class="d-flex flex-column">
-                                <MudText Typo="Typo.body1">
-                                    <strong>@itemContext.CodEncuesta</strong>
-                                </MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                    @itemContext.Municipio?.Nombre - @(itemContext.BarrioComarca?.Nombre ?? "SD")
-                                </MudText>
-                            </div>
-                        </ItemTemplate>
-                        <NoItemsTemplate>
-                            <MudText Typo="Typo.body2" Color="Color.Warning" Class="pa-2">
-                                <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
-                                No hay códigos disponibles
+                    @if (Ficha.Id != 0) 
+                    {
+                        <MudField Label="CÓDIGO DE ENCUESTA"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense">
+                            <MudText Typo="Typo.body1" Color="Color.Primary">
+                                <b>@Ficha.CodEncuesta</b>
                             </MudText>
-                        </NoItemsTemplate>
-                    </MudAutocomplete>
+                        </MudField>
+                    } else {
+                        <MudAutocomplete T="EncuestaAutorizada"
+                                         Label="CÓDIGO DE ENCUESTA"
+                                         Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un código --")"
+                                         SearchFunc="SearchEncuestaAutorizada"
+                                         Value="selectedEncuestaAutorizada"
+                                         ValueChanged="EncuestaAutorizadaChanged"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Disabled="loading || Ficha.Id != 0"
+                                         Required="true"
+                                         RequiredError="Debe seleccionar un código de encuesta autorizada."
+                                         For="@(() => selectedEncuestaAutorizada)"
+                                         ResetValueOnEmptyText="true"
+                                         CoerceText="false"
+                                         CoerceValue="false"
+                                         ToStringFunc="@(e => e == null ? null : $"{e.CodEncuesta}")">
+                            <ItemTemplate Context="itemContext">
+                                <div class="d-flex flex-column">
+                                    <MudText Typo="Typo.body1">
+                                        <strong>@itemContext.CodEncuesta</strong>
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        @itemContext.Municipio?.Nombre - @(itemContext.BarrioComarca?.Nombre ?? "SD")
+                                    </MudText>
+                                </div>
+                            </ItemTemplate>
+                            <NoItemsTemplate>
+                                <MudText Typo="Typo.body2" Color="Color.Warning" Class="pa-2">
+                                    <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                                    No hay códigos disponibles
+                                </MudText>
+                            </NoItemsTemplate>
+                        </MudAutocomplete>
+                    }
                 </div>
             </div>
             <MudDivider />
@@ -470,11 +481,11 @@
                                             </div>
                                         </CardHeaderContent>
                                         <CardHeaderActions>
-                                            <MudButton Variant="Variant.Filled"
+                                            <MudButton Variant="Variant.Outlined"
                                                        StartIcon="@Icons.Material.Filled.PersonSearch"
                                                        Color="Color.Info"
                                                        OnClick="@(() => ShowModalPersonaSearchAsync())"
-                                                       Size="Size.Small"
+                                                       Size="Size.Medium"
                                                        Class="mt-1">
                                                 @(Ficha.InformanteId == 0 ? "Buscar Persona" : "Cambiar Persona")
                                             </MudButton>
@@ -584,7 +595,7 @@
 
                             <!-- BOTONES DE ACCIÓN DEL TAB 1 -->
                             <MudItem xs="12" Class="d-flex justify-end gap-3 my-2">
-                                <MudButton Variant="Variant.Outlined"
+                                <MudButton Variant="Variant.Filled"
                                            Color="Color.Secondary"
                                            OnClick="ReturnAction"
                                            StartIcon="@Icons.Material.Filled.Cancel">
@@ -595,7 +606,7 @@
                                            ButtonType="ButtonType.Submit"
                                            Disabled="loading"
                                            StartIcon="@Icons.Material.Filled.Save">
-                                    Guardar Datos Ficha
+                                    Guardar Datos
                                 </MudButton>
                             </MudItem>
 

@@ -16,6 +16,7 @@ public class Persona
     private string? _primerApellido;
     private string? _segundoApellido;
     private string _nombreCompleto = null!;
+    private string? _direccion;
 
     public long Id { get; set; }
 
@@ -110,7 +111,11 @@ public class Persona
 
     [Display(Name = "Dirección")]
     [MaxLength(300, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres.")]
-    public string? Direccion { get; set; }
+    public string? Direccion
+    {
+        get => _direccion;
+        set => _direccion = value?.ToUpper();
+    }
 
     [Display(Name = "Tipo de Persona Jurídica")]
     public int? TipoPersonaJuridicaId { get; set; }

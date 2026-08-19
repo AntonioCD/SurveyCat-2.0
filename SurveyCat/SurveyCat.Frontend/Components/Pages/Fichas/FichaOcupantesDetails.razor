@@ -24,11 +24,12 @@ else
                 </div>
 
                 @* Encabezado de la Tabla de Arrastre *@
-                <div class="d-flex pa-3 mud-theme-dark mud-elevation-1 align-center" style="border-radius: 4px; font-weight: bold;">
-                    <div style="width: 8%; text-align: center;">N°</div>
-                    <div style="width: 22%;">Parentesco</div>
-                    <div style="width: 35%;">Nombre Completo</div>
-                    <div style="width: 25%;">Identificación</div>
+                <div class="d-flex pa-3 mud-elevation-1 align-center" style="border-radius: 4px; font-weight: bold; background-color:aliceblue">
+                    <div style="width: 4%; text-align: center;">N°</div>
+                    <div style="width: 32%;">Nombre Completo</div>
+                    <div style="width: 18%;">Tipo Ocupante</div>
+                    <div style="width: 18%;">Parentesco</div>
+                    <div style="width: 18%;">Identificación</div>
                     <div style="width: 10%; text-align: center;">Acciones</div>
                 </div>
 
@@ -56,8 +57,9 @@ else
                     <div style="width: 8%; text-align: center;">
                         <MudChip T="string" Color="Color.Info" Size="Size.Small" Variant="Variant.Text"><b>@context.Item</b></MudChip>
                     </div>
-                    <div style="width: 22%;">@context.Parentesco?.Nombre</div>
                     <div style="width: 35%;">@context.Persona?.NombreCompleto</div>
+                    <div style="width: 22%;">@context.TipoOcupante?.Nombre</div>
+                    <div style="width: 22%;">@context.Parentesco?.Nombre</div>
                     <div style="width: 25%;">@(string.IsNullOrWhiteSpace(context.Persona?.Identificacion) ? "---" : context.Persona.Identificacion)</div>
 
                     <div style="width: 10%; text-align: center;" @onclick:stopPropagation="true">

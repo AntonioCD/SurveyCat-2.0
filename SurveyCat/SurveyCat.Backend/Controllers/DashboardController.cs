@@ -68,6 +68,7 @@ public class DashboardController : ControllerBase
             .Take(5)
             .Select(f => new FichaRecienteDTO
             {
+                Id = f.Id,
                 Codigo = f.CodEncuesta,
                 Departamento = f.Municipio!.Nombre,
                 FechaEncuesta = f.FechaEncuesta,

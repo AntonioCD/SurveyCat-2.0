@@ -91,11 +91,17 @@ public partial class PersonalEncuestaForm
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
+            NoHeader = true,
             MaxWidth = MaxWidth.Large,
             FullWidth = true
         };
 
-        var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", options);
+        var parameters = new DialogParameters<PersonaSearch>
+        {
+            { x => x.SoloNaturales, true }
+        };
+
+        var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", parameters, options);
         var result = await dialog.Result;
 
         // Verificamos si el usuario seleccionó un registro en el modal

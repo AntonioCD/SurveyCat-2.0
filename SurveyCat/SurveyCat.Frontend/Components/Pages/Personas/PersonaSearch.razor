@@ -25,7 +25,7 @@
 
             <HeaderContent>
                 <MudTh>Identificación</MudTh>
-                <MudTh Style="width: 70%;">Nombre Completo | RUC</MudTh>
+                <MudTh Style="width: 70%;">@(SoloNaturales ? "Nombre Completo" : "Nombre Completo o RUC")</MudTh>
                 <MudTh Style="width: 10%; text-align: center;">Acción</MudTh>
             </HeaderContent>
 
@@ -41,6 +41,18 @@
                                        Size="Size.Small"
                                        OnClick="@(() => SeleccionarPersona(persona))" />
                     </MudTooltip>
+                    <AuthorizeView Roles="Administrador">
+                    <Authorized>
+                        <MudTooltip Text="Editar Persona">
+                            @* Cambiamos el botón para que ejecute la selección *@
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Warning"
+                                           Size="Size.Small"
+                                           OnClick="@(() => ShowModalAsync(persona.Id, true))" />
+                        </MudTooltip>
+                    </Authorized>
+                    </AuthorizeView>
                 </MudTd>
             </RowTemplate>
 

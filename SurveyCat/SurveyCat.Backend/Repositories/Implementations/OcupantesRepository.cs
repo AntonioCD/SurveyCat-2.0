@@ -21,6 +21,7 @@ public class OcupantesRepository : GenericRepository<Ocupante>, IOcupantesReposi
         var queryable = _context.Ocupantes
             .Include(f => f.Persona!)
             .ThenInclude(f => f.TipoIdentificacion)
+            .Include(f => f.TipoOcupante)
             .Include(f => f.Parentesco)
             .Where(f => f.FichaId == pagination.Id)
             .AsQueryable();
@@ -65,6 +66,7 @@ public class OcupantesRepository : GenericRepository<Ocupante>, IOcupantesReposi
         var ocupante = await _context.Ocupantes
             .Include(p => p.Persona)
             .Include(p => p.Ficha)
+            .Include(p => p.TipoOcupante)
             .Include(p => p.Parentesco)
             .FirstOrDefaultAsync(m => m.Id == id);
 

@@ -8,6 +8,7 @@ namespace SurveyCat.Shared.DTOs;
 
 public class FichaRecienteDTO
 {
+    public long Id { get; set; }
     public string Codigo { get; set; } = null!;
     public string Departamento { get; set; } = null!;
     public DateTime FechaEncuesta { get; set; }

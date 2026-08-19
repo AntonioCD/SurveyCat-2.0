@@ -74,16 +74,37 @@ public partial class PropietarioForm
         }
     }
 
-    private void UnidadMedidaChanged(Diccionario unidadMedida)
+    private void OnPresentaDocumentoChanged()
     {
-        selectedUnidadMedida = unidadMedida;
-        Propietario.UnidadMedidaId = unidadMedida.Id;
+        if (!Propietario.PresentaDocumento)
+        {
+            selectedDocumento = null;
+            Propietario.DocumentoId = null;
+            Propietario.AutorDocumento = null;
+            Propietario.FechaDocumento = null;
+            Propietario.AreaTitulada = null;
+            selectedUnidadMedida = null;
+            Propietario.UnidadMedidaId = null;
+
+            Propietario.Finca = null;
+            Propietario.Tomo = null;
+            Propietario.Folio = null;
+            Propietario.Asiento = null;
+            Propietario.FechaAdquisicion = null;
+            Propietario.FechaRegistro = null;
+        }
     }
 
-    private void DocumentoChanged(Diccionario documento)
+    private void UnidadMedidaChanged(Diccionario? unidadMedida)
+    {
+        selectedUnidadMedida = unidadMedida;
+        Propietario.UnidadMedidaId = unidadMedida?.Id;
+    }
+
+    private void DocumentoChanged(Diccionario? documento)
     {
         selectedDocumento = documento;
-        Propietario.DocumentoId = documento.Id;
+        Propietario.DocumentoId = documento?.Id;
     }
 
     private async Task<IEnumerable<Diccionario>> SearchUnidadMedida(string searchText, CancellationToken token)
@@ -118,6 +139,7 @@ public partial class PropietarioForm
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
+            NoHeader = true,
             MaxWidth = MaxWidth.Large,
             FullWidth = true
         };
@@ -138,14 +160,10 @@ public partial class PropietarioForm
                 persona = personaResult;
                 Propietario.PersonaId = persona.Id;
 
-                // Si necesitas refrescar cascadas asociadas al informante (municipios, depto, etc.), este es el lugar:
-                // await CargarCascadasDelInformanteAsync(informante);
-
                 Snackbar.Add("Datos de la persona cargados con éxito.", Severity.Success);
             }
             else
             {
-                // Opcional: Lógica en caso de que no se haya podido recuperar la data completa
                 Snackbar.Add("No se pudieron cargar los datos de la persona.", Severity.Warning);
             }
 
@@ -161,15 +179,15 @@ public partial class PropietarioForm
         {
             var messageError = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(messageError!, Severity.Error);
-            return null; // Retorna null en caso de error
+            return null;
         }
 
         if (responseHttp.Response == null)
         {
             Snackbar.Add("No se encontraron los detalles de la persona.", Severity.Warning);
-            return null; // Retorna null si la API respondió vacío
+            return null;
         }
 
-        return responseHttp.Response; // Retorna la Persona encontrada con éxito
+        return responseHttp.Response;
     }
 }

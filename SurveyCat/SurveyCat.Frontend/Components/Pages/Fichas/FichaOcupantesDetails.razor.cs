@@ -117,6 +117,8 @@ public partial class FichaOcupantesDetails
             Item = index + 1,
             PersonaId = f.PersonaId,
             Persona = f.Persona,
+            TipoOcupanteId = f.TipoOcupanteId,
+            TipoOcupante = f.TipoOcupante,
             ParentescoId = f.ParentescoId,
             Parentesco = f.Parentesco
         }).ToList();

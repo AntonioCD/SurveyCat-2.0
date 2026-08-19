@@ -8,9 +8,9 @@ namespace SurveyCat.Backend.UnitsOfWork.Interfaces
     {
         Task<IEnumerable<Persona>> GetComboAsync();
 
-        Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PaginationDTO pagination);
+        Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PersonasPaginationDTO pagination);
 
-        Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination);
+        Task<ActionResponse<int>> GetTotalRecordsAsync(PersonasPaginationDTO pagination);
 
         Task<ActionResponse<Persona>> GetAsync(long id);
     }

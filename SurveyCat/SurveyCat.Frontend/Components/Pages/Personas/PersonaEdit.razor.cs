@@ -10,6 +10,8 @@ public partial class PersonaEdit
 {
     private Persona? persona;
 
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
+
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
@@ -57,12 +59,19 @@ public partial class PersonaEdit
             return;
         }
 
-        Return();
-        Snackbar.Add("Registro guardado.", Severity.Success);
+        //Return();
+        Snackbar.Add("Registro guardado", Severity.Success);
+
+        MudDialog.Close(DialogResult.Ok(true));
     }
+
+    //private void Return()
+    //{
+    //    //NavigationManager.NavigateTo($"/personas");
+    //}
 
     private void Return()
     {
-        NavigationManager.NavigateTo($"/personas");
+        MudDialog.Cancel();
     }
 }

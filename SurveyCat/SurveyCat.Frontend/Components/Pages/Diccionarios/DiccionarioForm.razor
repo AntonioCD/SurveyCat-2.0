@@ -1,71 +1,108 @@
 ﻿<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
+    <ValidationSummary />
 
-    <MudItem xs="12" Class="mb-2">
-        @* d-flex y justify-space-between empujan el título a la izquierda y el input a la derecha *@
-        <div class="d-flex align-center justify-space-between gap-3 pl-1">
-
-            @* BLOQUE IZQUIERDO: Icono + Título y Subtítulo *@
-            <div class="d-flex align-center gap-3">
-                <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
-                <div class="d-flex flex-column">
-                    <MudText Typo="Typo.h5" Color="Color.Primary">
-                        <b>@(Diccionario?.Id != 0 ? "Editar Diccionario" : "Nuevo Diccionario")</b>
-                    </MudText>
-                    <MudText Typo="Typo.caption" Color="Color.Secondary">
-                        Complete los datos requeridos para registrar/editar un Diccionario.
-                    </MudText>
+    <MudGrid>
+        @* HEADER BAR *@
+        <MudItem xs="12">
+            <div class="d-flex align-center justify-space-between pa-2">
+                <div class="d-flex align-center gap-3">
+                    @* <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                                   Color="Color.Secondary"
+                                   OnClick="ReturnAction"
+                                   Title="Regresar"
+                                   Size="Size.Large" /> *@
+                    <MudIcon Icon="@Icons.Material.Filled.Book" Color="Color.Primary" Size="Size.Large" />
+                    <div class="d-flex flex-column">
+                        <MudText Typo="Typo.h5" Color="Color.Primary">
+                            <b>@(Diccionario?.Id != 0 ? "Editar Diccionario" : "Nuevo Diccionario")</b>
+                        </MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Complete los datos requeridos para registrar o editar un diccionario.
+                        </MudText>
+                    </div>
                 </div>
             </div>
-        </div>
-        <MudDivider Class="mt-3 mb-2" DividerType="DividerType.FullWidth" />
-    </MudItem>
-
-    <MudItem xs="12" >
-        <MudTextField Label="Catálogo"
-                      @bind-Value="@Diccionario.Catalogo"
-                      For="@(() => Diccionario.Catalogo)"
-                      Required="true"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense" />
-    </MudItem>
-    <MudItem xs="12" Class="d-flex justify-center">
-        <MudTextField Label="Nombre"
-                      @bind-Value="@Diccionario.Nombre"
-                      For="@(() => Diccionario.Nombre)"
-                      Required="true"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense" />
-    </MudItem>
-
-    <MudTextField Label="Descripción"
-                  @bind-Value="@Diccionario.Descripcion"
-                  For="@(() => Diccionario.Descripcion)"
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense" />
-
-    <MudGrid Class="align-center mb-4">
-        <MudItem xs="12" sm="6">
-            <MudTextField Label="Código"
-                          @bind-Value="@Diccionario.Codigo"
-                          For="@(() => Diccionario.Codigo)"
-                          Variant="Variant.Outlined"
-                          Margin="Margin.Dense"
-                          Class="mb-4" />
+            <MudDivider Class="mt-1 mb-3" />
         </MudItem>
-        <MudItem xs="12" sm="6" Class="d-flex justify-center">
-            <MudSwitch @bind-Value="@Diccionario.Activo"
-                       Label="@(Diccionario.Activo ? "Activo" : "Inactivo")"
-                       Color="Color.Primary"
-                       ThumbIcon="@(Diccionario.Activo? @Icons.Material.Filled.ToggleOn : @Icons.Material.Filled.ToggleOff)"
-                       Class="mb-4" />
+
+        @* SECCIÓN PRINCIPAL: DATOS DEL DICCIONARIO *@
+        <MudItem xs="12">
+            <MudCard Elevation="2" Class="mb-4">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" />
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6"><b>Información General</b></MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+
+                <MudCardContent>
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Label="Catálogo"
+                                          @bind-Value="@Diccionario.Catalogo"
+                                          For="@(() => Diccionario.Catalogo)"
+                                          Required="true"
+                                          RequiredError="El catálogo es requerido."
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Label="Nombre"
+                                          @bind-Value="@Diccionario.Nombre"
+                                          For="@(() => Diccionario.Nombre)"
+                                          Required="true"
+                                          RequiredError="El nombre es requerido."
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Label="Código"
+                                          @bind-Value="@Diccionario.Codigo"
+                                          For="@(() => Diccionario.Codigo)"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6" Class="d-flex align-center">
+                            <MudSwitch @bind-Value="@Diccionario.Activo"
+                                       Label="@(Diccionario.Activo ? "Activo" : "Inactivo")"
+                                       Color="Color.Primary"
+                                       ThumbIcon="@(Diccionario.Activo? Icons.Material.Filled.ToggleOn : Icons.Material.Filled.ToggleOff)" />
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudTextField Label="Descripción"
+                                          @bind-Value="@Diccionario.Descripcion"
+                                          For="@(() => Diccionario.Descripcion)"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Lines="2" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+
+                <MudCardActions Class="d-flex justify-end gap-2 pa-4">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Secondary"
+                               OnClick="ReturnAction"
+                               StartIcon="@Icons.Material.Filled.Cancel">
+                        Cancelar
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               ButtonType="ButtonType.Submit"
+                               StartIcon="@Icons.Material.Filled.Save">
+                        Guardar
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
         </MudItem>
     </MudGrid>
-
-    <div class="d-flex justify-end gap-2">
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
-    </div>
 </EditForm>
-
 

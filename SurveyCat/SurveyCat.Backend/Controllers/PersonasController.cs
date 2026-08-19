@@ -27,8 +27,8 @@ public class PersonasController : GenericController<Persona>
         return Ok(await _personasUnitOfWork.GetComboAsync());
     }
 
-    [HttpGet("paginated")]
-    public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
+    [HttpGet("paginatedPersonas")]
+    public async Task<IActionResult> GetAsync([FromQuery] PersonasPaginationDTO pagination)
     {
         var response = await _personasUnitOfWork.GetAsync(pagination);
         if (response.WasSuccess)
@@ -38,8 +38,8 @@ public class PersonasController : GenericController<Persona>
         return BadRequest();
     }
 
-    [HttpGet("totalRecords")]
-    public override async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PaginationDTO pagination)
+    [HttpGet("totalRecordsPersonas")]
+    public async Task<IActionResult> GetTotalRecordsAsync([FromQuery] PersonasPaginationDTO pagination)
     {
         var action = await _personasUnitOfWork.GetTotalRecordsAsync(pagination);
         if (action.WasSuccess)

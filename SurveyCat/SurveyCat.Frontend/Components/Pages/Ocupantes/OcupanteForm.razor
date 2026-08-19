@@ -50,7 +50,7 @@
                         <MudText Typo="Typo.body2" Color="Color.Secondary">Información vinculada al ocupante seleccionado.</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
-                        <MudButton Variant="Variant.Filled"
+                        <MudButton Variant="Variant.Outlined"
                                    StartIcon="@Icons.Material.Filled.PersonSearch"
                                    Color="Color.Info"
                                    OnClick="@(() => ShowModalPersonaSearchAsync())"
@@ -141,8 +141,8 @@
         </MudItem>
 
         <!-- BOTONES DE ACCIÓN DEL FORMULARIO -->
-        <MudItem xs="12" Class="d-flex justify-end gap-3 mt-4 mb-4">
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
+        <MudItem xs="12" Class="d-flex justify-end gap-3 mt-2 mb-2">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" StartIcon="@Icons.Material.Filled.Save">Guardar Ocupante</MudButton>
         </MudItem>
     </MudGrid>

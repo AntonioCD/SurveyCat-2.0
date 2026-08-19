@@ -25,7 +25,7 @@ public class PersonasRepository : GenericRepository<Persona>, IPersonasRepositor
             .ToListAsync();
     }
 
-    public override async Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PaginationDTO pagination)
+    public async Task<ActionResponse<IEnumerable<Persona>>> GetAsync(PersonasPaginationDTO pagination)
     {
         var queryable = _context.Personas
             .AsQueryable();
@@ -33,6 +33,11 @@ public class PersonasRepository : GenericRepository<Persona>, IPersonasRepositor
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
+        if (pagination.SoloNaturales)
+        {
+            queryable = queryable.Where(p => p.TipoPersona == TipoPersona.Natural);
         }
 
         return new ActionResponse<IEnumerable<Persona>>
@@ -45,7 +50,7 @@ public class PersonasRepository : GenericRepository<Persona>, IPersonasRepositor
         };
     }
 
-    public override async Task<ActionResponse<int>> GetTotalRecordsAsync(PaginationDTO pagination)
+    public async Task<ActionResponse<int>> GetTotalRecordsAsync(PersonasPaginationDTO pagination)
     {
         var queryable = _context.Personas
             .AsQueryable();
@@ -53,6 +58,11 @@ public class PersonasRepository : GenericRepository<Persona>, IPersonasRepositor
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
+        if (pagination.SoloNaturales)
+        {
+            queryable = queryable.Where(p => p.TipoPersona == TipoPersona.Natural);
         }
 
         double count = await queryable.CountAsync();

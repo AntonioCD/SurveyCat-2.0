@@ -78,6 +78,18 @@ public partial class ColindanteForm
         }
     }
 
+    private void PresentaConflictoChanged(bool value)
+    {
+        Colindante.PresentaConflicto = value;
+        if (!value)
+        {
+            selectedConflicto = null;
+            selectedViaGestion = null;
+            Colindante.ConflictoId = null;
+            Colindante.ViaGestionId = null;
+        }
+    }
+
     private void PuntoCardinalChanged(Diccionario puntoCardinal)
     {
         if (puntoCardinal != null)
@@ -89,20 +101,14 @@ public partial class ColindanteForm
 
     private void ConflictoChanged(Diccionario conflicto)
     {
-        if (conflicto != null)
-        {
-            selectedConflicto = conflicto;
-            Colindante.ConflictoId = conflicto!.Id;
-        }
+        selectedConflicto = conflicto;
+        Colindante.ConflictoId = conflicto?.Id;
     }
 
     private void ViaGestionChanged(Diccionario viaGestion)
     {
-        if (viaGestion != null)
-        {
-            selectedViaGestion = viaGestion;
-            Colindante.ViaGestionId = viaGestion!.Id;
-        }
+        selectedViaGestion = viaGestion;
+        Colindante.ViaGestionId = viaGestion?.Id;
     }
 
     private async Task<IEnumerable<Diccionario>> SearchPuntoCardinal(string searchText, CancellationToken token)
@@ -150,6 +156,7 @@ public partial class ColindanteForm
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
+            NoHeader = true,
             MaxWidth = MaxWidth.Large,
             FullWidth = true
         };
@@ -157,27 +164,18 @@ public partial class ColindanteForm
         var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", options);
         var result = await dialog.Result;
 
-        // Verificamos si el usuario seleccionó un registro en el modal
         if (!result.Canceled && result.Data is Persona personaSeleccionada)
         {
-            // 1. LLAMADO ASÍNCRONO: Esperamos a que la API traiga los detalles completos
             var personaResult = await GetPersonaDetails(personaSeleccionada.Id);
 
-            // 2. VALIDACIÓN: Evaluamos si devolvió a la persona o si falló (null)
             if (personaResult != null)
             {
-                // Asignamos el resultado a la variable que maneja tu formulario
                 persona = personaResult;
                 Colindante.PersonaId = persona.Id;
-
-                // Si necesitas refrescar cascadas asociadas al informante (municipios, depto, etc.), este es el lugar:
-                // await CargarCascadasDelInformanteAsync(informante);
-
                 Snackbar.Add("Datos de la persona cargados con éxito.", Severity.Success);
             }
             else
             {
-                // Opcional: Lógica en caso de que no se haya podido recuperar la data completa
                 Snackbar.Add("No se pudieron cargar los datos de la persona.", Severity.Warning);
             }
 
@@ -193,15 +191,15 @@ public partial class ColindanteForm
         {
             var messageError = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(messageError!, Severity.Error);
-            return null; // Retorna null en caso de error
+            return null;
         }
 
         if (responseHttp.Response == null)
         {
             Snackbar.Add("No se encontraron los detalles de la persona.", Severity.Warning);
-            return null; // Retorna null si la API respondió vacío
+            return null;
         }
 
-        return responseHttp.Response; // Retorna la Persona encontrada con éxito
+        return responseHttp.Response;
     }
 }

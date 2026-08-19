@@ -34,10 +34,9 @@ else
             <MudTd DataLabel="Barrios/Comarcas">
                 <MudTooltip Text="Ver Barrios/Comarcas">
                     <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
                                Size="Size.Medium"
                                OnClick="@(() => StatesAction(@context))"
-                               Style="width: 70px; min-width: 70px;"
+                               Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
 
                         <span>@context.BarriosComarcasNumber</span>
@@ -51,10 +50,9 @@ else
             <MudTd DataLabel="Sectores">
                 <MudTooltip Text="Ver Sectores">
                     <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
                                Size="Size.Medium"
                                OnClick="@(() => SectoresAction(@context))"
-                               Style="width: 70px; min-width: 70px;"
+                               Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
 
                         <span>@context.SectoresNumber</span>

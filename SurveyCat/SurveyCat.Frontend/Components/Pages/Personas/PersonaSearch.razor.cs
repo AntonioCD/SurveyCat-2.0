@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SurveyCat.Frontend.Repositories;
+using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
 
 namespace SurveyCat.Frontend.Components.Pages.Personas;
@@ -9,6 +10,8 @@ public partial class PersonaSearch
 {
     [CascadingParameter]
     public IMudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public bool SoloNaturales { get; set; }
 
     private List<Persona>? Personas { get; set; }
     private MudTable<Persona> tablePersonas = new();
@@ -39,50 +42,113 @@ public partial class PersonaSearch
         MudDialog.Cancel();
     }
 
+    //private async Task LoadTotalRecordsPersonasAsync()
+    //{
+    //    loading = true;
+    //    var url = $"api/personas/totalRecords";
+
+    //    if (!string.IsNullOrWhiteSpace(Filter))
+    //    {
+    //        url += $"?filter={Filter}";
+    //    }
+
+    //    var responseHttp = await Repository.GetAsync<int>(url);
+    //    if (responseHttp.Error)
+    //    {
+    //        var message = await responseHttp.GetErrorMessageAsync();
+    //        Snackbar.Add(message!, Severity.Error);
+    //        return;
+    //    }
+
+    //    personasTotalRecords = responseHttp.Response;
+    //    loading = false;
+    //}
+
+    //private async Task<TableData<Persona>> LoadListPersonasAsync(TableState state, CancellationToken cancellationToken)
+    //{
+    //    int page = state.Page + 1;
+    //    int pageSize = state.PageSize;
+    //    var url = $"api/personas/paginatedPersonas/?page={page}&recordsnumber={pageSize}";
+
+    //    if (!string.IsNullOrWhiteSpace(Filter))
+    //    {
+    //        url += $"&filter={Filter}";
+    //    }
+
+    //    var responseHttp = await Repository.GetAsync<List<Persona>>(url);
+    //    if (responseHttp.Error)
+    //    {
+    //        var message = await responseHttp.GetErrorMessageAsync();
+    //        Snackbar.Add(message!, Severity.Error);
+    //        return new TableData<Persona> { Items = [], TotalItems = 0 };
+    //    }
+    //    if (responseHttp.Response == null)
+    //    {
+    //        return new TableData<Persona> { Items = [], TotalItems = 0 };
+    //    }
+    //    return new TableData<Persona>
+    //    {
+    //        Items = responseHttp.Response,
+    //        TotalItems = personasTotalRecords
+    //    };
+    //}
+
     private async Task LoadTotalRecordsPersonasAsync()
     {
         loading = true;
-        var url = $"api/personas/totalRecords";
 
-        if (!string.IsNullOrWhiteSpace(Filter))
+        try
         {
-            url += $"?filter={Filter}";
-        }
+            var url = $"api/personas/totalRecordsPersonas?soloNaturales={SoloNaturales}";
 
-        var responseHttp = await Repository.GetAsync<int>(url);
-        if (responseHttp.Error)
+            if (!string.IsNullOrWhiteSpace(Filter))
+            {
+                url += $"&filter={Uri.EscapeDataString(Filter)}";
+            }
+
+            var responseHttp = await Repository.GetAsync<int>(url);
+
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add(message!, Severity.Error);
+                return;
+            }
+
+            personasTotalRecords = responseHttp.Response;
+        }
+        finally
         {
-            var message = await responseHttp.GetErrorMessageAsync();
-            Snackbar.Add(message!, Severity.Error);
-            return;
+            loading = false;
         }
-
-        personasTotalRecords = responseHttp.Response;
-        loading = false;
     }
 
     private async Task<TableData<Persona>> LoadListPersonasAsync(TableState state, CancellationToken cancellationToken)
     {
         int page = state.Page + 1;
         int pageSize = state.PageSize;
-        var url = $"api/personas/paginated/?page={page}&recordsnumber={pageSize}";
+
+        var url = $"api/personas/paginatedPersonas?page={page}&recordsNumber={pageSize}&soloNaturales={SoloNaturales}";
 
         if (!string.IsNullOrWhiteSpace(Filter))
         {
-            url += $"&filter={Filter}";
+            url += $"&filter={Uri.EscapeDataString(Filter)}";
         }
 
         var responseHttp = await Repository.GetAsync<List<Persona>>(url);
+
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
             Snackbar.Add(message!, Severity.Error);
             return new TableData<Persona> { Items = [], TotalItems = 0 };
         }
+
         if (responseHttp.Response == null)
         {
             return new TableData<Persona> { Items = [], TotalItems = 0 };
         }
+
         return new TableData<Persona>
         {
             Items = responseHttp.Response,
@@ -134,6 +200,7 @@ public partial class PersonaSearch
         {
             CloseOnEscapeKey = true,
             CloseButton = true,
+            NoHeader = true,
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
         };
