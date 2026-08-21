@@ -16,8 +16,8 @@ public partial class OcupanteForm
     private List<Diccionario> listaParentesco = new();
     private Persona? persona = new();
 
-    private Diccionario? selectedTipoOcupante = new();
-    private Diccionario? selectedParentesco = new();
+    private Diccionario? selectedTipoOcupante;
+    private Diccionario? selectedParentesco;
 
     // NUEVO: Constante y variable para el ID de "Familiar"
     private const string TIPO_FAMILIAR_NOMBRE = "Familiar";
@@ -62,6 +62,12 @@ public partial class OcupanteForm
                 persona = await GetPersonaDetails(Ocupante.PersonaId);
             }
         }
+        else
+        {
+            // Limpiar para nuevos registros
+            selectedTipoOcupante = null;
+            selectedParentesco = null;
+        }
     }
 
     private async Task LoadDiccionariosAsync()
@@ -92,37 +98,26 @@ public partial class OcupanteForm
     }
 
     // MODIFICADO: Limpiar Parentesco si no es Familiar
-    private void TipoOcupanteChanged(Diccionario tipoOcupante)
+    private void TipoOcupanteChanged(Diccionario? tipoOcupante)
     {
-        if (tipoOcupante != null)
-        {
-            selectedTipoOcupante = tipoOcupante;
-            Ocupante.TipoOcupanteId = tipoOcupante.Id;
+        selectedTipoOcupante = tipoOcupante;
+        Ocupante.TipoOcupanteId = tipoOcupante?.Id ?? 0;
 
-            // Si NO es Familiar, limpiar Parentesco
-            if (!ParentescoEsRequerido)
-            {
-                selectedParentesco = null;
-                Ocupante.ParentescoId = null;
-            }
-
-            editContext?.Validate();
-            StateHasChanged();
-        }
-    }
-
-    private void ParentescoChanged(Diccionario parentesco)
-    {
-        if (parentesco != null)
-        {
-            selectedParentesco = parentesco;
-            Ocupante.ParentescoId = parentesco.Id;
-        }
-        else
+        // Si NO es Familiar, limpiar Parentesco
+        if (!ParentescoEsRequerido)
         {
             selectedParentesco = null;
             Ocupante.ParentescoId = null;
         }
+
+        editContext?.Validate();
+        StateHasChanged();
+    }
+
+    private void ParentescoChanged(Diccionario? parentesco)
+    {
+        selectedParentesco = parentesco;
+        Ocupante.ParentescoId = parentesco?.Id;
 
         editContext?.Validate();
     }

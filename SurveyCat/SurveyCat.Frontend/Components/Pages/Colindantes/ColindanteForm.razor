@@ -159,7 +159,7 @@
             <MudAutocomplete T="Diccionario" Label="Punto Cardinal" Placeholder="-- Seleccione un Punto Cardinal --"
                              SearchFunc="SearchPuntoCardinal" Value="selectedPuntoCardinal" ValueChanged="PuntoCardinalChanged"
                              Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" RequiredError="El Punto Cardinal es requerido."
-                             For="@(() => selectedPuntoCardinal)" ResetValueOnEmptyText="true" CoerceText="false" CoerceValue="false"
+                             For="@(() => selectedPuntoCardinal)" ResetValueOnEmptyText="true" Clearable="true" CoerceText="false" CoerceValue="false"
                              ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
                 <ItemTemplate Context="itemContext">
                     @itemContext.Nombre
@@ -176,6 +176,7 @@
             <MudAutocomplete T="Diccionario" Label="Clase de Conflicto" Placeholder="-- Seleccione un Conflicto --"
                              SearchFunc="SearchConflicto" Value="selectedConflicto" ValueChanged="ConflictoChanged"
                              Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ResetValueOnEmptyText="true" Clearable="true"
                              Disabled="@(!Colindante.PresentaConflicto)"
                              ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
                 <ItemTemplate Context="itemContext">
@@ -188,6 +189,7 @@
             <MudAutocomplete T="Diccionario" Label="Gestión del Conflicto" Placeholder="-- Seleccione una Vía de Gestión --"
                              SearchFunc="SearchViaGestion" Value="selectedViaGestion" ValueChanged="ViaGestionChanged"
                              Variant="Variant.Outlined" Margin="Margin.Dense"
+                             ResetValueOnEmptyText="true" Clearable="true"
                              Disabled="@(!Colindante.PresentaConflicto)"
                              ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
                 <ItemTemplate Context="itemContext">

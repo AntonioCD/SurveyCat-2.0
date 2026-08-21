@@ -59,6 +59,8 @@
                                              ValueChanged="DocumentoChanged"
                                              Variant="Variant.Outlined"
                                              Margin="Margin.Dense"
+                                             ResetValueOnEmptyText="true"
+                                             Clearable="true"
                                              Disabled="@(loading || documentoGuardado)"
                                              Required="true"
                                              RequiredError="El tipo de documento es requerido."

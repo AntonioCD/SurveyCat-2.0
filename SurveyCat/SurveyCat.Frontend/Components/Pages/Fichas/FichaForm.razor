@@ -205,6 +205,8 @@
                                                                  Required="true"
                                                                  RequiredError="El Encuestador es requerido."
                                                                  For="@(() => selectedEncuestador)"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  ToStringFunc="@(e => e?.Persona?.NombreCompleto)" />
                                             </MudItem>
 
@@ -221,6 +223,8 @@
                                                                  Required="true"
                                                                  RequiredError="El Técnico es requerido."
                                                                  For="@(() => selectedTecnicoCatastral)"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  ToStringFunc="@(e => e?.Persona?.NombreCompleto)" />
                                             </MudItem>
 
@@ -237,6 +241,8 @@
                                                                  Required="true"
                                                                  RequiredError="El Jefe de Campo es requerido."
                                                                  For="@(() => selectedSupervisor)"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  ToStringFunc="@(e => e?.Persona?.NombreCompleto)" />
                                             </MudItem>
                                         </MudGrid>
@@ -326,6 +332,8 @@
                                                                  SearchFunc="SearchUnidadMedida"
                                                                  Value="selectedUnidadMedida"
                                                                  ValueChanged="UnidadMedidaChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading"
@@ -339,6 +347,8 @@
                                                                  SearchFunc="SearchOrigenTierra"
                                                                  Value="selectedOrigenTierra"
                                                                  ValueChanged="OrigenTierraChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading"
@@ -373,6 +383,8 @@
                                                                  SearchFunc="SearchCaserio"
                                                                  Value="selectedCaserio"
                                                                  ValueChanged="CaserioChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading"
@@ -404,6 +416,8 @@
                                             <MudItem xs="12">
                                                 <MudTextField Label="Dirección Exacta"
                                                               @bind-Value="Ficha.Direccion"
+                                                              @bind-Value:after="() => Ficha.Direccion = Ficha.Direccion?.ToUpper()"
+                                                              Immediate="true"
                                                               Variant="Variant.Outlined"
                                                               Margin="Margin.Dense"
                                                               Disabled="loading" />
@@ -432,6 +446,8 @@
                                                                  SearchFunc="SearchServidumbreAgua"
                                                                  Value="selectedServidumbreAgua"
                                                                  ValueChanged="ServidumbreAguaChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading || !Ficha.Servidumbre"
@@ -445,6 +461,8 @@
                                                                  SearchFunc="SearchServidumbrePase"
                                                                  Value="selectedServidumbrePase"
                                                                  ValueChanged="ServidumbrePaseChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading || !Ficha.Servidumbre"
@@ -458,6 +476,8 @@
                                                                  SearchFunc="SearchServidumbreOtra"
                                                                  Value="selectedServidumbreOtra"
                                                                  ValueChanged="ServidumbreOtraChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading || !Ficha.Servidumbre"
@@ -570,6 +590,8 @@
                                                                  SearchFunc="SearchRelacionInformanteParcela"
                                                                  Value="selectedRelacionInformanteParcela"
                                                                  ValueChanged="RelacionInformanteParcelaChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading"
@@ -583,6 +605,8 @@
                                                                  SearchFunc="SearchRelacionInformantePropietario"
                                                                  Value="selectedRelacionInformantePropietario"
                                                                  ValueChanged="RelacionInformantePropietarioChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
                                                                  Variant="Variant.Outlined"
                                                                  Margin="Margin.Dense"
                                                                  Disabled="loading"

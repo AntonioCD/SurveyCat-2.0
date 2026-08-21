@@ -118,7 +118,7 @@
             <MudAutocomplete T="Diccionario" Label="Tipo de Ocupante" Placeholder="-- Seleccione un Tipo --"
                              SearchFunc="SearchTipoOcupante" Value="selectedTipoOcupante" ValueChanged="TipoOcupanteChanged"
                              Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" RequiredError="El Tipo es requerido."
-                             For="@(() => selectedTipoOcupante)" ResetValueOnEmptyText="true" CoerceText="false" CoerceValue="false"
+                             For="@(() => selectedTipoOcupante)" ResetValueOnEmptyText="true" Clearable="true" CoerceText="false" CoerceValue="false"
                              ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
                 <ItemTemplate Context="itemContext">
                     @itemContext.Nombre
@@ -131,7 +131,7 @@
                              SearchFunc="SearchParentesco" Value="selectedParentesco" ValueChanged="ParentescoChanged"
                              Variant="Variant.Outlined" Margin="Margin.Dense" Required="ParentescoEsRequerido"
                              RequiredError="El Parentesco es requerido cuando el Tipo es Familiar."
-                             For="@(() => selectedParentesco)" ResetValueOnEmptyText="true" CoerceText="false" CoerceValue="false"
+                             For="@(() => selectedParentesco)" ResetValueOnEmptyText="true" Clearable="true" CoerceText="false" CoerceValue="false"
                              Disabled="@(!ParentescoHabilitado)" HelperText="@(ParentescoHabilitado ? "Seleccione el parentesco del familiar" : "Solo aplica para familiares")"
                              HelperTextOnFocus="true" ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
                 <ItemTemplate Context="itemContext">

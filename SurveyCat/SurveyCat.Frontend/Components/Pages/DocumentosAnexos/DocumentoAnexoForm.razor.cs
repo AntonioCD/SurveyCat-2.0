@@ -17,7 +17,7 @@ public partial class DocumentoAnexoForm
     private List<Diccionario>? diccionarios;
     private List<Diccionario> listaDocumentos = new();
 
-    private Diccionario? selectedDocumento = new();
+    private Diccionario? selectedDocumento;
 
     // Estados para el flujo unificado
     private bool documentoGuardado = false;
@@ -70,11 +70,15 @@ public partial class DocumentoAnexoForm
             if (DocumentoAnexo.Id != 0)
             {
                 selectedDocumento = listaDocumentos
-                    .Where(x => x.Id == DocumentoAnexo.DocumentoId)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => x.Id == DocumentoAnexo.DocumentoId);
 
                 documentoGuardado = true;
                 await CargarAdjuntosAsync();
+            }
+            else
+            {
+                // Limpiar la selección para nuevos registros
+                selectedDocumento = null;
             }
         }
         finally
@@ -123,14 +127,11 @@ public partial class DocumentoAnexoForm
 
     private void DocumentoChanged(Diccionario documento)
     {
-        if (documento != null)
-        {
-            selectedDocumento = documento;
-            DocumentoAnexo.DocumentoId = documento!.Id;
+        selectedDocumento = documento;
+        DocumentoAnexo.DocumentoId = documento?.Id ?? 0;
 
-            // Llenar automáticamente la descripción con el nombre del documento
-            //DocumentoAnexo.Descripcion = documento.Nombre;
-        }
+        // Si también usas la descripción automática:
+        // DocumentoAnexo.Descripcion = documento?.Nombre;
     }
 
     private async Task<IEnumerable<Diccionario>> SearchDocumento(string searchText, CancellationToken token)

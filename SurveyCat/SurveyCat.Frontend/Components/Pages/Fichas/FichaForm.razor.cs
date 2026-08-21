@@ -67,10 +67,30 @@ public partial class FichaForm
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
     [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        if (isInitialized)
-            return;
+        //if (isInitialized)
+        //    return;
+
+        //var uri = new Uri(NavigationManager.Uri);
+        //var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        //if (int.TryParse(query.Get("tab"), out int tabIndex))
+        //{
+        //    activeTabIndex = tabIndex;
+        //}
+
+        //if (Ficha == null)
+        //{
+        //    Ficha = new Ficha();
+        //}
+
+        //if (editContext == null || editContext.Model != Ficha)
+        //{
+        //    editContext = new EditContext(Ficha);
+        //}
+
+        //// Disparar carga asíncrona sin bloquear el render
+        //_ = LoadDataAsync();
 
         var uri = new Uri(NavigationManager.Uri);
         var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
@@ -89,8 +109,11 @@ public partial class FichaForm
             editContext = new EditContext(Ficha);
         }
 
-        // Disparar carga asíncrona sin bloquear el render
-        _ = LoadDataAsync();
+        // Cargar si es la primera vez o si el informante no se ha sincronizado correctamente
+        if (!isInitialized || (Ficha.Id != 0 && Ficha.InformanteId > 0 && (informante == null || informante.Id != Ficha.InformanteId)))
+        {
+            await LoadDataAsync();
+        }
     }
 
     private async Task LoadDataAsync()
@@ -125,10 +148,19 @@ public partial class FichaForm
                 selectedRelacionInformanteParcela = Ficha.RelacionInformanteParcela;
                 selectedRelacionInformantePropietario = Ficha.RelacionInformantePropietario;
 
-                if (Ficha.InformanteId > 0 && (informante == null || informante.Id != Ficha.InformanteId))
+                if (Ficha.Informante != null)
+                {
+                    informante = Ficha.Informante;
+                }
+                else if (Ficha.InformanteId > 0)
                 {
                     informante = await GetPersonaDetails(Ficha.InformanteId);
                 }
+
+                //if (Ficha.InformanteId > 0 && (informante == null || informante.Id != Ficha.InformanteId))
+                //{
+                //    informante = await GetPersonaDetails(Ficha.InformanteId);
+                //}
 
                 // Extraer consecutivo del código de encuesta
                 if (!string.IsNullOrWhiteSpace(Ficha.CodEncuesta) && Ficha.CodEncuesta.Length >= 4)
@@ -411,31 +443,30 @@ public partial class FichaForm
 
     private void EncuestadorChanged(PersonalEncuesta encuestador)
     {
-        if (encuestador == null) return;
+        //if (encuestador == null) return;
         selectedEncuestador = encuestador;
-        Ficha.EncuestadorId = encuestador.Id;
+        Ficha.EncuestadorId = encuestador?.Id ?? 0;
     }
 
     private void TecnicoCatastralChanged(PersonalEncuesta tecnicoCatastral)
     {
-        if (tecnicoCatastral == null) return;
+        //if (tecnicoCatastral == null) return;
         selectedTecnicoCatastral = tecnicoCatastral;
-        Ficha.TecnicoCatastralId = tecnicoCatastral.Id;
+        Ficha.TecnicoCatastralId = tecnicoCatastral?.Id ?? 0;
         //GenerarCodigoEncuesta();
     }
 
     private void SupervisorChanged(PersonalEncuesta supervisor)
     {
-        if (supervisor == null) return;
+        //if (supervisor == null) return;
         selectedSupervisor = supervisor;
-        Ficha.CoordinadorId = supervisor.Id;
+        Ficha.CoordinadorId = supervisor?.Id ?? 0;
     }
 
-    private void UnidadMedidaChanged(Diccionario unidadMedida)
+    private void UnidadMedidaChanged(Diccionario? unidadMedida)
     {
-        if (unidadMedida == null) return;
         selectedUnidadMedida = unidadMedida;
-        Ficha.UnidadMedidaId = unidadMedida.Id;
+        Ficha.UnidadMedidaId = unidadMedida?.Id;
     }
 
     private void EstadoChanged(Diccionario estado)
@@ -445,46 +476,40 @@ public partial class FichaForm
         Ficha.EstadoId = estado.Id;
     }
 
-    private void OrigenTierraChanged(Diccionario origenTierra)
+    private void OrigenTierraChanged(Diccionario? origenTierra)
     {
-        if (origenTierra == null) return;
         selectedOrigenTierra = origenTierra;
-        Ficha.OrigenTierraId = origenTierra.Id;
+        Ficha.OrigenTierraId = origenTierra?.Id;
     }
 
-    private void RelacionInformanteParcelaChanged(Diccionario relacionInformanteParcela)
+    private void RelacionInformanteParcelaChanged(Diccionario? relacionInformanteParcela)
     {
-        if (relacionInformanteParcela == null) return;
         selectedRelacionInformanteParcela = relacionInformanteParcela;
-        Ficha.RelacionInformanteParcelaId = relacionInformanteParcela.Id;
+        Ficha.RelacionInformanteParcelaId = relacionInformanteParcela?.Id;
     }
 
-    private void RelacionInformantePropietarioChanged(Diccionario relacionInformantePropietario)
+    private void RelacionInformantePropietarioChanged(Diccionario? relacionInformantePropietario)
     {
-        if (relacionInformantePropietario == null) return;
         selectedRelacionInformantePropietario = relacionInformantePropietario;
-        Ficha.RelacionInformantePropietarioId = relacionInformantePropietario.Id;
+        Ficha.RelacionInformantePropietarioId = relacionInformantePropietario?.Id;
     }
 
-    private void ServidumbreAguaChanged(Diccionario servidumbreAgua)
+    private void ServidumbreAguaChanged(Diccionario? servidumbreAgua)
     {
-        if (servidumbreAgua == null) return;
         selectedServidumbreAgua = servidumbreAgua;
-        Ficha.ServidumbreAguaId = servidumbreAgua.Id;
+        Ficha.ServidumbreAguaId = servidumbreAgua?.Id;
     }
 
-    private void ServidumbrePaseChanged(Diccionario servidumbrePase)
+    private void ServidumbrePaseChanged(Diccionario? servidumbrePase)
     {
-        if (servidumbrePase == null) return;
         selectedServidumbrePase = servidumbrePase;
-        Ficha.ServidumbrePaseId = servidumbrePase.Id;
+        Ficha.ServidumbrePaseId = servidumbrePase?.Id;
     }
 
-    private void ServidumbreOtraChanged(Diccionario servidumbreOtra)
+    private void ServidumbreOtraChanged(Diccionario? servidumbreOtra)
     {
-        if (servidumbreOtra == null) return;
         selectedServidumbreOtra = servidumbreOtra;
-        Ficha.ServidumbreOtraId = servidumbreOtra.Id;
+        Ficha.ServidumbreOtraId = servidumbreOtra?.Id;
     }
 
     private async Task DepartamentoChangedAsync(Departamento departamento)
@@ -565,13 +590,10 @@ public partial class FichaForm
         await LoadCaseriosAsync(barrioComarca.Id);
     }
 
-    private void CaserioChanged(Caserio caserio)
+    private void CaserioChanged(Caserio? caserio)
     {
-        if (caserio == null)
-            return;
-
         selectedCaserio = caserio;
-        Ficha.CaserioId = caserio.Id;
+        Ficha.CaserioId = caserio?.Id;
     }
 
     private async Task<IEnumerable<EncuestaAutorizada>> SearchEncuestaAutorizada(string searchText, CancellationToken token)

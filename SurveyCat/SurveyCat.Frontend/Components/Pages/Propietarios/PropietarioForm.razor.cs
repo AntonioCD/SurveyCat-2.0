@@ -16,8 +16,8 @@ public partial class PropietarioForm
     private List<Diccionario> listaDocumento = new();
     private Persona? persona = new();
 
-    private Diccionario? selectedUnidadMedida = new();
-    private Diccionario? selectedDocumento = new();
+    private Diccionario? selectedUnidadMedida;
+    private Diccionario? selectedDocumento;
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -34,7 +34,6 @@ public partial class PropietarioForm
             Propietario = new Propietario();
         }
 
-        // Recrear el EditContext si el modelo cambió
         if (editContext == null || editContext.Model != Propietario)
         {
             editContext = new EditContext(Propietario);
@@ -44,13 +43,19 @@ public partial class PropietarioForm
 
         if (Propietario.Id != 0)
         {
-            selectedUnidadMedida = listaUnidadMedida.Where(x => x.Id == Propietario.UnidadMedidaId).FirstOrDefault();
-            selectedDocumento = listaDocumento.Where(x => x.Id == Propietario.DocumentoId).FirstOrDefault();
+            selectedUnidadMedida = listaUnidadMedida.FirstOrDefault(x => x.Id == Propietario.UnidadMedidaId);
+            selectedDocumento = listaDocumento.FirstOrDefault(x => x.Id == Propietario.DocumentoId);
 
             if (persona == null || persona.Id != Propietario.PersonaId)
             {
                 persona = await GetPersonaDetails(Propietario.PersonaId);
             }
+        }
+        else
+        {
+            // Limpiar para nuevos registros
+            selectedUnidadMedida = null;
+            selectedDocumento = null;
         }
     }
 

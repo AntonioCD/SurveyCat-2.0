@@ -17,9 +17,9 @@ public partial class ColindanteForm
     private List<Diccionario> listaViasGestion = new();
     private Persona? persona = new();
 
-    private Diccionario? selectedPuntoCardinal = new();
-    private Diccionario? selectedConflicto = new();
-    private Diccionario? selectedViaGestion = new();
+    private Diccionario? selectedPuntoCardinal;
+    private Diccionario? selectedConflicto;
+    private Diccionario? selectedViaGestion;
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -36,7 +36,6 @@ public partial class ColindanteForm
             Colindante = new Colindante();
         }
 
-        // Recrear el EditContext si el modelo cambió
         if (editContext == null || editContext.Model != Colindante)
         {
             editContext = new EditContext(Colindante);
@@ -46,14 +45,21 @@ public partial class ColindanteForm
 
         if (Colindante.Id != 0)
         {
-            selectedPuntoCardinal = listaPuntosCardinales.Where(x => x.Id == Colindante.PuntoCardinalId).FirstOrDefault();
-            selectedConflicto = listaConflictos.Where(x => x.Id == Colindante.ConflictoId).FirstOrDefault();
-            selectedViaGestion = listaViasGestion.Where(x => x.Id == Colindante.ViaGestionId).FirstOrDefault();
+            selectedPuntoCardinal = listaPuntosCardinales.FirstOrDefault(x => x.Id == Colindante.PuntoCardinalId);
+            selectedConflicto = listaConflictos.FirstOrDefault(x => x.Id == Colindante.ConflictoId);
+            selectedViaGestion = listaViasGestion.FirstOrDefault(x => x.Id == Colindante.ViaGestionId);
 
             if (persona == null || persona.Id != Colindante.PersonaId)
             {
                 persona = await GetPersonaDetails(Colindante.PersonaId);
             }
+        }
+        else
+        {
+            // Limpiar para nuevos registros
+            selectedPuntoCardinal = null;
+            selectedConflicto = null;
+            selectedViaGestion = null;
         }
     }
 
@@ -90,22 +96,19 @@ public partial class ColindanteForm
         }
     }
 
-    private void PuntoCardinalChanged(Diccionario puntoCardinal)
+    private void PuntoCardinalChanged(Diccionario? puntoCardinal)
     {
-        if (puntoCardinal != null)
-        {
-            selectedPuntoCardinal = puntoCardinal;
-            Colindante.PuntoCardinalId = puntoCardinal!.Id;
-        }
+        selectedPuntoCardinal = puntoCardinal;
+        Colindante.PuntoCardinalId = puntoCardinal?.Id ?? 0;
     }
 
-    private void ConflictoChanged(Diccionario conflicto)
+    private void ConflictoChanged(Diccionario? conflicto)
     {
         selectedConflicto = conflicto;
         Colindante.ConflictoId = conflicto?.Id;
     }
 
-    private void ViaGestionChanged(Diccionario viaGestion)
+    private void ViaGestionChanged(Diccionario? viaGestion)
     {
         selectedViaGestion = viaGestion;
         Colindante.ViaGestionId = viaGestion?.Id;

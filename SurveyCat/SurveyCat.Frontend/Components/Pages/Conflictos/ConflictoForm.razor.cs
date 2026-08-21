@@ -16,8 +16,8 @@ public partial class ConflictoForm
     private List<Diccionario> listaConflictos = new();
     private List<Diccionario> listaViasGestion = new();
 
-    private Diccionario? selectedConflicto = new();
-    private Diccionario? selectedViaGestion = new();
+    private Diccionario? selectedConflicto;
+    private Diccionario? selectedViaGestion;
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -57,12 +57,16 @@ public partial class ConflictoForm
             if (Conflicto.Id != 0)
             {
                 selectedConflicto = listaConflictos
-                    .Where(x => x.Id == Conflicto.TipoConflictoId)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => x.Id == Conflicto.TipoConflictoId);
 
                 selectedViaGestion = listaViasGestion
-                    .Where(x => x.Id == Conflicto.ViaGestionId)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => x.Id == Conflicto.ViaGestionId);
+            }
+            else
+            {
+                // Limpiar selección para registros nuevos
+                selectedConflicto = null;
+                selectedViaGestion = null;
             }
         }
         finally
@@ -98,22 +102,16 @@ public partial class ConflictoForm
         }
     }
 
-    private void ConflictoChanged(Diccionario conflicto)
+    private void ConflictoChanged(Diccionario? conflicto)
     {
-        if (conflicto != null)
-        {
-            selectedConflicto = conflicto;
-            Conflicto.TipoConflictoId = conflicto!.Id;
-        }
+        selectedConflicto = conflicto;
+        Conflicto.TipoConflictoId = conflicto?.Id ?? 0;
     }
 
-    private void ViaGestionChanged(Diccionario viaGestion)
+    private void ViaGestionChanged(Diccionario? viaGestion)
     {
-        if (viaGestion != null)
-        {
-            selectedViaGestion = viaGestion;
-            Conflicto.ViaGestionId = viaGestion!.Id;
-        }
+        selectedViaGestion = viaGestion;
+        Conflicto.ViaGestionId = viaGestion?.Id ?? 0;
     }
 
     private async Task<IEnumerable<Diccionario>> SearchConflicto(string searchText, CancellationToken token)

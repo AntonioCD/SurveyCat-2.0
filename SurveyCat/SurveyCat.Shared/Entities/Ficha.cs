@@ -11,6 +11,8 @@ namespace SurveyCat.Shared.Entities;
 
 public class Ficha
 {
+    private string? _direccion;
+
     public long Id { get; set; }
 
     // =========================================
@@ -45,7 +47,11 @@ public class Ficha
 
     [Display(Name = "Dirección")]
     [MaxLength(300)]
-    public string? Direccion { get; set; }
+    public string? Direccion
+    {
+        get => _direccion;
+        set => _direccion = value?.ToUpper();
+    }
 
     [MaxLength(10)]
     public string? Manzana { get; set; }
