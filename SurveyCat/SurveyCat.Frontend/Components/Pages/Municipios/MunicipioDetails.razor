@@ -22,16 +22,16 @@ else
             <FilterComponent ApplyFilter="SetFilterValue" />
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>BarrioComarca</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh Style="width: 20%;">¿Barrio o Comarca?</MudTh>
             <MudTh Style="width: 20%;">Cod. SILEC</MudTh>
-            <MudTh Style="width: 20%;">Barrio/Comarca</MudTh>
             <MudTh Style="width: 20%;">Caserios</MudTh>
             <MudTh Style="width: 1%; white-space: nowrap; text-align: center;">Acciones</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="BarrioComarca">@context.Nombre</MudTd>
-            <MudTd DataLabel="Cod. SILEC">@context.CodBarrioComarca</MudTd>
             <MudTd DataLabel="Barrio/Comarca">@(!context.EsBarrio ? "Barrio" : "Comarca")</MudTd>
+            <MudTd DataLabel="Cod. SILEC">@context.CodBarrioComarca</MudTd>
             <MudTd DataLabel="Caserios">
                 @if(context.EsBarrio && context.CaseriosNumber >= 0)
                 {

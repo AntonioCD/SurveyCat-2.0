@@ -2,7 +2,7 @@
 @using SurveyCat.Shared.Entities
 @using System.ComponentModel.DataAnnotations
 
-<EditForm EditContext="editContext" OnValidSubmit="OnValidSubmit">
+<EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmitInternal">
     <DataAnnotationsValidator />
 
     @if (editContext?.GetValidationMessages().Any() == true)
@@ -98,11 +98,13 @@
 
         <!-- ================= PESTAÑAS ================= -->
         <MudItem xs="12">
-            <MudTabs Elevation="1"
+            <MudTabs Elevation="2"
                      Centered="true"
-                     Color="Color.Primary"
+                     Color="Color.Surface"
+                     IndicatorColor="Color.Primary"
+                     Slider="true"
                      @bind-ActivePanelIndex="activeTabIndex"
-                     Class="rounded-lg">
+                     Class="rounded-lg my-3">
 
                 <!-- TAB 1: DATOS DE LA FICHA -->
                 <MudTabPanel Text="Datos de la Ficha"
@@ -583,34 +585,46 @@
 
                                     <MudCardContent>
                                         <MudGrid Spacing="2">
+                                            <!-- CASILLA DE VERIFICACIÓN (Solo visible en creación de fichas) -->
+                                            @if (Ficha.Id == 0)
+                                            {
+                                                <MudItem xs="12">
+                                                    <MudCheckBox T="bool"
+                                                                    Label="¿El informante es también propietario del inmueble?"
+                                                                    @bind-Value="esInformantePropietario"
+                                                                    Color="Color.Primary"
+                                                                    Disabled="loading || Ficha.InformanteId == 0" />
+                                                </MudItem>
+                                            }
+
                                             <MudItem xs="12" sm="6">
                                                 <MudAutocomplete T="Diccionario"
-                                                                 Label="Relación con la Parcela"
-                                                                 Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
-                                                                 SearchFunc="SearchRelacionInformanteParcela"
-                                                                 Value="selectedRelacionInformanteParcela"
-                                                                 ValueChanged="RelacionInformanteParcelaChanged"
-                                                                 ResetValueOnEmptyText="true"
-                                                                 Clearable="true"
-                                                                 Variant="Variant.Outlined"
-                                                                 Margin="Margin.Dense"
-                                                                 Disabled="loading"
-                                                                 ToStringFunc="@(e => e?.Nombre)" />
+                                                                    Label="Relación con la Parcela"
+                                                                    Placeholder="@(Ficha.InformanteId == 0 ? "-- Seleccione primero un informante --" : (loading ? "-- Cargando... --" : "-- Seleccione --"))"
+                                                                    SearchFunc="SearchRelacionInformanteParcela"
+                                                                    Value="selectedRelacionInformanteParcela"
+                                                                    ValueChanged="RelacionInformanteParcelaChanged"
+                                                                    ResetValueOnEmptyText="true"
+                                                                    Clearable="true"
+                                                                    Variant="Variant.Outlined"
+                                                                    Margin="Margin.Dense"
+                                                                    Disabled="loading || Ficha.InformanteId == 0"
+                                                                    ToStringFunc="@(e => e?.Nombre)" />
                                             </MudItem>
 
                                             <MudItem xs="12" sm="6">
                                                 <MudAutocomplete T="Diccionario"
-                                                                 Label="Relación con el Propietario"
-                                                                 Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
-                                                                 SearchFunc="SearchRelacionInformantePropietario"
-                                                                 Value="selectedRelacionInformantePropietario"
-                                                                 ValueChanged="RelacionInformantePropietarioChanged"
-                                                                 ResetValueOnEmptyText="true"
-                                                                 Clearable="true"
-                                                                 Variant="Variant.Outlined"
-                                                                 Margin="Margin.Dense"
-                                                                 Disabled="loading"
-                                                                 ToStringFunc="@(e => e?.Nombre)" />
+                                                                    Label="Relación con el Propietario"
+                                                                    Placeholder="@(Ficha.InformanteId == 0 ? "-- Seleccione primero un informante --" : (loading ? "-- Cargando... --" : "-- Seleccione --"))"
+                                                                    SearchFunc="SearchRelacionInformantePropietario"
+                                                                    Value="selectedRelacionInformantePropietario"
+                                                                    ValueChanged="RelacionInformantePropietarioChanged"
+                                                                    ResetValueOnEmptyText="true"
+                                                                    Clearable="true"
+                                                                    Variant="Variant.Outlined"
+                                                                    Margin="Margin.Dense"
+                                                                    Disabled="loading || Ficha.InformanteId == 0"
+                                                                    ToStringFunc="@(e => e?.Nombre)" />
                                             </MudItem>
                                         </MudGrid>
                                     </MudCardContent>

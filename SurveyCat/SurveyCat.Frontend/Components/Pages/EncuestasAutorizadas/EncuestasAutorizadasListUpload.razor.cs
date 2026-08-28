@@ -436,15 +436,38 @@ public partial class EncuestasAutorizadasListUpload
 
     private async Task BarrioComarcaChangedAsync(BarrioComarca barrioComarca)
     {
-        if (barrioComarca == null) return;
-
-        selectedBarrioComarca = barrioComarca;
+        // 1. Limpiar siempre caserío y vista previa
         selectedCaserio = null;
         caserios = null;
         LimpiarVistaPrevia();
 
-        await LoadCaseriosAsync(barrioComarca.Id);
+        // 2. Si se deseleccionó o limpió el campo
+        if (barrioComarca == null)
+        {
+            selectedBarrioComarca = null;
+            return;
+        }
+
+        selectedBarrioComarca = barrioComarca;
+
+        // 3. Solo consultar caseríos si es Comarca (EsBarrio == false)
+        if (!barrioComarca.EsBarrio)
+        {
+            await LoadCaseriosAsync(barrioComarca.Id);
+        }
     }
+
+    //private async Task BarrioComarcaChangedAsync(BarrioComarca barrioComarca)
+    //{
+    //    if (barrioComarca == null) return;
+
+    //    selectedBarrioComarca = barrioComarca;
+    //    selectedCaserio = null;
+    //    caserios = null;
+    //    LimpiarVistaPrevia();
+
+    //    await LoadCaseriosAsync(barrioComarca.Id);
+    //}
 
     private void CaserioChanged(Caserio caserio)
     {

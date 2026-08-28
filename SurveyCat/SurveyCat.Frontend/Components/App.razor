@@ -60,6 +60,23 @@
             }, 50);
         }
     </script>
+    <script>
+        window.openFolderPicker = function (elementId) {
+            const input = document.getElementById(elementId);
+            if (input) {
+                input.value = '';
+                input.click();
+            }
+        };
+
+        window.getFolderRelativePath = function (elementId) {
+            const input = document.getElementById(elementId);
+            if (input && input.files && input.files.length > 0) {
+                return input.files[0].webkitRelativePath || "";
+            }
+            return "";
+        };
+    </script>
 </body>
 
 </html>

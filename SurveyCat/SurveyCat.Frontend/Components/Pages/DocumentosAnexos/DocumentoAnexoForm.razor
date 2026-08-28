@@ -7,16 +7,13 @@
     <ValidationSummary />
 
     <MudGrid>
-        @* HEADER BAR *@
+        @* BARRA DE ENCABEZADO *@
         <MudItem xs="12">
             <div class="d-flex align-center justify-space-between pa-2">
                 <div class="d-flex align-center gap-3">
-                    @* <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
-                                   Color="Color.Secondary"
-                                   OnClick="ReturnAction"
-                                   Title="Regresar"
-                                   Size="Size.Large" /> *@
-                    <MudIcon Icon="@Icons.Material.Filled.AttachFile" Color="Color.Primary" Size="Size.Large" />
+                    <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large">
+                        <MudIcon Icon="@Icons.Material.Filled.AttachFile" />
+                    </MudAvatar>
                     <div class="d-flex flex-column">
                         <MudText Typo="Typo.h5" Color="Color.Primary">
                             <b>@(DocumentoAnexo?.Id != 0 ? "Editar Documento Anexo" : "Nuevo Documento Anexo")</b>
@@ -26,19 +23,23 @@
                         </MudText>
                     </div>
                 </div>
+                @if (documentoGuardado)
+                {
+                    <MudChip T="string" Color="Color.Success" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Filled.CheckCircle">
+                        Documento Guardado
+                    </MudChip>
+                }
             </div>
             <MudDivider Class="mt-1 mb-3" />
         </MudItem>
 
         @* ================= SECCIÓN 1: DATOS DEL DOCUMENTO ANEXO ================= *@
         <MudItem xs="12">
-            <MudCard Elevation="2" Class="mb-4">
-                <MudCardHeader>
-                    <CardHeaderAvatar>
-                        <MudIcon Icon="@Icons.Material.Filled.Description" Color="Color.Primary" />
-                    </CardHeaderAvatar>
+            <MudCard Elevation="2" Class="mb-4 rounded-lg">
+                <MudCardHeader Class="pb-2">
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6" Color="Color.Primary"><b>Datos del Documento Anexo</b></MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Paso 1: Información básica del documento</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         @if (loading)
@@ -120,20 +121,18 @@
         @if (documentoGuardado)
         {
             <MudItem xs="12">
-                <MudCard Elevation="2" Class="mb-4">
-                    <MudCardHeader>
-                        <CardHeaderAvatar>
-                            <MudIcon Icon="@Icons.Material.Filled.Collections" Color="Color.Primary" />
-                        </CardHeaderAvatar>
+                <MudCard Elevation="2" Class="mb-4 rounded-lg">
+                    <MudCardHeader Class="pb-2">
                         <CardHeaderContent>
                             <MudText Typo="Typo.h6" Color="Color.Primary"><b>Adjuntos del Documento</b></MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Paso 2: Carga y administración de imágenes asociadas</MudText>
                         </CardHeaderContent>
                         <CardHeaderActions>
                             @if (!mostrandoFormularioAdjunto)
                             {
-                                <MudButton Variant="Variant.Outlined"
+                                <MudButton Variant="Variant.Filled"
                                            StartIcon="@Icons.Material.Filled.Add"
-                                           Color="Color.Info"
+                                           Color="Color.Primary"
                                            Size="Size.Medium"
                                            Class="mt-2 mr-2"
                                            OnClick="@(() => AbrirFormularioAdjunto())">
@@ -144,34 +143,65 @@
                     </MudCardHeader>
 
                     <MudCardContent>
-                        @* TARJETA INTERNA: FORMULARIO DE NUEVO ADJUNTO *@
                         @if (mostrandoFormularioAdjunto)
                         {
-                            <MudCard Outlined="true" Class="mb-4 border-left-4 border-info">
-                                <MudCardHeader>
+                            <MudCard Outlined="true" Class="mb-4 rounded-lg border-2" Style="border-color: var(--mud-palette-info);">
+                                <MudCardHeader Class="pb-2">
                                     <CardHeaderAvatar>
-                                        <MudIcon Icon="@Icons.Material.Filled.CloudUpload" Color="Color.Info" Size="Size.Small" />
+                                        <MudIcon Icon="@Icons.Material.Filled.CloudUpload" Color="Color.Info" Size="Size.Medium" />
                                     </CardHeaderAvatar>
                                     <CardHeaderContent>
-                                        <MudText Typo="Typo.subtitle2" Color="Color.Info"><b>Nuevo Adjunto</b></MudText>
+                                        <MudText Typo="Typo.subtitle1" Color="Color.Info"><b>Cargar Nuevo Archivo Adjunto</b></MudText>
                                     </CardHeaderContent>
                                 </MudCardHeader>
 
                                 <MudCardContent>
                                     <MudGrid>
                                         <MudItem xs="12">
-                                            <MudFileUpload T="IBrowserFile" OnFilesChanged="OnFilesChangedHandler">
-                                                <ActivatorContent>
-                                                    <MudButton Variant="Variant.Outlined"
-                                                               Color="@(string.IsNullOrEmpty(ArchivoOriginalName) ? Color.Primary : Color.Success)"
-                                                               StartIcon="@Icons.Material.Filled.AttachFile"
-                                                               Size="Size.Large"
-                                                               FullWidth="true"
-                                                               Style="height: 48px; border-style: dashed; border-width: 2px;">
-                                                        @(string.IsNullOrEmpty(ArchivoOriginalName) ? "SELECCIONAR ARCHIVO" : $"{ArchivoOriginalName}")
+                                            <InputFile id="fileFolderInput"
+                                                       OnChange="UploadFolderAsync"
+                                                       @attributes='new Dictionary<string, object> { { "webkitdirectory", "" } }'
+                                                       style="display: none;" />
+
+                                            @if (string.IsNullOrEmpty(CarpetaSeleccionada))
+                                            {
+                                                <MudButton Variant="Variant.Outlined"
+                                                           Color="Color.Primary"
+                                                           StartIcon="@Icons.Material.Filled.FolderOpen"
+                                                           Size="Size.Large"
+                                                           FullWidth="true"
+                                                           Style="height: 52px; border-style: dashed; border-width: 2px;"
+                                                           OnClick="AbrirSeleccionCarpeta">
+                                                    SELECCIONAR CARPETA DE ENCUESTA
+                                                </MudButton>
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex align-center justify-space-between mb-3 pa-3 rounded-lg border-dashed border-1 mud-border-success" Style="background-color: var(--mud-palette-background-grey);">
+                                                    <div class="d-flex align-center gap-2">
+                                                        <MudIcon Icon="@Icons.Material.Filled.Folder" Color="Color.Success" />
+                                                        <MudText Typo="Typo.body2">
+                                                            <b>Carpeta validada:</b> @CarpetaSeleccionada (@archivosEnCarpeta.Count archivos encontrados)
+                                                        </MudText>
+                                                    </div>
+                                                    <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small" OnClick="LimpiarSeleccionCarpeta">
+                                                        Cambiar Carpeta
                                                     </MudButton>
-                                                </ActivatorContent>
-                                            </MudFileUpload>
+                                                </div>
+
+                                                <MudSelect T="IBrowserFile"
+                                                           Label="Seleccionar Archivo de la Carpeta"
+                                                           Value="selectedFile"
+                                                           ValueChanged="OnFileSelectedFromFolder"
+                                                           Variant="Variant.Outlined"
+                                                           Margin="Margin.Dense"
+                                                           ToStringFunc="@(f => f?.Name)">
+                                                    @foreach (var file in archivosEnCarpeta)
+                                                    {
+                                                        <MudSelectItem Value="@file">@file.Name</MudSelectItem>
+                                                    }
+                                                </MudSelect>
+                                            }
                                         </MudItem>
 
                                         <MudItem xs="12" sm="4">
@@ -210,42 +240,51 @@
                             </MudCard>
                         }
 
-                        @* GRID DE TARJETAS PARA LOS ARCHIVOS ADJUNTOS *@
                         @if (adjuntos != null && adjuntos.Any())
                         {
-                            <MudGrid Spacing="2">
+                            <MudGrid Spacing="3">
                                 @foreach (var adjuntoRow in adjuntos)
                                 {
-                                    <MudItem xs="12" sm="6" md="3">
-                                        <MudPaper Outlined="true" Class="px-3 py-2 d-flex align-center justify-space-between gap-2" Style="border-radius: 6px;">
-                                            <div class="d-flex align-center gap-2 overflow-hidden">
-                                                <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text" Class="ma-0 pa-1">
-                                                    <b>Pág. @adjuntoRow.ItemPagina</b>
-                                                </MudChip>
-                                                <MudText Typo="Typo.body2" Class="text-truncate" Title="@adjuntoRow.NombreArchivo">
-                                                    @adjuntoRow.NombreArchivo
+                                    <MudItem xs="6" sm="4" md="3" lg="2">
+                                        <MudCard Elevation="1" Class="rounded-lg h-100 d-flex flex-column justify-space-between">
+                                            <MudCardContent Class="pa-2">
+                                                <div class="d-flex align-center gap-2 mb-2">
+                                                    <MudAvatar Color="Color.Info" Variant="Variant.Text" Size="Size.Small">
+                                                        <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Small" />
+                                                    </MudAvatar>
+                                                    <MudChip T="string" Color="Color.Primary" Size="Size.Small" Variant="Variant.Outlined" Class="ma-0 px-2">
+                                                        Pág. @adjuntoRow.ItemPagina
+                                                    </MudChip>
+                                                </div>
+                                                <MudText Typo="Typo.caption" Class="text-truncate d-block" Title="@adjuntoRow.NombreArchivo">
+                                                    <b>@adjuntoRow.NombreArchivo</b>
                                                 </MudText>
-                                            </div>
+                                            </MudCardContent>
 
-                                            <div class="d-flex align-center">
-                                                <MudIconButton Icon="@Icons.Material.Filled.Visibility"
-                                                               Color="Color.Info"
-                                                               Size="Size.Small"
-                                                               OnClick="@(() => VerDocumentoAsync(adjuntoRow))" />
-                                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                                               Color="Color.Error"
-                                                               Size="Size.Small"
-                                                               OnClick="@(() => EliminarAdjuntoAsync(adjuntoRow))" />
-                                            </div>
-                                        </MudPaper>
+                                            <MudCardActions Class="d-flex justify-end border-top pa-1 gap-1">
+                                                <MudTooltip Text="Visualizar adjunto">
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                                                   Color="Color.Info"
+                                                                   Size="Size.Small"
+                                                                   OnClick="@(() => VerDocumentoAsync(adjuntoRow))" />
+                                                </MudTooltip>
+
+                                                <MudTooltip Text="Eliminar adjunto">
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                                   Color="Color.Error"
+                                                                   Size="Size.Small"
+                                                                   OnClick="@(() => EliminarAdjuntoAsync(adjuntoRow))" />
+                                                </MudTooltip>
+                                            </MudCardActions>
+                                        </MudCard>
                                     </MudItem>
                                 }
                             </MudGrid>
                         }
                         else
                         {
-                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-2">
-                                <MudText>No hay adjuntos registrados. Haga clic en <b>"Agregar Adjunto"</b> para comenzar.</MudText>
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-2 rounded-lg" Icon="@Icons.Material.Filled.Info">
+                                No hay adjuntos registrados. Haga clic en <b>"Agregar Adjunto"</b> para comenzar a subir imágenes.
                             </MudAlert>
                         }
                     </MudCardContent>
@@ -256,7 +295,7 @@
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Secondary"
                            Size="Size.Large"
-                           StartIcon="@Icons.Material.Filled.CheckCircle"
+                           StartIcon="@Icons.Material.Filled.ArrowBack"
                            OnClick="@(() => Finalizar())">
                     Volver al listado
                 </MudButton>

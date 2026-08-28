@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Pages.Adjuntos;
 using SurveyCat.Frontend.Components.Shared;
@@ -25,15 +26,21 @@ public partial class DocumentoAnexoForm
     private bool mostrandoFormularioAdjunto = false;
     private List<Adjunto> adjuntos = new();
     private Adjunto nuevoAdjunto = new();
+
+    // Selección de carpeta y archivo en 2 Pasos
+    private string CarpetaSeleccionada = string.Empty;
+    private List<IBrowserFile> archivosEnCarpeta = new();
     private IBrowserFile? selectedFile;
     private string ArchivoOriginalName = string.Empty;
     private string Extension = string.Empty;
+
     private bool adjuntoListoParaGuardar => selectedFile != null && nuevoAdjunto.ItemPagina > 0;
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private HttpClient Http { get; set; } = null!;
+    [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
 
     [Parameter] public string CodEncuesta { get; set; } = string.Empty;
 
@@ -77,7 +84,6 @@ public partial class DocumentoAnexoForm
             }
             else
             {
-                // Limpiar la selección para nuevos registros
                 selectedDocumento = null;
             }
         }
@@ -129,9 +135,6 @@ public partial class DocumentoAnexoForm
     {
         selectedDocumento = documento;
         DocumentoAnexo.DocumentoId = documento?.Id ?? 0;
-
-        // Si también usas la descripción automática:
-        // DocumentoAnexo.Descripcion = documento?.Nombre;
     }
 
     private async Task<IEnumerable<Diccionario>> SearchDocumento(string searchText, CancellationToken token)
@@ -145,7 +148,7 @@ public partial class DocumentoAnexoForm
             .ToList();
     }
 
-    // ================= SECCIÓN 2: ADJUNTOS =================
+    // ================= SECCIÓN 2: ADJUNTOS (FLUJO DE 2 PASOS) =================
 
     private void AbrirFormularioAdjunto()
     {
@@ -154,9 +157,7 @@ public partial class DocumentoAnexoForm
             DocumentoAnexoId = DocumentoAnexo.Id,
             ItemPagina = 1
         };
-        selectedFile = null;
-        ArchivoOriginalName = string.Empty;
-        Extension = string.Empty;
+        LimpiarSeleccionCarpeta();
         mostrandoFormularioAdjunto = true;
     }
 
@@ -164,26 +165,77 @@ public partial class DocumentoAnexoForm
     {
         mostrandoFormularioAdjunto = false;
         nuevoAdjunto = new Adjunto();
-        selectedFile = null;
-        ArchivoOriginalName = string.Empty;
-        Extension = string.Empty;
+        LimpiarSeleccionCarpeta();
     }
 
-    private void OnFilesChangedHandler(InputFileChangeEventArgs e)
+    private async Task AbrirSeleccionCarpeta()
     {
-        var file = e.File;
-        if (file != null)
+        await JSRuntime.InvokeVoidAsync("openFolderPicker", "fileFolderInput");
+    }
+
+    private async Task UploadFolderAsync(InputFileChangeEventArgs e)
+    {
+        try
         {
-            selectedFile = file;
-            ArchivoOriginalName = file.Name;
-            Extension = Path.GetExtension(file.Name);
+            var files = e.GetMultipleFiles(maximumFileCount: 500).ToList();
+            if (!files.Any()) return;
+
+            var relativePath = await JSRuntime.InvokeAsync<string>("getFolderRelativePath", "fileFolderInput");
+            var pathParts = relativePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            var nombreCarpeta = pathParts.Length > 0 ? pathParts[0] : string.Empty;
+
+            // VALIDACIÓN: Verificar si el nombre de la carpeta coincide con el código de la encuesta
+            if (!string.IsNullOrEmpty(CodEncuesta) && !nombreCarpeta.Equals(CodEncuesta, StringComparison.OrdinalIgnoreCase))
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Add($"La carpeta seleccionada '{nombreCarpeta}' NO coincide con el código de encuesta '{CodEncuesta}'.", Severity.Error);
+
+                LimpiarSeleccionCarpeta();
+                return;
+            }
+
+            CarpetaSeleccionada = nombreCarpeta;
+            archivosEnCarpeta = files;
+
+            // Preselecciona el primer archivo encontrado
+            var primerArchivo = archivosEnCarpeta.FirstOrDefault();
+            if (primerArchivo != null)
+            {
+                OnFileSelectedFromFolder(primerArchivo);
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al leer la carpeta: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void OnFileSelectedFromFolder(IBrowserFile file)
+    {
+        selectedFile = file;
+        if (selectedFile != null)
+        {
+            ArchivoOriginalName = selectedFile.Name;
+            Extension = Path.GetExtension(selectedFile.Name);
             GenerarNombreArchivoAdjunto();
         }
     }
 
+    private void LimpiarSeleccionCarpeta()
+    {
+        CarpetaSeleccionada = string.Empty;
+        archivosEnCarpeta.Clear();
+        selectedFile = null;
+        ArchivoOriginalName = string.Empty;
+        Extension = string.Empty;
+        nuevoAdjunto.NombreArchivo = string.Empty;
+        StateHasChanged();
+    }
+
     private void GenerarNombreArchivoAdjunto()
     {
-        // Validar límites de página
         if (nuevoAdjunto.ItemPagina > DocumentoAnexo.NumeroPaginas)
         {
             nuevoAdjunto.ItemPagina = DocumentoAnexo.NumeroPaginas;
@@ -194,8 +246,7 @@ public partial class DocumentoAnexoForm
             nuevoAdjunto.ItemPagina = 1;
         }
 
-        // Usar selectedDocumento (el diccionario seleccionado) en lugar de DocumentoAnexo.Documento
-        if (selectedDocumento != null)
+        if (selectedDocumento != null && !string.IsNullOrEmpty(Extension))
         {
             var codigo = selectedDocumento.Codigo ?? string.Empty;
             var numPaginas = DocumentoAnexo.NumeroPaginas.ToString("D2");
@@ -208,7 +259,7 @@ public partial class DocumentoAnexoForm
     {
         if (selectedFile == null)
         {
-            Snackbar.Add("Debe seleccionar un archivo.", Severity.Warning);
+            Snackbar.Add("Debe seleccionar un archivo de la carpeta.", Severity.Warning);
             return;
         }
 

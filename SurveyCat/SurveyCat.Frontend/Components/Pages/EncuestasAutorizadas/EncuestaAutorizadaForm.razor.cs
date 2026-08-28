@@ -217,20 +217,45 @@ public partial class EncuestaAutorizadaForm
         await LoadBarriosComarcasAsync(municipio.Id);
     }
 
+    //private async Task BarrioComarcaChangedAsync(BarrioComarca barrioComarca)
+    //{
+    //    if (barrioComarca == null)
+    //        return;
+
+    //    selectedBarrioComarca = barrioComarca;
+    //    EncuestaAutorizada.BarrioComarcaId = barrioComarca.Id;
+    //    selectedCaserio = null;
+    //    caserios = null;
+
+    //    // Limpiar el ID
+    //    EncuestaAutorizada.CaserioId = null;
+
+    //    await LoadCaseriosAsync(barrioComarca.Id);
+    //}
+
     private async Task BarrioComarcaChangedAsync(BarrioComarca barrioComarca)
     {
+        // 1. Limpiar siempre la selección del Caserío anterior
+        selectedCaserio = null;
+        caserios = null;
+        EncuestaAutorizada.CaserioId = null;
+
+        // 2. Si se limpió el autocomplete de Barrio/Comarca
         if (barrioComarca == null)
+        {
+            selectedBarrioComarca = null;
+            EncuestaAutorizada.BarrioComarcaId = null;
             return;
+        }
 
         selectedBarrioComarca = barrioComarca;
         EncuestaAutorizada.BarrioComarcaId = barrioComarca.Id;
-        selectedCaserio = null;
-        caserios = null;
 
-        // Limpiar el ID
-        EncuestaAutorizada.CaserioId = null;
-
-        await LoadCaseriosAsync(barrioComarca.Id);
+        // 3. Solo cargar caseríos si es una Comarca (EsBarrio == false)
+        if (!barrioComarca.EsBarrio)
+        {
+            await LoadCaseriosAsync(barrioComarca.Id);
+        }
     }
 
     private void CaserioChanged(Caserio caserio)

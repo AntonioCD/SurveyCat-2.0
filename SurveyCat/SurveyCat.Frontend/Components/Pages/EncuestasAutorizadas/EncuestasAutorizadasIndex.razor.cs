@@ -98,6 +98,7 @@ public partial class EncuestasAutorizadasIndex
     {
         var options = new DialogOptions
         {
+            MaxWidth = MaxWidth.Large,
             CloseOnEscapeKey = true,
             CloseButton = true,
             NoHeader = true

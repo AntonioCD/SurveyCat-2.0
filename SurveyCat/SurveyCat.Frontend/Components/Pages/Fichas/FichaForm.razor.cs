@@ -16,6 +16,7 @@ public partial class FichaForm
     private EditContext editContext = null!;
     private bool loading = true;
     private bool isInitialized = false;
+    private bool esInformantePropietario = false;
     private List<EncuestaAutorizada>? encuestasAutorizadasDisponibles = new();
     private List<Diccionario>? diccionarios = new();
     private List<Diccionario> listaUnidadMedida = new();
@@ -415,6 +416,10 @@ public partial class FichaForm
         {
             Ficha.TipoEncuesta = TipoEncuesta.Unificada;
         }
+        else
+        {
+            Ficha.TipoEncuesta = TipoEncuesta.Horizontal;
+        }
 
         // Notificar al formulario que hubo cambios
         editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Ficha.MunicipioId));
@@ -482,17 +487,11 @@ public partial class FichaForm
         Ficha.OrigenTierraId = origenTierra?.Id;
     }
 
-    private void RelacionInformanteParcelaChanged(Diccionario? relacionInformanteParcela)
-    {
-        selectedRelacionInformanteParcela = relacionInformanteParcela;
-        Ficha.RelacionInformanteParcelaId = relacionInformanteParcela?.Id;
-    }
-
-    private void RelacionInformantePropietarioChanged(Diccionario? relacionInformantePropietario)
-    {
-        selectedRelacionInformantePropietario = relacionInformantePropietario;
-        Ficha.RelacionInformantePropietarioId = relacionInformantePropietario?.Id;
-    }
+    //private void RelacionInformantePropietarioChanged(Diccionario? relacionInformantePropietario)
+    //{
+    //    selectedRelacionInformantePropietario = relacionInformantePropietario;
+    //    Ficha.RelacionInformantePropietarioId = relacionInformantePropietario?.Id;
+    //}
 
     private void ServidumbreAguaChanged(Diccionario? servidumbreAgua)
     {
@@ -594,6 +593,75 @@ public partial class FichaForm
     {
         selectedCaserio = caserio;
         Ficha.CaserioId = caserio?.Id;
+    }
+
+    private void RelacionInformanteParcelaChanged(Diccionario? relacionInformanteParcela)
+    {
+        selectedRelacionInformanteParcela = relacionInformanteParcela;
+        Ficha.RelacionInformanteParcelaId = relacionInformanteParcela?.Id;
+    }
+
+    private void RelacionInformantePropietarioChanged(Diccionario? relacionInformantePropietario)
+    {
+        selectedRelacionInformantePropietario = relacionInformantePropietario;
+        Ficha.RelacionInformantePropietarioId = relacionInformantePropietario?.Id;
+
+        // Solo auto-seleccionar si la ficha es nueva
+        if (Ficha.Id == 0 && relacionInformantePropietario != null && !string.IsNullOrWhiteSpace(relacionInformantePropietario.Nombre))
+        {
+            var nombreLower = relacionInformantePropietario.Nombre.ToLower();
+            if (nombreLower.Contains("mismo") || nombreLower.Equals("propietario"))
+            {
+                esInformantePropietario = true;
+            }
+        }
+    }
+
+    private async Task HandleValidSubmitInternal()
+    {
+        // Indicar si es una creación inicial antes de llamar a OnValidSubmit
+        bool esNuevaFicha = Ficha.Id == 0;
+
+        // 1. Ejecutar el guardado/actualización de la Ficha en la API
+        await OnValidSubmit.InvokeAsync();
+
+        // 2. Si era una ficha nueva, estaba marcada la casilla y se asignó un Id válido
+        if (esNuevaFicha && esInformantePropietario && Ficha.Id > 0 && Ficha.InformanteId > 0)
+        {
+            await AgregarInformanteComoPropietarioAsync();
+
+            // Resetear la variable local para que no vuelva a procesarse en futuros guardados
+            esInformantePropietario = false;
+        }
+    }
+
+    private async Task AgregarInformanteComoPropietarioAsync()
+    {
+        try
+        {
+            var nuevoPropietario = new Propietario
+            {
+                FichaId = Ficha.Id,
+                PersonaId = Ficha.InformanteId,
+                TipoDerecho = TipoDerecho.Propietario
+            };
+
+            var responseHttp = await Repository.PostAsync("/api/propietarios", nuevoPropietario);
+
+            if (responseHttp.Error)
+            {
+                var error = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add($"Ficha guardada, pero no se pudo asociar como propietario: {error}", Severity.Warning);
+            }
+            else
+            {
+                Snackbar.Add("Informante agregado automáticamente como propietario.", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al registrar propietario: {ex.Message}", Severity.Error);
+        }
     }
 
     private async Task<IEnumerable<EncuestaAutorizada>> SearchEncuestaAutorizada(string searchText, CancellationToken token)
@@ -819,9 +887,9 @@ public partial class FichaForm
         };
 
         var parameters = new DialogParameters<PersonaSearch>
-        {
-            { x => x.SoloNaturales, true }
-        };
+    {
+        { x => x.SoloNaturales, true }
+    };
 
         var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", parameters, options);
         var result = await dialog.Result;
@@ -834,6 +902,14 @@ public partial class FichaForm
             {
                 informante = informanteResult;
                 Ficha.InformanteId = informante.Id;
+
+                // Limpiar o resetear las selecciones previas al cambiar de informante
+                selectedRelacionInformanteParcela = null;
+                selectedRelacionInformantePropietario = null;
+                Ficha.RelacionInformanteParcelaId = null;
+                Ficha.RelacionInformantePropietarioId = null;
+                esInformantePropietario = false;
+
                 Snackbar.Add("Datos del entrevistado cargados con éxito.", Severity.Success);
             }
             else
@@ -844,6 +920,44 @@ public partial class FichaForm
             StateHasChanged();
         }
     }
+
+    //private async Task ShowModalPersonaSearchAsync()
+    //{
+    //    var options = new DialogOptions
+    //    {
+    //        CloseOnEscapeKey = true,
+    //        CloseButton = true,
+    //        NoHeader = true,
+    //        MaxWidth = MaxWidth.Large,
+    //        FullWidth = true
+    //    };
+
+    //    var parameters = new DialogParameters<PersonaSearch>
+    //    {
+    //        { x => x.SoloNaturales, true }
+    //    };
+
+    //    var dialog = await DialogService.ShowAsync<PersonaSearch>("Buscar Persona", parameters, options);
+    //    var result = await dialog.Result;
+
+    //    if (!result.Canceled && result.Data is Persona personaSeleccionada)
+    //    {
+    //        var informanteResult = await GetPersonaDetails(personaSeleccionada.Id);
+
+    //        if (informanteResult != null)
+    //        {
+    //            informante = informanteResult;
+    //            Ficha.InformanteId = informante.Id;
+    //            Snackbar.Add("Datos del entrevistado cargados con éxito.", Severity.Success);
+    //        }
+    //        else
+    //        {
+    //            Snackbar.Add("No se pudieron cargar los datos del entrevistado.", Severity.Warning);
+    //        }
+
+    //        StateHasChanged();
+    //    }
+    //}
 
     private async Task<Persona?> GetPersonaDetails(long personaId)
     {

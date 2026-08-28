@@ -32,7 +32,7 @@ public class PersonasRepository : GenericRepository<Persona>, IPersonasRepositor
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
-            queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
+            queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()) || x.Identificacion.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
         if (pagination.SoloNaturales)
@@ -57,7 +57,7 @@ public class PersonasRepository : GenericRepository<Persona>, IPersonasRepositor
 
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
-            queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()));
+            queryable = queryable.Where(x => x.NombreCompleto.ToLower().Contains(pagination.Filter.ToLower()) || x.Identificacion.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
         if (pagination.SoloNaturales)

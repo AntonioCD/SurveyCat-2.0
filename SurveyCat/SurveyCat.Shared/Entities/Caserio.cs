@@ -16,6 +16,9 @@ public class Caserio
     [Required(ErrorMessage = "El campo {0} es obligatorio.")]
     public string Nombre { get; set; } = null!;
 
+    [Display(Name = "¿Es Barrio?")]
+    public bool EsBarrio { get; set; } = false;
+
     [Display(Name = "Código Caserío")]
     [Range(1, int.MaxValue, ErrorMessage = "El campo {0} debe ser mayor a 0.")]
     public int CodCaserio { get; set; }

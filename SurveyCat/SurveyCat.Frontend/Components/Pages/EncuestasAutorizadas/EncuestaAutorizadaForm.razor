@@ -114,7 +114,7 @@
 
         <MudItem xs="12" sm="6">
             <MudAutocomplete T="BarrioComarca"
-                             Label="Barrio/Comarca"
+                             Label="Barrio / Comarca"
                              Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Barrio/Comarca --")"
                              SearchFunc="SearchBarrioComarca"
                              Value="selectedBarrioComarca"
@@ -122,26 +122,44 @@
                              Variant="Variant.Outlined"
                              Margin="Margin.Dense"
                              Disabled="loading"
-                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre} ({(e.EsBarrio ? "Barrio" : "Comarca")})")">
                 <ItemTemplate Context="itemContext">
-                    @itemContext.Nombre
+                    <div class="d-flex align-center justify-space-between w-100 gap-2">
+                        <MudText Typo="Typo.body2">@itemContext.Nombre</MudText>
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Variant="Variant.Text"
+                                 Color="@(itemContext.EsBarrio ? Color.Primary : Color.Tertiary)"
+                                 Class="ma-0">
+                            @(itemContext.EsBarrio ? "Barrio" : "Comarca")
+                        </MudChip>
+                    </div>
                 </ItemTemplate>
             </MudAutocomplete>
         </MudItem>
 
         <MudItem xs="12" sm="6">
             <MudAutocomplete T="Caserio"
-                             Label="Caserio"
-                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Caserio --")"
+                             Label="Unidad Territorial de Comarca"
+                             Placeholder="@(loading ? "-- Cargando datos... --" : (selectedBarrioComarca?.EsBarrio == true ? "-- No aplica para Barrios --" : "-- Seleccione un Caserío --"))"
                              SearchFunc="SearchCaserio"
                              Value="selectedCaserio"
                              ValueChanged="CaserioChanged"
                              Variant="Variant.Outlined"
                              Margin="Margin.Dense"
-                             Disabled="loading"
-                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                             Disabled="@(loading || selectedBarrioComarca == null || selectedBarrioComarca.EsBarrio)"
+                             ToStringFunc="@(e => e == null ? null : $"{e.Nombre} ({(e.EsBarrio ? "Barrio" : "Caserío")})")">
                 <ItemTemplate Context="itemContext">
-                    @itemContext.Nombre
+                    <div class="d-flex align-center justify-space-between w-100 gap-2">
+                        <MudText Typo="Typo.body2">@itemContext.Nombre</MudText>
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Variant="Variant.Text"
+                                 Color="@(itemContext.EsBarrio ? Color.Primary : Color.Info)"
+                                 Class="ma-0">
+                            @(itemContext.EsBarrio ? "Barrio" : "Caserío")
+                        </MudChip>
+                    </div>
                 </ItemTemplate>
             </MudAutocomplete>
         </MudItem>

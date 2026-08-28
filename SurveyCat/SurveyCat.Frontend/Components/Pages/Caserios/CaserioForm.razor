@@ -10,10 +10,10 @@
                 <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
                 <div class="d-flex flex-column">
                     <MudText Typo="Typo.h5" Color="Color.Primary">
-                        <b>@(Caserio?.Id != 0 ? "Editar Caserio" : "Nuevo Caserio")</b>
+                        <b>@(Caserio?.Id != 0 ? "Editar Caserío" : "Nuevo Caserío")</b>
                     </MudText>
                     <MudText Typo="Typo.caption" Color="Color.Secondary">
-                        Complete los datos requeridos para registrar/editar un Caserio.
+                        Complete los datos requeridos para registrar/editar un Caserío.
                     </MudText>
                 </div>
             </div>
@@ -29,13 +29,24 @@
                   Margin="Margin.Dense"
                   Class="mb-4" />
 
-    <MudTextField Label="Cod. SILEC"
-                    @bind-Value="@Caserio.CodCaserio"
-                    For="@(() => Caserio.CodCaserio)"
-                    Required="true"
-                    Variant="Variant.Outlined"
-                    Margin="Margin.Dense"
-                    Class="mb-4" />
+    <MudGrid Class="align-center mb-4">
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Cod. SILEC"
+                          @bind-Value="@Caserio.CodCaserio"
+                          For="@(() => Caserio.CodCaserio)"
+                          Required="true"
+                          MaxLength="4"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense" />
+        </MudItem>
+        <MudItem xs="12" sm="6" Class="d-flex justify-center">
+            <MudSwitch @bind-Value="@Caserio.EsBarrio"
+                       Label="@(Caserio.EsBarrio ? "Es un Barrio" : "Es un Caserío")"
+                       Color="Color.Primary"
+                       ThumbIcon="@(Caserio.EsBarrio? Icons.Material.Filled.LocationCity : Icons.Material.Filled.Landscape)" />
+        </MudItem>
+    </MudGrid>
+
 
     <div class="d-flex justify-end gap-2">
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="ReturnAction">Cancelar</MudButton>

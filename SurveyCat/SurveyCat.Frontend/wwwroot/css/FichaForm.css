@@ -7,28 +7,49 @@
     padding: 0 16px;
 }
 
+/* Pestañas inactivas: texto blanco ligeramente atenue */
 .meta-tabs .mud-tab {
+    color: rgba(255, 255, 255, 0.75) !important;
     font-weight: 500;
-    font-size: 14px;
-    padding: 12px 20px;
-    color: var(--mud-palette-text-secondary);
-    text-transform: none !important;
-    letter-spacing: normal !important;
+    transition: all 0.2s ease-in-out;
 }
 
     .meta-tabs .mud-tab .mud-tab-icon {
         margin-right: 8px;
     }
 
-    .meta-tabs .mud-tab.mud-selected {
-        color: var(--mud-palette-primary);
-        background-color: var(--mud-palette-primary-hover);
+    .meta-tabs .mud-tab:hover {
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.12) !important;
     }
 
+    /* PESTAÑA SELECCIONADA: Fondo blanco con texto azul */
+    .meta-tabs .mud-tab.mud-selected {
+        color: var(--mud-palette-primary) !important; /* O el código exacto de tu azul, ej: #1976d2 */
+        background-color: #ffffff !important;
+        font-weight: 700 !important;
+        border-radius: 6px 6px 0 0;
+    }
+
+/* Pestañas inactivas: opacidad normal */
+.mud-tabs .mud-tab {
+    opacity: 0.65;
+    transition: all 0.2s ease-in-out;
+    text-transform: none;
+}
+
+    /* Pestaña seleccionada: fondo contrastado, texto destacado y borde inferior */
+    .mud-tabs .mud-tab.mud-tab-active {
+        opacity: 1;
+        font-weight: 700 !important;
+        background-color: rgba(var(--mud-palette-primary-rgb), 0.1) !important;
+        color: var(--mud-palette-primary) !important;
+        border-bottom: 3px solid var(--mud-palette-primary);
+    }
+
+/* Ocultar la línea indicadora ya que el bloque blanco marca la selección */
 .meta-tabs .mud-tab-indicator {
-    background-color: var(--mud-palette-primary);
-    height: 3px;
-    border-radius: 2px;
+    display: none !important;
 }
 
 .meta-tabs .mud-panel {
