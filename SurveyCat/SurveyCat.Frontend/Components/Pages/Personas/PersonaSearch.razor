@@ -1,5 +1,75 @@
-﻿<MudDialog>
+﻿@using SurveyCat.Shared.DTOs
+
+<MudDialog>
     <DialogContent>
+        <!-- BÚSQUEDA DIRECTA POR CÉDULA EN PADRÓN O SISTEMA -->
+        <MudPaper Elevation="1" Class="pa-3 mb-4 rounded-lg bg-light">
+            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">
+                <b>Búsqueda Rápida por Cédula (Sistema o Padrón Electoral)</b>
+            </MudText>
+            <div class="d-flex align-center gap-2">
+                <MudTextField @bind-Value="cedulaSearchTerm"
+                              Label="Cédula de Identidad"
+                              Placeholder="Ej. 001-160895-0000X o 0011608950000X"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Immediate="true"
+                              OnKeyDown="@HandleCedulaKeyDown"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Badge" />
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           OnClick="BuscarPorCedulaAsync"
+                           Disabled="searchingCedula"
+                           Size="Size.Medium">
+                    @if (searchingCedula)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="ms-1" />
+                    }
+                    else
+                    {
+                        <span>Buscar</span>
+                    }
+                </MudButton>
+            </div>
+
+            <!-- RESULTADO DE BÚSQUEDA EN PADRÓN -->
+            @if (resultadoBusqueda?.EncontradoEnPadron == true && resultadoBusqueda.DatosPadron != null)
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+                    <div class="d-flex align-center justify-space-between flex-wrap gap-2">
+                        <div>
+                            <MudText Typo="Typo.body2">
+                                <b>Persona encontrada en el Padrón Electoral:</b>
+                            </MudText>
+                            <MudText Typo="Typo.body1" Color="Color.Primary">
+                                <b>@resultadoBusqueda.DatosPadron.NombreCompleto</b> — Cédula: <b>@resultadoBusqueda.DatosPadron.Cedula</b>
+                            </MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                Domicilio: @(resultadoBusqueda.DatosPadron.Domicilio ?? "Sin registro")
+                            </MudText>
+                        </div>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   StartIcon="@Icons.Material.Filled.PersonAdd"
+                                   OnClick="ImportarPersonaDesdePadronAsync"
+                                   Disabled="savingImport">
+                            Agregar a Personas del Sistema
+                        </MudButton>
+                    </div>
+                </MudAlert>
+            }
+            else if (cedulaBuscadaNoEncontrada)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">
+                    No se encontró ninguna persona registrada en el Sistema ni en el Padrón con la cédula <b>@cedulaSearchTerm</b>.
+                </MudAlert>
+            }
+        </MudPaper>
+
+        <!-- TABLA HABITUAL DE PERSONAS -->
         <MudTable @ref="tablePersonas"
                   ServerData="LoadListPersonasAsync"
                   Dense="true"
@@ -10,13 +80,13 @@
                   Elevation="0">
             <ToolBarContent>
                 <div class="d-flex align-center">
-                    <MudText Typo="Typo.h6" Class="me-4">BUSCAR PERSONA</MudText>
+                    <MudText Typo="Typo.h6" Class="me-4">LISTADO GENERAL DE PERSONAS</MudText>
                     <MudButton Variant="Variant.Outlined"
                                EndIcon="@Icons.Material.Filled.Add"
                                Color="Color.Info"
                                Size="Size.Small"
                                OnClick="@(() => ShowModalAsync())">
-                        Nuevo
+                        Nuevo Manual
                     </MudButton>
                 </div>
                 <MudSpacer />
@@ -34,7 +104,6 @@
                 <MudTd DataLabel="Nombre Completo">@persona.NombreCompleto</MudTd>
                 <MudTd DataLabel="Acción" Style="text-align: center; white-space: nowrap;">
                     <MudTooltip Text="Seleccionar Persona">
-                        @* Cambiamos el botón para que ejecute la selección *@
                         <MudIconButton Icon="@Icons.Material.Filled.CheckCircle"
                                        Variant="Variant.Filled"
                                        Color="Color.Success"
@@ -42,16 +111,15 @@
                                        OnClick="@(() => SeleccionarPersona(persona))" />
                     </MudTooltip>
                     <AuthorizeView Roles="Administrador">
-                    <Authorized>
-                        <MudTooltip Text="Editar Persona">
-                            @* Cambiamos el botón para que ejecute la selección *@
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                           Variant="Variant.Filled"
-                                           Color="Color.Warning"
-                                           Size="Size.Small"
-                                           OnClick="@(() => ShowModalAsync(persona.Id, true))" />
-                        </MudTooltip>
-                    </Authorized>
+                        <Authorized>
+                            <MudTooltip Text="Editar Persona">
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                               Variant="Variant.Filled"
+                                               Color="Color.Warning"
+                                               Size="Size.Small"
+                                               OnClick="@(() => ShowModalAsync(persona.Id, true))" />
+                            </MudTooltip>
+                        </Authorized>
                     </AuthorizeView>
                 </MudTd>
             </RowTemplate>

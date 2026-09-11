@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SurveyCat.Backend.UnitsOfWork.Implementations;
+using SurveyCat.Backend.Helpers;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
 using SurveyCat.Shared.Entities;
@@ -14,10 +14,15 @@ namespace SurveyCat.Backend.Controllers;
 public class PersonasController : GenericController<Persona>
 {
     private readonly IPersonasUnitOfWork _personasUnitOfWork;
+    private readonly IPersonasHelper _personasHelper;
 
-    public PersonasController(IGenericUnitOfWork<Persona> unitOfWork, IPersonasUnitOfWork personasUnitOfWork) : base(unitOfWork)
+    public PersonasController(
+        IGenericUnitOfWork<Persona> unitOfWork,
+        IPersonasUnitOfWork personasUnitOfWork,
+        IPersonasHelper personasHelper) : base(unitOfWork)
     {
         _personasUnitOfWork = personasUnitOfWork;
+        _personasHelper = personasHelper;
     }
 
     [AllowAnonymous]
@@ -58,5 +63,27 @@ public class PersonasController : GenericController<Persona>
             return Ok(response.Result);
         }
         return NotFound(response.Message);
+    }
+
+    [HttpGet("buscar-cedula/{cedula}")]
+    public async Task<IActionResult> BuscarPorCedulaAsync(string cedula)
+    {
+        var response = await _personasHelper.BuscarPorCedulaAsync(cedula);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest(response.Message);
+    }
+
+    [HttpPost("importar-padron")]
+    public async Task<IActionResult> ImportarDesdePadronAsync([FromBody] PadronPersonaDTO padronDto)
+    {
+        var response = await _personasHelper.ImportarDesdePadronAsync(padronDto);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest(response.Message);
     }
 }

@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
-using System.IO;
+using Microsoft.IdentityModel.Tokens;
 using SurveyCat.Backend.Data;
+using SurveyCat.Backend.Helpers;
 using SurveyCat.Backend.Repositories.Implementations;
 using SurveyCat.Backend.Repositories.Interfaces;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.Entities;
+using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -59,6 +60,8 @@ builder.Services.AddScoped<IPropietariosUnitOfWork, PropietariosUnitOfWork>();
 builder.Services.AddScoped<IPersonasUnitOfWork, PersonasUnitOfWork>();
 builder.Services.AddScoped<ISectoresUnitOfWork, SectoresUnitOfWork>();
 builder.Services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();
+
+builder.Services.AddScoped<IPersonasHelper, PersonasHelper>();
 
 builder.Services.AddIdentity<User, IdentityRole>(x =>
 {

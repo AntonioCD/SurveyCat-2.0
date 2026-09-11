@@ -22,6 +22,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<Ocupante> Ocupantes { get; set; }
         public DbSet<Ficha> Fichas { get; set; }
         public DbSet<Municipio> Municipios { get; set; }
+        public DbSet<Padron> Padron { get; set; }
         public DbSet<Persona> Personas { get; set; }
         public DbSet<PersonalEncuesta> PersonalEncuestas { get; set; }
         public DbSet<Propietario> Propietarios { get; set; }
@@ -30,6 +31,12 @@ namespace SurveyCat.Backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Padron>(entity =>
+            {
+                entity.ToTable("Padron", t => t.ExcludeFromMigrations());
+                entity.HasKey(p => p.Id);
+            });
 
             modelBuilder.Entity<Adjunto>(e =>
             {

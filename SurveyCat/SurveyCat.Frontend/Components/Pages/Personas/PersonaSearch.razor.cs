@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.DTOs;
@@ -16,6 +17,11 @@ public partial class PersonaSearch
     private List<Persona>? Personas { get; set; }
     private MudTable<Persona> tablePersonas = new();
     private int personasTotalRecords = 0;
+    private string cedulaSearchTerm = string.Empty;
+    private bool searchingCedula = false;
+    private bool savingImport = false;
+    private bool cedulaBuscadaNoEncontrada = false;
+    private ResultadoBusquedaCedulaDTO? resultadoBusqueda;
     private bool loading;
 
     private readonly int[] pageSizeOptions = { 10, 25, 50, int.MaxValue };
@@ -41,57 +47,6 @@ public partial class PersonaSearch
     {
         MudDialog.Cancel();
     }
-
-    //private async Task LoadTotalRecordsPersonasAsync()
-    //{
-    //    loading = true;
-    //    var url = $"api/personas/totalRecords";
-
-    //    if (!string.IsNullOrWhiteSpace(Filter))
-    //    {
-    //        url += $"?filter={Filter}";
-    //    }
-
-    //    var responseHttp = await Repository.GetAsync<int>(url);
-    //    if (responseHttp.Error)
-    //    {
-    //        var message = await responseHttp.GetErrorMessageAsync();
-    //        Snackbar.Add(message!, Severity.Error);
-    //        return;
-    //    }
-
-    //    personasTotalRecords = responseHttp.Response;
-    //    loading = false;
-    //}
-
-    //private async Task<TableData<Persona>> LoadListPersonasAsync(TableState state, CancellationToken cancellationToken)
-    //{
-    //    int page = state.Page + 1;
-    //    int pageSize = state.PageSize;
-    //    var url = $"api/personas/paginatedPersonas/?page={page}&recordsnumber={pageSize}";
-
-    //    if (!string.IsNullOrWhiteSpace(Filter))
-    //    {
-    //        url += $"&filter={Filter}";
-    //    }
-
-    //    var responseHttp = await Repository.GetAsync<List<Persona>>(url);
-    //    if (responseHttp.Error)
-    //    {
-    //        var message = await responseHttp.GetErrorMessageAsync();
-    //        Snackbar.Add(message!, Severity.Error);
-    //        return new TableData<Persona> { Items = [], TotalItems = 0 };
-    //    }
-    //    if (responseHttp.Response == null)
-    //    {
-    //        return new TableData<Persona> { Items = [], TotalItems = 0 };
-    //    }
-    //    return new TableData<Persona>
-    //    {
-    //        Items = responseHttp.Response,
-    //        TotalItems = personasTotalRecords
-    //    };
-    //}
 
     private async Task LoadTotalRecordsPersonasAsync()
     {
@@ -163,37 +118,6 @@ public partial class PersonaSearch
         await tablePersonas.ReloadServerData();
     }
 
-    //private async Task ShowModalAsync(long id = 0, bool isEdit = false)
-    //{
-    //    var options = new DialogOptions
-    //    {
-    //        CloseOnEscapeKey = true,
-    //        CloseButton = true,
-    //        MaxWidth = MaxWidth.Medium,
-    //        FullWidth = true
-    //    };
-    //    IDialogReference? dialog;
-    //    if (isEdit)
-    //    {
-    //        var parameters = new DialogParameters
-    //    {
-    //        { "Id", id }
-    //    }; dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
-    //    }
-    //    else
-    //    {
-    //        dialog = await DialogService.ShowAsync<PersonaCreate>("Nueva Persona", options);
-    //    }
-
-    //    var result = await dialog.Result;
-    //    if (result!.Canceled!)
-    //    {
-    //        await LoadTotalRecordsPersonasAsync();
-
-    //        await tablePersonas.ReloadServerData();
-    //    }
-    //}
-
     private async Task ShowModalAsync(long id = 0, bool isEdit = false)
     {
         var options = new DialogOptions
@@ -236,6 +160,89 @@ public partial class PersonaSearch
         {
             // El usuario canceló, no hacer nada
             Console.WriteLine("Usuario canceló la operación");
+        }
+    }
+
+    private async Task HandleCedulaKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await BuscarPorCedulaAsync();
+        }
+    }
+
+    private async Task BuscarPorCedulaAsync()
+    {
+        if (string.IsNullOrWhiteSpace(cedulaSearchTerm))
+        {
+            Snackbar.Add("Ingrese un número de cédula para consultar.", Severity.Warning);
+            return;
+        }
+
+        searchingCedula = true;
+        cedulaBuscadaNoEncontrada = false;
+        resultadoBusqueda = null;
+
+        try
+        {
+            var responseHttp = await Repository.GetAsync<ResultadoBusquedaCedulaDTO>($"api/personas/buscar-cedula/{Uri.EscapeDataString(cedulaSearchTerm)}");
+
+            if (responseHttp.Error)
+            {
+                var msg = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add(msg!, Severity.Error);
+                return;
+            }
+
+            resultadoBusqueda = responseHttp.Response;
+
+            if (resultadoBusqueda != null)
+            {
+                if (resultadoBusqueda.EncontradoEnSistema && resultadoBusqueda.PersonaExistente != null)
+                {
+                    Snackbar.Add("La persona ya existe en el sistema. Seleccionada automáticamente.", Severity.Info);
+                    SeleccionarPersona(resultadoBusqueda.PersonaExistente);
+                }
+                else if (!resultadoBusqueda.EncontradoEnPadron)
+                {
+                    cedulaBuscadaNoEncontrada = true;
+                }
+            }
+        }
+        finally
+        {
+            searchingCedula = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ImportarPersonaDesdePadronAsync()
+    {
+        if (resultadoBusqueda?.DatosPadron == null) return;
+
+        savingImport = true;
+
+        try
+        {
+            var responseHttp = await Repository.PostAsync<PadronPersonaDTO, Persona>("api/personas/importar-padron", resultadoBusqueda.DatosPadron);
+
+            if (responseHttp.Error)
+            {
+                var msg = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add($"Error al registrar la persona: {msg}", Severity.Error);
+                return;
+            }
+
+            var nuevaPersona = responseHttp.Response;
+            if (nuevaPersona != null)
+            {
+                Snackbar.Add("Persona agregada exitosamente al sistema desde el Padrón.", Severity.Success);
+                SeleccionarPersona(nuevaPersona); // Cierra el modal y la selecciona inmediatamente en FichaForm
+            }
+        }
+        finally
+        {
+            savingImport = false;
         }
     }
 }
