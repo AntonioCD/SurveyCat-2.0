@@ -1,50 +1,77 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.DTOs;
 
 namespace SurveyCat.Frontend.Components.Pages;
 
-public partial class Home
+public partial class Home : IDisposable
 {
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IRepository Repository { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
-    // Variable para almacenar la respuesta de la API
     private DashboardResponseDTO? dashboardData;
-
     private bool cargando = true;
+    private bool cargandoAuth = true;
 
-    // Variables para el gráfico de MudBlazor
     public List<ChartSeries> Series = new List<ChartSeries>();
-
     public string[] XAxisLabels = Array.Empty<string>();
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Llamar al backend
-        var responseHttp = await Repository.GetAsync<DashboardResponseDTO>("api/dashboard");
+        // Suscribirse a los cambios de estado de autenticación (Login/Logout)
+        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
 
-        if (!responseHttp.Error)
+        await CargarDatosSegunAuth();
+    }
+
+    private async Task CargarDatosSegunAuth()
+    {
+        cargandoAuth = true;
+        StateHasChanged();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true && user.IsInRole("Administrador"))
         {
-            // 2. Guardar los datos reales
-            dashboardData = responseHttp.Response;
+            var responseHttp = await Repository.GetAsync<DashboardResponseDTO>("api/dashboard");
 
-            // 3. Configurar el gráfico con los datos de la API
-            if (dashboardData != null)
+            if (!responseHttp.Error && responseHttp.Response != null)
             {
+                dashboardData = responseHttp.Response;
+
                 Series = new List<ChartSeries>
-            {
-                new ChartSeries()
                 {
-                    Name = "Fichas Levantadas",
-                    Data = dashboardData.ValoresGrafico.ToArray()
-                }
-            };
+                    new ChartSeries()
+                    {
+                        Name = "Fichas Levantadas",
+                        Data = dashboardData.ValoresGrafico.ToArray()
+                    }
+                };
                 XAxisLabels = dashboardData.MesesGrafico.ToArray();
             }
         }
 
+        cargandoAuth = false;
         cargando = false;
+        StateHasChanged();
+    }
+
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        await InvokeAsync(async () =>
+        {
+            await CargarDatosSegunAuth();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        // Desuscribir el evento para evitar fugas de memoria
+        AuthenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
     }
 }

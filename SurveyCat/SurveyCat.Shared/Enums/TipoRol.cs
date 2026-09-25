@@ -21,7 +21,7 @@ namespace SurveyCat.Shared.Enums
         [Display(Name = "Técnico Catastral")]
         TécnicoCatastral = 3,
 
-        [Display(Name = "Control de Calidad Legal")]
-        ControlCalidadLegal = 4
+        [Display(Name = "Digitador")]
+        Digitador = 4
     }
 }

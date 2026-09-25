@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7258") });
+//builder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7258") });
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://surveyback.ineter.gob.ni/") });
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddAuthorizationCore();
 

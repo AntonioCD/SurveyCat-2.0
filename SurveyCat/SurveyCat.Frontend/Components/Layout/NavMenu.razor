@@ -3,27 +3,34 @@
         Inicio
     </MudNavLink>
 
-    <AuthorizeView Roles="Administrador">
+    <!-- Sección: Operaciones (Disponible para Administrador y Digitador) -->
+    <AuthorizeView Roles="Administrador, Digitador">
         <Authorized>
-            <!-- Sección: Operaciones -->
             <MudText Typo="Typo.caption" Class="px-3 pt-3 pb-1 mud-text-secondary fw-bold" Style="font-size: 0.7rem; letter-spacing: 0.8px;">
                 OPERACIONES
             </MudText>
 
             <MudNavGroup Title="Gestión de Encuestas" Icon="@Icons.Material.Outlined.Assignment" Expanded="true" Class="rounded-lg mb-1">
+                <!-- Disponible para Administrador y Digitador -->
                 <MudNavLink Href="fichas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ReceiptLong" Class="rounded-lg">
                     Fichas Catastrales
                 </MudNavLink>
-                <MudNavLink Href="encuestasAutorizadas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Verified" Class="rounded-lg">
-                    Encuestas Autorizadas
-                </MudNavLink>
+
+                <!-- Exclusivo para Administrador -->
+                <AuthorizeView Roles="Administrador" Context="adminContext">
+                    <Authorized>
+                        <MudNavLink Href="encuestasAutorizadas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Verified" Class="rounded-lg">
+                            Encuestas Autorizadas
+                        </MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
             </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
 
-            @* <MudNavLink Href="reportes" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Insights" Class="rounded-lg mb-1">
-                Reportes y Métricas
-            </MudNavLink> *@
-
-            <!-- Sección: Configuración del Sistema -->
+    <!-- Sección: Configuración del Sistema (Exclusivo para Administrador) -->
+    <AuthorizeView Roles="Administrador">
+        <Authorized>
             <MudText Typo="Typo.caption" Class="px-3 pt-4 pb-1 mud-text-secondary fw-bold" Style="font-size: 0.7rem; letter-spacing: 0.8px;">
                 CONFIGURACIÓN
             </MudText>
