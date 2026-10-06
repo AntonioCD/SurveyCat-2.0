@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using SurveyCat.Frontend.Repositories;
 using SurveyCat.Shared.Entities;
+using SurveyCat.Shared.Enums;
 using System.Threading.Tasks;
 
 namespace SurveyCat.Frontend.Components.Pages.EncuestasAutorizadas;
@@ -16,11 +17,18 @@ public partial class EncuestaAutorizadaForm
     private List<Municipio>? municipios;
     private List<BarrioComarca>? barriosComarcas;
     private List<Caserio>? caserios;
+    private List<PersonalEncuesta>? personalEncuestas = new();
+    private List<PersonalEncuesta>? listaEncuestadores = new();
+    private List<PersonalEncuesta>? listaTecnicosCatastrales = new();
+    private List<PersonalEncuesta>? listaSupervisores = new();
 
     private Departamento? selectedDepartamento;
     private Municipio? selectedMunicipio;
     private BarrioComarca? selectedBarrioComarca;
     private Caserio? selectedCaserio;
+    private PersonalEncuesta? selectedEncuestador;
+    private PersonalEncuesta? selectedTecnicoCatastral;
+    private PersonalEncuesta? selectedSupervisor;
 
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IRepository Repository { get; set; } = null!;
@@ -58,11 +66,17 @@ public partial class EncuestaAutorizadaForm
         {
             // Cargar departamentos primero
             await LoadDepartamentosAsync();
+            await LoadPersonalEncuestaAsync();
 
             if (EncuestaAutorizada.Id != 0)
             {
                 // Si es edición, cargar los datos relacionados
                 await LoadRelatedDataForEditAsync();
+
+                //Asignar valores
+                selectedEncuestador = EncuestaAutorizada.Encuestador;
+                selectedTecnicoCatastral = EncuestaAutorizada.TecnicoCatastral;
+                selectedSupervisor = EncuestaAutorizada.Coordinador;
             }
         }
         finally
@@ -177,6 +191,27 @@ public partial class EncuestaAutorizadaForm
         caserios = responseHttp.Response;
     }
 
+    private async Task LoadPersonalEncuestaAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<PersonalEncuesta>>("/api/personalEncuestas/combo");
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+
+        personalEncuestas = responseHttp.Response;
+
+        if (personalEncuestas != null)
+        {
+            listaEncuestadores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Encuestador).ToList();
+            listaTecnicosCatastrales = personalEncuestas.Where(x => x.TipoRol == TipoRol.TécnicoCatastral).ToList();
+            listaSupervisores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Supervisor).ToList();
+        }
+    }
+
     private async Task DepartamentoChangedAsync(Departamento departamento)
     {
         if (departamento == null)
@@ -267,6 +302,24 @@ public partial class EncuestaAutorizadaForm
         EncuestaAutorizada.CaserioId = caserio.Id;
     }
 
+    private void EncuestadorChanged(PersonalEncuesta encuestador)
+    {
+        selectedEncuestador = encuestador;
+        EncuestaAutorizada.EncuestadorId = encuestador?.Id ?? 0;
+    }
+
+    private void TecnicoCatastralChanged(PersonalEncuesta tecnicoCatastral)
+    {
+        selectedTecnicoCatastral = tecnicoCatastral;
+        EncuestaAutorizada.TecnicoCatastralId = tecnicoCatastral?.Id ?? 0;
+    }
+
+    private void SupervisorChanged(PersonalEncuesta supervisor)
+    {
+        selectedSupervisor = supervisor;
+        EncuestaAutorizada.CoordinadorId = supervisor?.Id ?? 0;
+    }
+
     private async Task<IEnumerable<Departamento>> SearchDepartamento(string searchText, CancellationToken token)
     {
         await Task.Delay(5);
@@ -308,6 +361,39 @@ public partial class EncuestaAutorizadaForm
 
         return caserios!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchEncuestador(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return listaEncuestadores!;
+
+        return listaEncuestadores!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchTecnicoCatastral(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return listaTecnicosCatastrales!;
+
+        return listaTecnicosCatastrales!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchSupervisor(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return listaSupervisores!;
+
+        return listaSupervisores!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
             .ToList();
     }
 }

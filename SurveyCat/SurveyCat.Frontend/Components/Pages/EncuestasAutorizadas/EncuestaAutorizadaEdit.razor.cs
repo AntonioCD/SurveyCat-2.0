@@ -42,6 +42,9 @@ public partial class EncuestaAutorizadaEdit
         encuestaAutorizada!.Municipio = null;
         encuestaAutorizada.BarrioComarca = null;
         encuestaAutorizada.Caserio = null;
+        encuestaAutorizada.Encuestador = null;
+        encuestaAutorizada.TecnicoCatastral = null;
+        encuestaAutorizada.Coordinador = null;
         var responseHttp = await Repository.PutAsync("api/encuestasAutorizadas", encuestaAutorizada);
 
         if (responseHttp.Error)

@@ -15,147 +15,225 @@
             Seleccione los filtros y suba un archivo Excel con los códigos de encuesta.
         </MudText>
 
-        <MudGrid>
-            <MudItem xs="12" sm="6" style="position: relative;">
-                <MudSelect T="TipoSector" Label="Tipo de Sector"
-                           @bind-Value="tipoSectorSeleccionado"
-                           For="@(() => tipoSectorSeleccionado)"
-                           Variant="Variant.Outlined"
-                           Margin="Margin.Dense"
-                           Disabled="loading"
-                           Required="true"
-                           Validation="@(new RangeAttribute(1, int.MaxValue) { ErrorMessage = "Seleccione un Tipo de Sector." })">
+        <!-- 1. SECCIÓN: DATOS GENERALES -->
+        <MudPaper Outlined="true" Class="pa-4 mb-4" Style="border-radius: 8px;">
+            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="d-flex align-center mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.Place" Size="Size.Small" Class="mr-2" />
+                <b>Datos Generales y Ubicación</b>
+            </MudText>
 
-                    @foreach (TipoSector item in Enum.GetValues(typeof(TipoSector)))
+            <MudGrid>
+                <!-- Tipo de Sector -->
+                <MudItem xs="12" sm="6" style="position: relative;">
+                    <MudSelect T="TipoSector" Label="Tipo de Sector"
+                               @bind-Value="tipoSectorSeleccionado"
+                               For="@(() => tipoSectorSeleccionado)"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Disabled="loading"
+                               Required="true"
+                               Validation="@(new RangeAttribute(1, int.MaxValue) { ErrorMessage = "Seleccione un Tipo de Sector." })">
+
+                        @foreach (TipoSector item in Enum.GetValues(typeof(TipoSector)))
+                        {
+                            <MudSelectItem Value="@item">
+                                @((int)item == 0 ? "-- Seleccione un Tipo --" : item.ToString())
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    @if ((int)tipoSectorSeleccionado == 0)
                     {
-                        <MudSelectItem Value="@item">
-                            @((int)item == 0 ? "-- Seleccione un Tipo --" : item.ToString())
-                        </MudSelectItem>
+                        <input @key="@((int)tipoSectorSeleccionado)"
+                               type="text"
+                               value=""
+                               required
+                               oninvalid="this.setCustomValidity('Seleccione un Tipo de Parcela.')"
+                               oninput="this.setCustomValidity('')"
+                               style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
                     }
-                </MudSelect>
+                    else
+                    {
+                        <input @key="@((int)tipoSectorSeleccionado)"
+                               type="text"
+                               value="@((int)tipoSectorSeleccionado)"
+                               style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
+                    }
+                </MudItem>
 
-                @if ((int)tipoSectorSeleccionado == 0)
-                {
-                    <input @key="@((int)tipoSectorSeleccionado)"
-                           type="text"
-                           value=""
-                           required
-                           oninvalid="this.setCustomValidity('Seleccione un Tipo de Parcela.')"
-                           oninput="this.setCustomValidity('')"
-                           style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
-                }
-                else
-                {
-                    <input @key="@((int)tipoSectorSeleccionado)"
-                           type="text"
-                           value="@((int)tipoSectorSeleccionado)"
-                           style="opacity: 0; width: 100%; height: 1px; position: absolute; bottom: 0; left: 0; pointer-events: none;" />
-                }
-            </MudItem>
+                <!-- Departamento -->
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="Departamento"
+                                     Label="Departamento"
+                                     Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Departamento --")"
+                                     SearchFunc="SearchDepartamento"
+                                     Value="selectedDepartamento"
+                                     ValueChanged="DepartamentoChangedAsync"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Disabled="loading"
+                                     Required="true"
+                                     RequiredError="El Departamento es requerido."
+                                     For="@(() => selectedDepartamento)"
+                                     ResetValueOnEmptyText="true"
+                                     CoerceText="false"
+                                     CoerceValue="false"
+                                     ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                        <ItemTemplate Context="itemContext">
+                            @itemContext.Nombre
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudItem>
 
-            <!-- Departamento -->
-            <MudItem xs="12" sm="6">
-                <MudAutocomplete T="Departamento"
-                                 Label="Departamento"
-                                 Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Departamento --")"
-                                 SearchFunc="SearchDepartamento"
-                                 Value="selectedDepartamento"
-                                 ValueChanged="DepartamentoChangedAsync"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense"
-                                 Disabled="loading"
-                                 Required="true"
-                                 RequiredError="El Departamento es requerido."
-                                 For="@(() => selectedDepartamento)"
-                                 ResetValueOnEmptyText="true"
-                                 CoerceText="false"
-                                 CoerceValue="false"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
-                    <ItemTemplate Context="itemContext">
-                        @itemContext.Nombre
-                    </ItemTemplate>
-                </MudAutocomplete>
-            </MudItem>
+                <!-- Municipio -->
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="Municipio"
+                                     Label="Municipio"
+                                     Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Municipio --")"
+                                     SearchFunc="SearchMunicipio"
+                                     Value="selectedMunicipio"
+                                     ValueChanged="MunicipioChangedAsync"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Disabled="loading"
+                                     Required="true"
+                                     RequiredError="El Municipio es requerido."
+                                     For="@(() => selectedMunicipio)"
+                                     ResetValueOnEmptyText="true"
+                                     CoerceText="false"
+                                     CoerceValue="false"
+                                     ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
+                        <ItemTemplate Context="itemContext">
+                            @itemContext.Nombre
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudItem>
 
-            <!-- Municipio -->
-            <MudItem xs="12" sm="6">
-                <MudAutocomplete T="Municipio"
-                                 Label="Municipio"
-                                 Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Municipio --")"
-                                 SearchFunc="SearchMunicipio"
-                                 Value="selectedMunicipio"
-                                 ValueChanged="MunicipioChangedAsync"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense"
-                                 Disabled="loading"
-                                 Required="true"
-                                 RequiredError="El Municipio es requerido."
-                                 For="@(() => selectedMunicipio)"
-                                 ResetValueOnEmptyText="true"
-                                 CoerceText="false"
-                                 CoerceValue="false"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.Nombre}")">
-                    <ItemTemplate Context="itemContext">
-                        @itemContext.Nombre
-                    </ItemTemplate>
-                </MudAutocomplete>
-            </MudItem>
+                <!-- Barrio/Comarca -->
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="BarrioComarca"
+                                     Label="Barrio / Comarca"
+                                     Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Barrio/Comarca --")"
+                                     SearchFunc="SearchBarrioComarca"
+                                     Value="selectedBarrioComarca"
+                                     ValueChanged="BarrioComarcaChangedAsync"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Disabled="loading"
+                                     ToStringFunc="@(e => e == null ? null : $"{e.Nombre} ({(e.EsBarrio ? "Barrio" : "Comarca")})")">
+                        <ItemTemplate Context="itemContext">
+                            <div class="d-flex align-center justify-space-between w-100 gap-2">
+                                <MudText Typo="Typo.body2">@itemContext.Nombre</MudText>
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Variant="Variant.Text"
+                                         Color="@(itemContext.EsBarrio ? Color.Primary : Color.Tertiary)"
+                                         Class="ma-0">
+                                    @(itemContext.EsBarrio ? "Barrio" : "Comarca")
+                                </MudChip>
+                            </div>
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudItem>
 
-            <!-- Barrio/Comarca -->
-            <MudItem xs="12" sm="6">
-                <MudAutocomplete T="BarrioComarca"
-                                 Label="Barrio / Comarca"
-                                 Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un Barrio/Comarca --")"
-                                 SearchFunc="SearchBarrioComarca"
-                                 Value="selectedBarrioComarca"
-                                 ValueChanged="BarrioComarcaChangedAsync"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense"
-                                 Disabled="loading"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.Nombre} ({(e.EsBarrio ? "Barrio" : "Comarca")})")">
-                    <ItemTemplate Context="itemContext">
-                        <div class="d-flex align-center justify-space-between w-100 gap-2">
-                            <MudText Typo="Typo.body2">@itemContext.Nombre</MudText>
-                            <MudChip T="string"
-                                     Size="Size.Small"
-                                     Variant="Variant.Text"
-                                     Color="@(itemContext.EsBarrio ? Color.Primary : Color.Tertiary)"
-                                     Class="ma-0">
-                                @(itemContext.EsBarrio ? "Barrio" : "Comarca")
-                            </MudChip>
-                        </div>
-                    </ItemTemplate>
-                </MudAutocomplete>
-            </MudItem>
+                <!-- Caserio -->
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="Caserio"
+                                     Label="Unidad Territorial de Comarca"
+                                     Placeholder="@(loading ? "-- Cargando datos... --" : (selectedBarrioComarca?.EsBarrio == true ? "-- No aplica para Barrios --" : "-- Seleccione un Caserío --"))"
+                                     SearchFunc="SearchCaserio"
+                                     Value="selectedCaserio"
+                                     ValueChanged="CaserioChanged"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Disabled="@(loading || selectedBarrioComarca == null || selectedBarrioComarca.EsBarrio)"
+                                     ToStringFunc="@(e => e == null ? null : $"{e.Nombre} ({(e.EsBarrio ? "Barrio" : "Caserío")})")">
+                        <ItemTemplate Context="itemContext">
+                            <div class="d-flex align-center justify-space-between w-100 gap-2">
+                                <MudText Typo="Typo.body2">@itemContext.Nombre</MudText>
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Variant="Variant.Text"
+                                         Color="@(itemContext.EsBarrio ? Color.Primary : Color.Info)"
+                                         Class="ma-0">
+                                    @(itemContext.EsBarrio ? "Barrio" : "Caserío")
+                                </MudChip>
+                            </div>
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
 
-            <!-- Caserio -->
-            <MudItem xs="12" sm="6">
-                <MudAutocomplete T="Caserio"
-                                 Label="Unidad Territorial de Comarca"
-                                 Placeholder="@(loading ? "-- Cargando datos... --" : (selectedBarrioComarca?.EsBarrio == true ? "-- No aplica para Barrios --" : "-- Seleccione un Caserío --"))"
-                                 SearchFunc="SearchCaserio"
-                                 Value="selectedCaserio"
-                                 ValueChanged="CaserioChanged"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense"
-                                 Disabled="@(loading || selectedBarrioComarca == null || selectedBarrioComarca.EsBarrio)"
-                                 ToStringFunc="@(e => e == null ? null : $"{e.Nombre} ({(e.EsBarrio ? "Barrio" : "Caserío")})")">
-                    <ItemTemplate Context="itemContext">
-                        <div class="d-flex align-center justify-space-between w-100 gap-2">
-                            <MudText Typo="Typo.body2">@itemContext.Nombre</MudText>
-                            <MudChip T="string"
-                                     Size="Size.Small"
-                                     Variant="Variant.Text"
-                                     Color="@(itemContext.EsBarrio ? Color.Primary : Color.Info)"
-                                     Class="ma-0">
-                                @(itemContext.EsBarrio ? "Barrio" : "Caserío")
-                            </MudChip>
-                        </div>
-                    </ItemTemplate>
-                </MudAutocomplete>
-            </MudItem>
+        <!-- 2. SECCIÓN: DATOS DEL PERSONAL -->
+        <MudPaper Outlined="true" Class="pa-4 mb-4" Style="border-radius: 8px;">
+            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="d-flex align-center mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.People" Size="Size.Small" Class="mr-2" />
+                <b>Datos del Personal</b>
+            </MudText>
 
-            <!-- Upload de archivo Excel -->
+            <MudGrid>
+                <!-- Encuestador -->
+                <MudItem xs="12" sm="4">
+                    <MudAutocomplete T="PersonalEncuesta"
+                                     Label="Encuestador"
+                                     Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
+                                     SearchFunc="SearchEncuestador"
+                                     Value="selectedEncuestador"
+                                     ValueChanged="EncuestadorChanged"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Disabled="loading"
+                                     Required="true"
+                                     RequiredError="El Encuestador es requerido."
+                                     For="@(() => selectedEncuestador)"
+                                     ResetValueOnEmptyText="true"
+                                     Clearable="true"
+                                     ToStringFunc="@(e => e?.Persona?.NombreCompleto)" />
+                </MudItem>
+
+                <!-- Técnico Catastral -->
+                <MudItem xs="12" sm="4">
+                    <MudAutocomplete T="PersonalEncuesta"
+                                     Label="Técnico Catastral"
+                                     Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
+                                     SearchFunc="SearchTecnicoCatastral"
+                                     Value="selectedTecnicoCatastral"
+                                     ValueChanged="TecnicoCatastralChanged"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Disabled="loading"
+                                     Required="true"
+                                     RequiredError="El Técnico es requerido."
+                                     For="@(() => selectedTecnicoCatastral)"
+                                     ResetValueOnEmptyText="true"
+                                     Clearable="true"
+                                     ToStringFunc="@(e => e?.Persona?.NombreCompleto)" />
+                </MudItem>
+
+                <!-- Jefe de Campo -->
+                <MudItem xs="12" sm="4">
+                    <MudAutocomplete T="PersonalEncuesta"
+                                     Label="Jefe de Campo"
+                                     Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
+                                     SearchFunc="SearchSupervisor"
+                                     Value="selectedSupervisor"
+                                     ValueChanged="SupervisorChanged"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Disabled="loading"
+                                     Required="true"
+                                     RequiredError="El Jefe de Campo es requerido."
+                                     For="@(() => selectedSupervisor)"
+                                     ResetValueOnEmptyText="true"
+                                     Clearable="true"
+                                     ToStringFunc="@(e => e?.Persona?.NombreCompleto)" />
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        <!-- 3. SECCIÓN: CARGA DE ARCHIVO EXCEL -->
+        <MudGrid>
             <MudItem xs="12">
                 <MudPaper Class="pa-4" Elevation="0" Style="border: 2px dashed #e0e0e0; border-radius: 8px;">
                     <div class="d-flex flex-column align-center">
@@ -182,7 +260,6 @@
 
                 @if (selectedFile != null)
                 {
-                    <!-- Usamos Icon="..." en MudAlert para sustituir el ícono nativo y centrarlo -->
                     <MudAlert Severity="Severity.Info"
                               Variant="Variant.Outlined"
                               Icon="@Icons.Material.Filled.InsertDriveFile"
@@ -200,12 +277,10 @@
                     </MudText>
                 }
 
-                <!-- Agregamos d-flex align-center para alinearlo perfectamente -->
                 <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-2 d-flex align-center">
                     <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" Class="mr-1" />
                     El archivo debe contener una columna "Encuesta" con los códigos a registrar
                 </MudText>
-
             </MudItem>
 
             <!-- Resumen del archivo cargado -->

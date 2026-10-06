@@ -32,6 +32,12 @@ namespace SurveyCat.Backend.Repositories.Implementations
                     .ThenInclude(m => m!.Departamento)
                 .Include(e => e.BarrioComarca)
                 .Include(e => e.Caserio)
+                .Include(e => e.Encuestador)
+                .ThenInclude(t => t!.Persona)
+                .Include(e => e.TecnicoCatastral)
+                .ThenInclude(t => t!.Persona)
+                .Include(e => e.Coordinador)
+                .ThenInclude(t => t!.Persona)
                 .Where(e => !_context.Fichas.Any(f => f.CodEncuesta == e.CodEncuesta))
                 .OrderBy(e => e.CodEncuesta)
                 .ToListAsync();
@@ -82,9 +88,15 @@ namespace SurveyCat.Backend.Repositories.Implementations
         public async Task<ActionResponse<EncuestaAutorizada>> GetAsync(long id)
         {
             var encuestaAutorizada = await _context.EncuestasAutorizadas
-                .Include(p => p.Municipio)
-                .Include(p => p.BarrioComarca)
-                .Include(p => p.Caserio)
+                .Include(e => e.Municipio)
+                .Include(e => e.BarrioComarca)
+                .Include(e => e.Caserio)
+                .Include(e => e.Encuestador)
+                .ThenInclude(t => t!.Persona)
+                .Include(e => e.TecnicoCatastral)
+                .ThenInclude(t => t!.Persona)
+                .Include(e => e.Coordinador)
+                .ThenInclude(t => t!.Persona)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (encuestaAutorizada == null)

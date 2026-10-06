@@ -153,7 +153,7 @@ public partial class FichaOcupantesDetails
         }
         else
         {
-            NavigationManager.NavigateTo($"/ocupantes/create/{FichaId}");
+            NavigationManager.NavigateTo($"/ocupantes/batch-create/{FichaId}");
         }
     }
 

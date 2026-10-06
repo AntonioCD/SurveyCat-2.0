@@ -197,9 +197,7 @@ public class Ficha
     // =========================================
 
     [Display(Name = "Informante")]
-    [Range(1, int.MaxValue, ErrorMessage = "Seleccione un Informante.")]
-    [Required]
-    public long InformanteId { get; set; }
+    public long? InformanteId { get; set; }
 
     public Persona? Informante { get; set; }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyCat.Backend.Data;
 
@@ -11,9 +12,11 @@ using SurveyCat.Backend.Data;
 namespace SurveyCat.Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260929155001_AddPersonalEncuestaFieldsInEncuestaAutorizadaEntity")]
+    partial class AddPersonalEncuestaFieldsInEncuestaAutorizadaEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -557,7 +560,7 @@ namespace SurveyCat.Backend.Migrations
                     b.Property<DateTime>("FechaEncuesta")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("InformanteId")
+                    b.Property<long>("InformanteId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Lote")
@@ -1387,7 +1390,8 @@ namespace SurveyCat.Backend.Migrations
                     b.HasOne("SurveyCat.Shared.Entities.Persona", "Informante")
                         .WithMany("Fichas")
                         .HasForeignKey("InformanteId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("SurveyCat.Shared.Entities.Municipio", "Municipio")
                         .WithMany("Fichas")

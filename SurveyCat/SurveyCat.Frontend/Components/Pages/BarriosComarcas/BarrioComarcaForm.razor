@@ -43,6 +43,7 @@
             <MudSwitch @bind-Value="@BarrioComarca.EsBarrio"
                        Label="@(BarrioComarca.EsBarrio ? "Es una Comarca" : "Es un Barrio")"
                        Color="Color.Primary"
+                       UncheckedColor="Color.Secondary"
                        ThumbIcon="@(BarrioComarca.EsBarrio? Icons.Material.Filled.Landscape : Icons.Material.Filled.LocationCity)" />
         </MudItem>
     </MudGrid>

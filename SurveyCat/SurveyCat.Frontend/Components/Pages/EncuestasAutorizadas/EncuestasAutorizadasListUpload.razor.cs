@@ -22,12 +22,20 @@ public partial class EncuestasAutorizadasListUpload
     private List<Municipio>? municipios;
     private List<BarrioComarca>? barriosComarcas;
     private List<Caserio>? caserios;
+    private List<PersonalEncuesta>? personalEncuestas = new();
+    private List<PersonalEncuesta>? listaEncuestadores = new();
+    private List<PersonalEncuesta>? listaTecnicosCatastrales = new();
+    private List<PersonalEncuesta>? listaSupervisores = new();
 
     private TipoSector tipoSectorSeleccionado;
     private Departamento? selectedDepartamento;
     private Municipio? selectedMunicipio;
     private BarrioComarca? selectedBarrioComarca;
     private Caserio? selectedCaserio;
+    private PersonalEncuesta? selectedEncuestador;
+    private PersonalEncuesta? selectedTecnicoCatastral;
+    private PersonalEncuesta? selectedSupervisor;
+
     private User? user;
     private string usuarioId = "SD";
     private IBrowserFile? selectedFile;
@@ -47,6 +55,7 @@ public partial class EncuestasAutorizadasListUpload
     {
         await LoadUserAsync();
         await LoadDepartamentosAsync();
+        await LoadPersonalEncuestaAsync();
         loading = false;
         StateHasChanged();
     }
@@ -88,6 +97,27 @@ public partial class EncuestasAutorizadasListUpload
         catch (Exception ex)
         {
             Snackbar.Add($"Error al cargar usuario: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadPersonalEncuestaAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<PersonalEncuesta>>("/api/personalEncuestas/combo");
+
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+
+        personalEncuestas = responseHttp.Response;
+
+        if (personalEncuestas != null)
+        {
+            listaEncuestadores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Encuestador).ToList();
+            listaTecnicosCatastrales = personalEncuestas.Where(x => x.TipoRol == TipoRol.TécnicoCatastral).ToList();
+            listaSupervisores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Supervisor).ToList();
         }
     }
 
@@ -273,7 +303,7 @@ public partial class EncuestasAutorizadasListUpload
                 DepartamentoNombre = selectedDepartamento!.Nombre,
                 MunicipioNombre = selectedMunicipio!.Nombre,
                 BarrioComarcaNombre = selectedBarrioComarca!.Nombre,
-                CaserioNombre = selectedCaserio?.Nombre ?? "SD"
+                CaserioNombre = selectedCaserio?.Nombre ?? "SD",
             });
         }
 
@@ -304,6 +334,9 @@ public partial class EncuestasAutorizadasListUpload
                     MunicipioId = selectedMunicipio!.Id,
                     BarrioComarcaId = selectedBarrioComarca!.Id,
                     CaserioId = selectedCaserio?.Id,
+                    EncuestadorId = selectedEncuestador?.Id,
+                    TecnicoCatastralId = selectedTecnicoCatastral?.Id,
+                    CoordinadorId = selectedSupervisor?.Id,
                     UsuarioCargaId = usuarioId,
                     Observacion = $"Carga masiva - {fechaCarga:dd/MM/yyyy HH:mm}"
                 };
@@ -475,6 +508,24 @@ public partial class EncuestasAutorizadasListUpload
         LimpiarVistaPrevia();
     }
 
+    private void EncuestadorChanged(PersonalEncuesta encuestador)
+    {
+        selectedEncuestador = encuestador;
+        //EncuestaAutorizada.EncuestadorId = encuestador?.Id ?? 0;
+    }
+
+    private void TecnicoCatastralChanged(PersonalEncuesta tecnicoCatastral)
+    {
+        selectedTecnicoCatastral = tecnicoCatastral;
+        //EncuestaAutorizada.TecnicoCatastralId = tecnicoCatastral?.Id ?? 0;
+    }
+
+    private void SupervisorChanged(PersonalEncuesta supervisor)
+    {
+        selectedSupervisor = supervisor;
+        //EncuestaAutorizada.CoordinadorId = supervisor?.Id ?? 0;
+    }
+
     private void LimpiarVistaPrevia()
     {
         mostrarVistaPrevia = false;
@@ -522,6 +573,39 @@ public partial class EncuestasAutorizadasListUpload
 
         return caserios!
             .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchEncuestador(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return listaEncuestadores!;
+
+        return listaEncuestadores!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchTecnicoCatastral(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return listaTecnicosCatastrales!;
+
+        return listaTecnicosCatastrales!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
+    private async Task<IEnumerable<PersonalEncuesta>> SearchSupervisor(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return listaSupervisores!;
+
+        return listaSupervisores!
+            .Where(c => c.Persona!.NombreCompleto.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
             .ToList();
     }
 

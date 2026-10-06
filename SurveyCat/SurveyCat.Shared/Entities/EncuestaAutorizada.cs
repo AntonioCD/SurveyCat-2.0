@@ -40,6 +40,28 @@ namespace SurveyCat.Shared.Entities
 
         public Caserio? Caserio { get; set; }
 
+        // =========================================
+        // PERSONAL
+        // =========================================
+
+        [Display(Name = "Encuestador")]
+        public int? EncuestadorId { get; set; }
+
+        [ForeignKey("EncuestadorId")]
+        public PersonalEncuesta? Encuestador { get; set; }
+
+        [Display(Name = "Coordinador")]
+        public int? CoordinadorId { get; set; }
+
+        [ForeignKey("CoordinadorId")]
+        public PersonalEncuesta? Coordinador { get; set; }
+
+        [Display(Name = "Técnico Catastral")]
+        public int? TecnicoCatastralId { get; set; }
+
+        [ForeignKey("TecnicoCatastralId")]
+        public PersonalEncuesta? TecnicoCatastral { get; set; }
+
         [Required]
         public DateTime FechaCarga { get; set; } = DateTime.UtcNow;
 

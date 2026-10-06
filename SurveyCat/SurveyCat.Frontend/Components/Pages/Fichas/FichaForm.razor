@@ -46,50 +46,85 @@
                     </div>
                 </div>
 
-                <div style="width: 280px;">
-                    @if (Ficha.Id != 0) 
+                <div class="d-flex align-center gap-3">
+                    @if (Ficha.Id != 0)
                     {
+                        <!-- CÓDIGO DE ENCUESTA -->
                         <MudField Label="CÓDIGO DE ENCUESTA"
                                   Variant="Variant.Outlined"
-                                  Margin="Margin.Dense">
-                            <MudText Typo="Typo.body1" Color="Color.Primary">
-                                <b>@Ficha.CodEncuesta</b>
+                                  Margin="Margin.Dense"
+                                  Class="ma-0"
+                                  Style="min-width: 250px;">
+                            <MudText Typo="Typo.body1" Color="Color.Primary" Class="fw-bold">
+                                @Ficha.CodEncuesta
                             </MudText>
                         </MudField>
-                    } else {
-                        <MudAutocomplete T="EncuestaAutorizada"
-                                         Label="CÓDIGO DE ENCUESTA"
-                                         Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un código --")"
-                                         SearchFunc="SearchEncuestaAutorizada"
-                                         Value="selectedEncuestaAutorizada"
-                                         ValueChanged="EncuestaAutorizadaChanged"
-                                         Variant="Variant.Outlined"
-                                         Margin="Margin.Dense"
-                                         Disabled="loading || Ficha.Id != 0"
-                                         Required="true"
-                                         RequiredError="Debe seleccionar un código de encuesta autorizada."
-                                         For="@(() => selectedEncuestaAutorizada)"
-                                         ResetValueOnEmptyText="true"
-                                         CoerceText="false"
-                                         CoerceValue="false"
-                                         ToStringFunc="@(e => e == null ? null : $"{e.CodEncuesta}")">
-                            <ItemTemplate Context="itemContext">
-                                <div class="d-flex flex-column">
-                                    <MudText Typo="Typo.body1">
-                                        <strong>@itemContext.CodEncuesta</strong>
+
+                        <!-- INDICADOR DE ESTADO -->
+                        <div class="d-flex align-center gap-2 px-2">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="fw-bold">
+                                ESTADO:
+                            </MudText>
+                            <MudChip T="string"
+                                     Color="@GetColorEstado(selectedEstado?.Nombre)"
+                                     Variant="Variant.Filled"
+                                     Size="Size.Medium"
+                                     Class="ma-0">
+                                <b>@(selectedEstado?.Nombre ?? Ficha.Estado?.Nombre ?? "Sin Estado")</b>
+                            </MudChip>
+                        </div>
+
+                        <!-- BOTÓN DE ACCIÓN -->
+                        @if (!EsEstadoDigitado())
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Success"
+                                       Size="Size.Medium"
+                                       StartIcon="@Icons.Material.Filled.CheckCircle"
+                                       OnClick="MarcarComoDigitadoAsync"
+                                       Disabled="loading"
+                                       Class="px-4">
+                                Marcar como Digitado
+                            </MudButton>
+                        }
+                    }
+                    else
+                    {
+                        <div style="width: 280px;">
+                            <MudAutocomplete T="EncuestaAutorizada"
+                                             Label="CÓDIGO DE ENCUESTA"
+                                             Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione un código --")"
+                                             SearchFunc="SearchEncuestaAutorizada"
+                                             Value="selectedEncuestaAutorizada"
+                                             ValueChanged="EncuestaAutorizadaChanged"
+                                             Variant="Variant.Outlined"
+                                             Margin="Margin.Dense"
+                                             Disabled="loading || Ficha.Id != 0"
+                                             Required="true"
+                                             RequiredError="Debe seleccionar un código de encuesta autorizada."
+                                             For="@(() => selectedEncuestaAutorizada)"
+                                             ResetValueOnEmptyText="true"
+                                             CoerceText="false"
+                                             CoerceValue="false"
+                                             ToStringFunc="@(e => e == null ? null : $"{e.CodEncuesta}")">
+                                <ItemTemplate Context="itemContext">
+                                    <div class="d-flex flex-column">
+                                        <MudText Typo="Typo.body1">
+                                            <strong>@itemContext.CodEncuesta</strong>
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @itemContext.Municipio?.Nombre - @(itemContext.BarrioComarca?.Nombre ?? "SD")
+                                        </MudText>
+                                    </div>
+                                </ItemTemplate>
+                                <NoItemsTemplate>
+                                    <MudText Typo="Typo.body2" Color="Color.Warning" Class="pa-2">
+                                        <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
+                                        No hay códigos disponibles
                                     </MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                        @itemContext.Municipio?.Nombre - @(itemContext.BarrioComarca?.Nombre ?? "SD")
-                                    </MudText>
-                                </div>
-                            </ItemTemplate>
-                            <NoItemsTemplate>
-                                <MudText Typo="Typo.body2" Color="Color.Warning" Class="pa-2">
-                                    <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" />
-                                    No hay códigos disponibles
-                                </MudText>
-                            </NoItemsTemplate>
-                        </MudAutocomplete>
+                                </NoItemsTemplate>
+                            </MudAutocomplete>
+                        </div>
                     }
                 </div>
             </div>
@@ -503,19 +538,30 @@
                                             </div>
                                         </CardHeaderContent>
                                         <CardHeaderActions>
+                                            @if (TieneInformante)
+                                            {
+                                                <MudButton Variant="Variant.Outlined"
+                                                           StartIcon="@Icons.Material.Filled.PersonRemove"
+                                                           Color="Color.Error"
+                                                           OnClick="QuitarInformante"
+                                                           Size="Size.Medium"
+                                                           Class="mt-1 mr-2">
+                                                    Quitar Persona
+                                                </MudButton>
+                                            }
                                             <MudButton Variant="Variant.Outlined"
                                                        StartIcon="@Icons.Material.Filled.PersonSearch"
                                                        Color="Color.Info"
                                                        OnClick="@(() => ShowModalPersonaSearchAsync())"
                                                        Size="Size.Medium"
                                                        Class="mt-1">
-                                                @(Ficha.InformanteId == 0 ? "Buscar Persona" : "Cambiar Persona")
+                                                @(TieneInformante ? "Cambiar Persona" : "Buscar Persona")
                                             </MudButton>
                                         </CardHeaderActions>
                                     </MudCardHeader>
 
                                     <MudCardContent>
-                                        @if (Ficha.InformanteId == 0)
+                                        @if (!TieneInformante)
                                         {
                                             <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="my-1">
                                                 Debe buscar y seleccionar una persona registrada para vincularla como informante.
@@ -590,43 +636,69 @@
                                             {
                                                 <MudItem xs="12">
                                                     <MudCheckBox T="bool"
-                                                                    Label="¿El informante es también propietario del inmueble?"
-                                                                    @bind-Value="esInformantePropietario"
-                                                                    Color="Color.Primary"
-                                                                    Disabled="loading || Ficha.InformanteId == 0" />
+                                                                 Label="¿El informante es también propietario del inmueble?"
+                                                                 @bind-Value="esInformantePropietario"
+                                                                 Color="Color.Primary"
+                                                                 Disabled="loading || !TieneInformante" />
                                                 </MudItem>
                                             }
 
                                             <MudItem xs="12" sm="6">
                                                 <MudAutocomplete T="Diccionario"
-                                                                    Label="Relación con la Parcela"
-                                                                    Placeholder="@(Ficha.InformanteId == 0 ? "-- Seleccione primero un informante --" : (loading ? "-- Cargando... --" : "-- Seleccione --"))"
-                                                                    SearchFunc="SearchRelacionInformanteParcela"
-                                                                    Value="selectedRelacionInformanteParcela"
-                                                                    ValueChanged="RelacionInformanteParcelaChanged"
-                                                                    ResetValueOnEmptyText="true"
-                                                                    Clearable="true"
-                                                                    Variant="Variant.Outlined"
-                                                                    Margin="Margin.Dense"
-                                                                    Disabled="loading || Ficha.InformanteId == 0"
-                                                                    ToStringFunc="@(e => e?.Nombre)" />
+                                                                 Label="Relación con la Parcela"
+                                                                 Placeholder="@(!TieneInformante ? "-- Seleccione primero un informante --" : (loading ? "-- Cargando... --" : "-- Seleccione --"))"
+                                                                 SearchFunc="SearchRelacionInformanteParcela"
+                                                                 Value="selectedRelacionInformanteParcela"
+                                                                 ValueChanged="RelacionInformanteParcelaChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
+                                                                 Variant="Variant.Outlined"
+                                                                 Margin="Margin.Dense"
+                                                                 Disabled="loading || !TieneInformante"
+                                                                 ToStringFunc="@(e => e?.Nombre)" />
                                             </MudItem>
 
                                             <MudItem xs="12" sm="6">
                                                 <MudAutocomplete T="Diccionario"
-                                                                    Label="Relación con el Propietario"
-                                                                    Placeholder="@(Ficha.InformanteId == 0 ? "-- Seleccione primero un informante --" : (loading ? "-- Cargando... --" : "-- Seleccione --"))"
-                                                                    SearchFunc="SearchRelacionInformantePropietario"
-                                                                    Value="selectedRelacionInformantePropietario"
-                                                                    ValueChanged="RelacionInformantePropietarioChanged"
-                                                                    ResetValueOnEmptyText="true"
-                                                                    Clearable="true"
-                                                                    Variant="Variant.Outlined"
-                                                                    Margin="Margin.Dense"
-                                                                    Disabled="loading || Ficha.InformanteId == 0"
-                                                                    ToStringFunc="@(e => e?.Nombre)" />
+                                                                 Label="Relación con el Propietario"
+                                                                 Placeholder="@(!TieneInformante ? "-- Seleccione primero un informante --" : (loading ? "-- Cargando... --" : "-- Seleccione --"))"
+                                                                 SearchFunc="SearchRelacionInformantePropietario"
+                                                                 Value="selectedRelacionInformantePropietario"
+                                                                 ValueChanged="RelacionInformantePropietarioChanged"
+                                                                 ResetValueOnEmptyText="true"
+                                                                 Clearable="true"
+                                                                 Variant="Variant.Outlined"
+                                                                 Margin="Margin.Dense"
+                                                                 Disabled="loading || !TieneInformante"
+                                                                 ToStringFunc="@(e => e?.Nombre)" />
                                             </MudItem>
                                         </MudGrid>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudItem>
+
+                            <!-- SECCIÓN 6: OBSERVACIONES -->
+                            <MudItem xs="12">
+                                <MudCard Elevation="1" Outlined="true" Class="rounded-lg">
+                                    <MudCardHeader Class="pb-2">
+                                        <CardHeaderContent>
+                                            <div class="d-flex align-center gap-2">
+                                                <MudText Typo="Typo.h6" Color="Color.Primary" Class="fw-semibold">Observaciones</MudText>
+                                            </div>
+                                        </CardHeaderContent>
+                                    </MudCardHeader>
+
+                                    <MudCardContent>
+                                        <MudTextField Label="Observaciones"
+                                                      @bind-Value="Ficha.Observacion"
+                                                      @bind-Value:after="() => Ficha.Observacion = Ficha.Observacion?.ToUpper()"
+                                                      Placeholder="Escriba cualquier aclaración o nota relevante sobre el levantamiento de la encuesta..."
+                                                      Variant="Variant.Outlined"
+                                                      Margin="Margin.Dense"
+                                                      Lines="10"
+                                                      Immediate="true"
+                                                      Disabled="loading"
+                                                      For="@(() => Ficha.Observacion)" />
                                     </MudCardContent>
                                 </MudCard>
                             </MudItem>
