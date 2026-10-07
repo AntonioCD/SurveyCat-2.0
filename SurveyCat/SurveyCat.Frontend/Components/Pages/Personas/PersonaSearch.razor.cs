@@ -17,11 +17,21 @@ public partial class PersonaSearch
     private List<Persona>? Personas { get; set; }
     private MudTable<Persona> tablePersonas = new();
     private int personasTotalRecords = 0;
+
     private string cedulaSearchTerm = string.Empty;
     private bool searchingCedula = false;
-    private bool savingImport = false;
     private bool cedulaBuscadaNoEncontrada = false;
     private ResultadoBusquedaCedulaDTO? resultadoBusqueda;
+
+    private string searchPrimerNombreTerm = string.Empty;
+    private string searchSegundoNombreTerm = string.Empty;
+    private string searchPrimerApellidoTerm = string.Empty;
+    private string searchSegundoApellidoTerm = string.Empty;
+
+    private bool searchingNombre = false;
+    private ResultadoBusquedaNombreDTO? resultadoBusquedaNombre;
+
+    private bool savingImport = false;
     private bool loading;
 
     private readonly int[] pageSizeOptions = { 10, 25, 50, int.MaxValue };
@@ -133,9 +143,9 @@ public partial class PersonaSearch
         if (isEdit)
         {
             var parameters = new DialogParameters
-        {
-            { "Id", id }
-        };
+            {
+                { "Id", id }
+            };
             dialog = await DialogService.ShowAsync<PersonaEdit>("Editar Persona", parameters, options);
         }
         else
@@ -145,21 +155,13 @@ public partial class PersonaSearch
 
         var result = await dialog.Result;
 
-        // CORRECCIÓN: Verificar si NO está cancelado y si hay datos
         if (result != null && !result.Canceled && result.Data != null)
         {
-            // Recargar la tabla
             await LoadTotalRecordsPersonasAsync();
             await tablePersonas.ReloadServerData();
 
-            // Mostrar mensaje de éxito
             var mensaje = isEdit ? "Persona actualizada exitosamente" : "Persona creada exitosamente";
             Snackbar.Add(mensaje, Severity.Success);
-        }
-        else if (result != null && result.Canceled)
-        {
-            // El usuario canceló, no hacer nada
-            Console.WriteLine("Usuario canceló la operación");
         }
     }
 
@@ -168,6 +170,14 @@ public partial class PersonaSearch
         if (e.Key == "Enter")
         {
             await BuscarPorCedulaAsync();
+        }
+    }
+
+    private async Task HandleNombreKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await BuscarPorNombreAsync();
         }
     }
 
@@ -216,15 +226,62 @@ public partial class PersonaSearch
         }
     }
 
-    private async Task ImportarPersonaDesdePadronAsync()
+    private async Task BuscarPorNombreAsync()
     {
-        if (resultadoBusqueda?.DatosPadron == null) return;
+        if (string.IsNullOrWhiteSpace(searchPrimerNombreTerm) &&
+            string.IsNullOrWhiteSpace(searchSegundoNombreTerm) &&
+            string.IsNullOrWhiteSpace(searchPrimerApellidoTerm) &&
+            string.IsNullOrWhiteSpace(searchSegundoApellidoTerm))
+        {
+            Snackbar.Add("Ingrese al menos un nombre o apellido para realizar la búsqueda.", Severity.Warning);
+            return;
+        }
+
+        searchingNombre = true;
+        resultadoBusquedaNombre = null;
+
+        try
+        {
+            var url = $"api/personas/buscar-por-nombre" +
+                      $"?primerNombre={Uri.EscapeDataString(searchPrimerNombreTerm)}" +
+                      $"&segundoNombre={Uri.EscapeDataString(searchSegundoNombreTerm)}" +
+                      $"&primerApellido={Uri.EscapeDataString(searchPrimerApellidoTerm)}" +
+                      $"&segundoApellido={Uri.EscapeDataString(searchSegundoApellidoTerm)}";
+
+            var responseHttp = await Repository.GetAsync<ResultadoBusquedaNombreDTO>(url);
+
+            if (responseHttp.Error)
+            {
+                var msg = await responseHttp.GetErrorMessageAsync();
+                Snackbar.Add(msg!, Severity.Error);
+                return;
+            }
+
+            resultadoBusquedaNombre = responseHttp.Response;
+
+            // Filtrar automáticamente la tabla general local con los valores ingresados
+            var filtroCombinado = $"{searchPrimerNombreTerm} {searchSegundoNombreTerm} {searchPrimerApellidoTerm} {searchSegundoApellidoTerm}".Trim();
+            if (!string.IsNullOrWhiteSpace(filtroCombinado))
+            {
+                await SetFilterValuePersonas(filtroCombinado);
+            }
+        }
+        finally
+        {
+            searchingNombre = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ImportarPersonaDesdePadronAsync(PadronPersonaDTO padronDTO)
+    {
+        if (padronDTO == null) return;
 
         savingImport = true;
 
         try
         {
-            var responseHttp = await Repository.PostAsync<PadronPersonaDTO, Persona>("api/personas/importar-padron", resultadoBusqueda.DatosPadron);
+            var responseHttp = await Repository.PostAsync<PadronPersonaDTO, Persona>("api/personas/importar-padron", padronDTO);
 
             if (responseHttp.Error)
             {
@@ -237,7 +294,7 @@ public partial class PersonaSearch
             if (nuevaPersona != null)
             {
                 Snackbar.Add("Persona agregada exitosamente al sistema desde el Padrón.", Severity.Success);
-                SeleccionarPersona(nuevaPersona); // Cierra el modal y la selecciona inmediatamente en FichaForm
+                SeleccionarPersona(nuevaPersona);
             }
         }
         finally

@@ -2,74 +2,175 @@
 
 <MudDialog>
     <DialogContent>
-        <!-- BÚSQUEDA DIRECTA POR CÉDULA EN PADRÓN O SISTEMA -->
+        <!-- SECCIÓN DE BÚSQUEDA RÁPIDA (CÉDULA O NOMBRES EN PADRÓN) -->
         <MudPaper Elevation="1" Class="pa-3 mb-4 rounded-lg bg-light">
-            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">
-                <b>Búsqueda Rápida por Cédula (Sistema o Padrón Electoral)</b>
-            </MudText>
-            <div class="d-flex align-center gap-2">
-                <MudTextField @bind-Value="cedulaSearchTerm"
-                              Label="Cédula de Identidad"
-                              Placeholder="Ej. 001-160895-0000X o 0011608950000X"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Immediate="true"
-                              OnKeyDown="@HandleCedulaKeyDown"
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Badge" />
+            <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
 
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           StartIcon="@Icons.Material.Filled.Search"
-                           OnClick="BuscarPorCedulaAsync"
-                           Disabled="searchingCedula"
-                           Size="Size.Medium">
-                    @if (searchingCedula)
-                    {
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="ms-1" />
-                    }
-                    else
-                    {
-                        <span>Buscar</span>
-                    }
-                </MudButton>
-            </div>
+                <!-- PESTAÑA 1: BÚSQUEDA POR CÉDULA -->
+                <MudTabPanel Text="Buscar por Cédula" Icon="@Icons.Material.Filled.Badge">
+                    <div class="d-flex align-center gap-2 mt-2">
+                        <MudTextField @bind-Value="cedulaSearchTerm"
+                                      Label="Cédula de Identidad"
+                                      Placeholder="Ej. 001-160895-0000X o 0011608950000X"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      OnKeyDown="@HandleCedulaKeyDown"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Badge" />
 
-            <!-- RESULTADO DE BÚSQUEDA EN PADRÓN -->
-            @if (resultadoBusqueda?.EncontradoEnPadron == true && resultadoBusqueda.DatosPadron != null)
-            {
-                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
-                    <div class="d-flex align-center justify-space-between flex-wrap gap-2">
-                        <div>
-                            <MudText Typo="Typo.body2">
-                                <b>Persona encontrada en el Padrón Electoral:</b>
-                            </MudText>
-                            <MudText Typo="Typo.body1" Color="Color.Primary">
-                                <b>@resultadoBusqueda.DatosPadron.NombreCompleto</b> — Cédula: <b>@resultadoBusqueda.DatosPadron.Cedula</b>
-                            </MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                Domicilio: @(resultadoBusqueda.DatosPadron.Domicilio ?? "Sin registro")
-                            </MudText>
-                        </div>
                         <MudButton Variant="Variant.Filled"
-                                   Color="Color.Success"
-                                   StartIcon="@Icons.Material.Filled.PersonAdd"
-                                   OnClick="ImportarPersonaDesdePadronAsync"
-                                   Disabled="savingImport">
-                            Agregar a Personas del Sistema
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Search"
+                                   OnClick="BuscarPorCedulaAsync"
+                                   Disabled="searchingCedula"
+                                   Size="Size.Medium">
+                            @if (searchingCedula)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="ms-1" />
+                            }
+                            else
+                            {
+                                <span>Buscar</span>
+                            }
                         </MudButton>
                     </div>
-                </MudAlert>
-            }
-            else if (cedulaBuscadaNoEncontrada)
-            {
-                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">
-                    No se encontró ninguna persona registrada en el Sistema ni en el Padrón con la cédula <b>@cedulaSearchTerm</b>.
-                </MudAlert>
-            }
+
+                    @if (resultadoBusqueda?.EncontradoEnPadron == true && resultadoBusqueda.DatosPadron != null)
+                    {
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+                            <div class="d-flex align-center justify-space-between flex-wrap gap-2">
+                                <div>
+                                    <MudText Typo="Typo.body2"><b>Persona encontrada en el Padrón:</b></MudText>
+                                    <MudText Typo="Typo.body1" Color="Color.Primary">
+                                        <b>@resultadoBusqueda.DatosPadron.NombreCompleto</b> — Cédula: <b>@resultadoBusqueda.DatosPadron.Cedula</b>
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">Domicilio: @(resultadoBusqueda.DatosPadron.Domicilio ?? "Sin registro")</MudText>
+                                </div>
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Success"
+                                           StartIcon="@Icons.Material.Filled.PersonAdd"
+                                           OnClick="@(() => ImportarPersonaDesdePadronAsync(resultadoBusqueda.DatosPadron))"
+                                           Disabled="savingImport">
+                                    Agregar al Sistema
+                                </MudButton>
+                            </div>
+                        </MudAlert>
+                    }
+                    else if (cedulaBuscadaNoEncontrada)
+                    {
+                        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">
+                            No se encontró ninguna persona en el Sistema ni en el Padrón con la cédula <b>@cedulaSearchTerm</b>.
+                        </MudAlert>
+                    }
+                </MudTabPanel>
+
+                <!-- PESTAÑA 2: BÚSQUEDA POR NOMBRES / APELLIDOS -->
+                <MudTabPanel Text="Buscar por Nombre / Apellido" Icon="@Icons.Material.Filled.PersonSearch">
+                    <MudGrid Class="mt-1" Spacing="2">
+                        <MudItem xs="12" sm="3">
+                            <MudTextField @bind-Value="searchPrimerNombreTerm"
+                                          Label="Primer Nombre"
+                                          Placeholder="Ej. JORGE"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true"
+                                          OnKeyDown="@HandleNombreKeyDown" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="3">
+                            <MudTextField @bind-Value="searchSegundoNombreTerm"
+                                          Label="Segundo Nombre"
+                                          Placeholder="Ej. LUIS"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true"
+                                          OnKeyDown="@HandleNombreKeyDown" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="3">
+                            <MudTextField @bind-Value="searchPrimerApellidoTerm"
+                                          Label="Primer Apellido"
+                                          Placeholder="Ej. LUNA"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true"
+                                          OnKeyDown="@HandleNombreKeyDown" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="3">
+                            <MudTextField @bind-Value="searchSegundoApellidoTerm"
+                                          Label="Segundo Apellido"
+                                          Placeholder="Ej. ESPINOZA"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Immediate="true"
+                                          OnKeyDown="@HandleNombreKeyDown" />
+                        </MudItem>
+
+                        <MudItem xs="12" Class="d-flex justify-end my-1">
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Search"
+                                       OnClick="BuscarPorNombreAsync"
+                                       Disabled="searchingNombre">
+                                Buscar en Padrón y Sistema
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+
+                    <!-- RESULTADOS DE BÚSQUEDA POR NOMBRE -->
+                    @if (resultadoBusquedaNombre != null)
+                    {
+                        @if (resultadoBusquedaNombre.PersonasEnPadron.Any())
+                        {
+                            <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mt-3 mb-1">
+                                <b>Coincidencias encontradas en Padrón Electoral (@resultadoBusquedaNombre.PersonasEnPadron.Count):</b>
+                            </MudText>
+                            <MudSimpleTable Dense="true" Hover="true" Outlined="true" Style="max-height: 200px; overflow-y: auto;">
+                                <thead>
+                                    <tr>
+                                        <th>Cédula</th>
+                                        <th>Nombre Completo</th>
+                                        <th>Domicilio</th>
+                                        <th style="text-align:center;">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in resultadoBusquedaNombre.PersonasEnPadron)
+                                    {
+                                        <tr>
+                                            <td>@item.Cedula</td>
+                                            <td><b>@item.NombreCompleto</b></td>
+                                            <td><small>@(item.Domicilio ?? "-")</small></td>
+                                            <td style="text-align:center;">
+                                                <MudButton Variant="Variant.Filled"
+                                                           Color="Color.Success"
+                                                           Size="Size.Small"
+                                                           StartIcon="@Icons.Material.Filled.PersonAdd"
+                                                           OnClick="@(() => ImportarPersonaDesdePadronAsync(item))"
+                                                           Disabled="savingImport">
+                                                    Importar
+                                                </MudButton>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </MudSimpleTable>
+                        }
+                        else if (!resultadoBusquedaNombre.PersonasEnSistema.Any())
+                        {
+                            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mt-3">
+                                No se encontraron personas coincidentes en el Padrón Electoral.
+                            </MudAlert>
+                        }
+                    }
+                </MudTabPanel>
+
+            </MudTabs>
         </MudPaper>
 
-        <!-- TABLA HABITUAL DE PERSONAS -->
+        <!-- TABLA HABITUAL DE PERSONAS LOCALES EN EL SISTEMA -->
         <MudTable @ref="tablePersonas"
                   ServerData="LoadListPersonasAsync"
                   Dense="true"

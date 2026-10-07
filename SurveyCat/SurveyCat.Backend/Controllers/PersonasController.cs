@@ -76,6 +76,21 @@ public class PersonasController : GenericController<Persona>
         return BadRequest(response.Message);
     }
 
+    [HttpGet("buscar-por-nombre")]
+    public async Task<IActionResult> BuscarPorNombreAsync(
+    [FromQuery] string? primerNombre,
+    [FromQuery] string? segundoNombre,
+    [FromQuery] string? primerApellido,
+    [FromQuery] string? segundoApellido)
+    {
+        var response = await _personasHelper.BuscarPorNombreAsync(primerNombre, segundoNombre, primerApellido, segundoApellido);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest(response.Message);
+    }
+
     [HttpPost("importar-padron")]
     public async Task<IActionResult> ImportarDesdePadronAsync([FromBody] PadronPersonaDTO padronDto)
     {
