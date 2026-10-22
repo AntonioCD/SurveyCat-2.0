@@ -22,19 +22,22 @@ public partial class FichaForm
     [EditorRequired, Parameter] public EventCallback OnValidSubmit { get; set; }
     [EditorRequired, Parameter] public EventCallback ReturnAction { get; set; }
 
-    #endregion
+    #endregion Services & Parameters
 
     #region State & Private Fields
 
     // Banderas y contexto de edición
     private EditContext editContext = null!;
+
     private bool loading = true;
     private bool isInitialized = false;
     private bool esInformantePropietario = false;
+    private long currentFichaId = 0;
     // La variable activeTabIndex se elimina de aquí porque ya está declarada en FichaForm.razor
 
     // Colecciones / Catálogos
     private List<EncuestaAutorizada>? encuestasAutorizadasDisponibles = new();
+
     private List<Diccionario>? diccionarios = new();
     private List<Diccionario> listaUnidadMedida = new();
     private List<Diccionario> listaEstado = new();
@@ -47,6 +50,7 @@ public partial class FichaForm
     private List<Municipio>? municipios = new();
     private List<BarrioComarca>? barriosComarcas = new();
     private List<Caserio>? caserios;
+    private List<Jornada>? jornadas;
 
     private List<PersonalEncuesta>? personalEncuestas = new();
     private List<PersonalEncuesta>? listaEncuestadores = new();
@@ -55,6 +59,7 @@ public partial class FichaForm
 
     // Entidades seleccionadas
     private Persona? informante = new();
+
     private EncuestaAutorizada? selectedEncuestaAutorizada;
     private Diccionario? selectedUnidadMedida;
     private Diccionario? selectedEstado;
@@ -68,19 +73,46 @@ public partial class FichaForm
     private Municipio? selectedMunicipio;
     private BarrioComarca? selectedBarrioComarca;
     private Caserio? selectedCaserio;
+    private Jornada? selectedJornada;
     private PersonalEncuesta? selectedEncuestador;
     private PersonalEncuesta? selectedTecnicoCatastral;
     private PersonalEncuesta? selectedSupervisor;
 
-    #endregion
+    #endregion State & Private Fields
 
     #region Computed Properties
 
     private bool TieneInformante => Ficha?.InformanteId.HasValue == true && Ficha.InformanteId.Value > 0;
 
-    #endregion
+    #endregion Computed Properties
 
     #region Lifecycle Methods
+
+    //protected override async Task OnParametersSetAsync()
+    //{
+    //    var uri = new Uri(NavigationManager.Uri);
+    //    var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+    //    if (int.TryParse(query.Get("tab"), out int tabIndex))
+    //    {
+    //        activeTabIndex = tabIndex;
+    //    }
+
+    //    if (Ficha == null)
+    //    {
+    //        Ficha = new Ficha();
+    //    }
+
+    //    if (editContext == null || editContext.Model != Ficha)
+    //    {
+    //        editContext = new EditContext(Ficha);
+    //    }
+
+    //    // Cargar si es la primera vez o si el informante no se ha sincronizado correctamente
+    //    if (!isInitialized || (Ficha.Id != 0 && Ficha.InformanteId > 0 && (informante == null || informante.Id != Ficha.InformanteId)))
+    //    {
+    //        await LoadDataAsync();
+    //    }
+    //}
 
     protected override async Task OnParametersSetAsync()
     {
@@ -101,14 +133,15 @@ public partial class FichaForm
             editContext = new EditContext(Ficha);
         }
 
-        // Cargar si es la primera vez o si el informante no se ha sincronizado correctamente
-        if (!isInitialized || (Ficha.Id != 0 && Ficha.InformanteId > 0 && (informante == null || informante.Id != Ficha.InformanteId)))
+        // Cargar si no se ha inicializado O si el ID de la Ficha cambió (de 0 al ID real cargado de la API)
+        if (!isInitialized || (Ficha.Id != 0 && Ficha.Id != currentFichaId))
         {
+            currentFichaId = Ficha.Id;
             await LoadDataAsync();
         }
     }
 
-    #endregion
+    #endregion Lifecycle Methods
 
     #region Data Loading Methods
 
@@ -122,13 +155,15 @@ public partial class FichaForm
             var tareaPersonal = LoadPersonalEncuestaAsync();
             var tareaDepartamentos = LoadDepartamentosAsync();
             var tareaEncuestas = LoadEncuestasAutorizadasDisponiblesAsync();
+            var tareaJornadas = LoadJornadasAsync();
 
-            await Task.WhenAll(tareaDiccionarios, tareaPersonal, tareaDepartamentos, tareaEncuestas);
+            await Task.WhenAll(tareaDiccionarios, tareaPersonal, tareaDepartamentos, tareaEncuestas, tareaJornadas);
 
             if (Ficha.Id != 0)
             {
                 await LoadRelatedDataForEditAsync();
 
+                selectedJornada = jornadas?.FirstOrDefault(j => j.Id == Ficha.JornadaId) ?? Ficha.Jornada;
                 selectedEncuestador = Ficha.Encuestador;
                 selectedTecnicoCatastral = Ficha.TecnicoCatastral;
                 selectedSupervisor = Ficha.Coordinador;
@@ -221,6 +256,19 @@ public partial class FichaForm
         }
     }
 
+    private string FormatJornada(Jornada? jornada)
+    {
+        if (jornada == null)
+            return string.Empty;
+
+        if (!string.IsNullOrEmpty(jornada.CodJornada) && !string.IsNullOrEmpty(jornada.Nombre))
+        {
+            return $"{jornada.CodJornada} - {jornada.Nombre}";
+        }
+
+        return jornada.Nombre ?? jornada.CodJornada ?? string.Empty;
+    }
+
     private async Task LoadEncuestasAutorizadasDisponiblesAsync()
     {
         var responseHttp = await Repository.GetAsync<List<EncuestaAutorizada>>("/api/encuestasAutorizadas/disponibles");
@@ -231,6 +279,18 @@ public partial class FichaForm
             return;
         }
         encuestasAutorizadasDisponibles = responseHttp.Response;
+    }
+
+    private async Task LoadJornadasAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<Jornada>>("/api/jornadas/combo");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+        jornadas = responseHttp.Response;
     }
 
     private async Task LoadPersonalEncuestaAsync()
@@ -322,7 +382,7 @@ public partial class FichaForm
         caserios = responseHttp.Response;
     }
 
-    #endregion
+    #endregion Data Loading Methods
 
     #region Selection Handlers
 
@@ -362,6 +422,12 @@ public partial class FichaForm
         editContext?.NotifyFieldChanged(FieldIdentifier.Create(() => Ficha.CodEncuesta));
 
         StateHasChanged();
+    }
+
+    private void JornadaChanged(Jornada jornada)
+    {
+        selectedJornada = jornada;
+        Ficha.JornadaId = jornada?.Id ?? 0;
     }
 
     private void EncuestadorChanged(PersonalEncuesta encuestador)
@@ -503,7 +569,7 @@ public partial class FichaForm
         }
     }
 
-    #endregion
+    #endregion Selection Handlers
 
     #region Search / Autocomplete Methods
 
@@ -521,6 +587,16 @@ public partial class FichaForm
                        (e.Municipio?.Nombre?.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ?? false) ||
                        (e.BarrioComarca?.Nombre?.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ?? false))
             .Take(10)
+            .ToList();
+    }
+
+    private async Task<IEnumerable<Jornada>> SearchJornada(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5, token);
+        if (string.IsNullOrWhiteSpace(searchText)) return jornadas!;
+
+        return jornadas!
+            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) || c.CodJornada.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
             .ToList();
     }
 
@@ -605,7 +681,9 @@ public partial class FichaForm
     }
 
     private async Task<IEnumerable<Diccionario>> SearchServidumbreAgua(string searchText, CancellationToken token) => await SearchServidumbreInternal(searchText, token);
+
     private async Task<IEnumerable<Diccionario>> SearchServidumbrePase(string searchText, CancellationToken token) => await SearchServidumbreInternal(searchText, token);
+
     private async Task<IEnumerable<Diccionario>> SearchServidumbreOtra(string searchText, CancellationToken token) => await SearchServidumbreInternal(searchText, token);
 
     private async Task<IEnumerable<Diccionario>> SearchServidumbreInternal(string searchText, CancellationToken token)
@@ -662,7 +740,7 @@ public partial class FichaForm
             .ToList();
     }
 
-    #endregion
+    #endregion Search / Autocomplete Methods
 
     #region Form Submit & Modal Actions
 
@@ -788,7 +866,7 @@ public partial class FichaForm
         }
     }
 
-    #endregion
+    #endregion Form Submit & Modal Actions
 
     #region Private Helpers
 
@@ -864,5 +942,5 @@ public partial class FichaForm
         return Color.Secondary;
     }
 
-    #endregion
+    #endregion Private Helpers
 }

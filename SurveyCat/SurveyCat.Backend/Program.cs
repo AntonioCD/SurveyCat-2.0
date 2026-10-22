@@ -36,6 +36,7 @@ builder.Services.AddScoped<IDocumentosAnexosRepository, DocumentosAnexosReposito
 builder.Services.AddScoped<IEncuestasAutorizadasRepository, EncuestasAutorizadasRepository>();
 builder.Services.AddScoped<IOcupantesRepository, OcupantesRepository>();
 builder.Services.AddScoped<IFichasRepository, FichasRepository>();
+builder.Services.AddScoped<IJornadasRepository, JornadasRepository>();
 builder.Services.AddScoped<IMunicipiosRepository, MunicipiosRepository>();
 builder.Services.AddScoped<IPersonalEncuestasRepository, PersonalEncuestasRepository>();
 builder.Services.AddScoped<IPersonasRepository, PersonasRepository>();
@@ -54,6 +55,7 @@ builder.Services.AddScoped<IDocumentosAnexosUnitOfWork, DocumentosAnexosUnitOfWo
 builder.Services.AddScoped<IEncuestasAutorizadasUnitOfWork, EncuestasAutorizadasUnitOfWork>();
 builder.Services.AddScoped<IOcupantesUnitOfWork, OcupantesUnitOfWork>();
 builder.Services.AddScoped<IFichasUnitOfWork, FichasUnitOfWork>();
+builder.Services.AddScoped<IJornadasUnitOfWork, JornadasUnitOfWork>();
 builder.Services.AddScoped<IMunicipiosUnitOfWork, MunicipiosUnitOfWork>();
 builder.Services.AddScoped<IPersonalEncuestasUnitOfWork, PersonalEncuestasUnitOfWork>();
 builder.Services.AddScoped<IPropietariosUnitOfWork, PropietariosUnitOfWork>();

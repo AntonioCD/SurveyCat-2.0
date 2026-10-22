@@ -26,4 +26,6 @@ public class EncuestasAutorizadasUnitOfWork : GenericUnitOfWork<EncuestaAutoriza
 
     public async Task<ActionResponse<int>> BulkCreateAsync(List<EncuestaAutorizada> encuestas)
         => await _encuestasAutorizadasRepository.BulkCreateAsync(encuestas);
+
+    public async Task<ActionResponse<EncuestaAutorizada>> DeleteByLongAsync(long id) => await _encuestasAutorizadasRepository.DeleteByLongAsync(id);
 }

@@ -13,6 +13,7 @@ public partial class EncuestaAutorizadaForm
     private EditContext editContext = null!;
     private bool loading = true;
     private bool isInitialized = false;
+    private List<Jornada>? jornadas;
     private List<Departamento>? departamentos;
     private List<Municipio>? municipios;
     private List<BarrioComarca>? barriosComarcas;
@@ -22,6 +23,7 @@ public partial class EncuestaAutorizadaForm
     private List<PersonalEncuesta>? listaTecnicosCatastrales = new();
     private List<PersonalEncuesta>? listaSupervisores = new();
 
+    private Jornada? selectedJornada;
     private Departamento? selectedDepartamento;
     private Municipio? selectedMunicipio;
     private BarrioComarca? selectedBarrioComarca;
@@ -65,6 +67,7 @@ public partial class EncuestaAutorizadaForm
         try
         {
             // Cargar departamentos primero
+            await LoadJornadasAsync();
             await LoadDepartamentosAsync();
             await LoadPersonalEncuestaAsync();
 
@@ -143,6 +146,18 @@ public partial class EncuestaAutorizadaForm
         }
     }
 
+    private async Task LoadJornadasAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<Jornada>>("/api/jornadas/combo");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+        jornadas = responseHttp.Response;
+    }
+
     private async Task LoadDepartamentosAsync()
     {
         var responseHttp = await Repository.GetAsync<List<Departamento>>("/api/departamentos/combo");
@@ -211,6 +226,13 @@ public partial class EncuestaAutorizadaForm
             listaSupervisores = personalEncuestas.Where(x => x.TipoRol == TipoRol.Supervisor).ToList();
         }
     }
+
+    private void JornadaChanged(Jornada jornada)
+    {
+        selectedJornada = jornada;
+        EncuestaAutorizada.JornadaId = jornada?.Id ?? 0;
+    }
+
 
     private async Task DepartamentoChangedAsync(Departamento departamento)
     {
@@ -319,6 +341,18 @@ public partial class EncuestaAutorizadaForm
         selectedSupervisor = supervisor;
         EncuestaAutorizada.CoordinadorId = supervisor?.Id ?? 0;
     }
+
+    private async Task<IEnumerable<Jornada>> SearchJornada(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return jornadas!;
+
+        return jornadas!
+            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) || c.CodJornada.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+    }
+
 
     private async Task<IEnumerable<Departamento>> SearchDepartamento(string searchText, CancellationToken token)
     {

@@ -19,6 +19,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
     public override async Task<ActionResponse<IEnumerable<Ficha>>> GetAsync(PaginationDTO pagination)
     {
         var queryable = _context.Fichas
+            .Include(f => f.Jornada)
             .Include(f => f.Municipio)
             .Include(f => f.Sector)
             .Include(f => f.Propietarios)
@@ -31,6 +32,11 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
         if (!string.IsNullOrWhiteSpace(pagination.Filter))
         {
             queryable = queryable.Where(x => x.CodEncuesta.ToLower().Contains(pagination.Filter.ToLower()));
+        }
+
+        if (pagination.Id > 0)
+        {
+            queryable = queryable.Where(x => x.JornadaId == pagination.Id);
         }
 
         return new ActionResponse<IEnumerable<Ficha>>
@@ -53,6 +59,11 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
             queryable = queryable.Where(x => x.CodEncuesta.ToLower().Contains(pagination.Filter.ToLower()));
         }
 
+        if (pagination.Id > 0)
+        {
+            queryable = queryable.Where(x => x.JornadaId == pagination.Id);
+        }
+
         double count = await queryable.CountAsync();
         return new ActionResponse<int>
         {
@@ -64,6 +75,7 @@ public class FichasRepository : GenericRepository<Ficha>, IFichasRepository
     public async Task<ActionResponse<Ficha>> GetAsync(long id)
     {
         var ficha = await _context.Fichas
+             .Include(f => f.Jornada)
              .Include(f => f.Municipio).ThenInclude(m => m!.Departamento)
              .Include(f => f.Sector)
              .Include(m => m.BarrioComarca)

@@ -15,5 +15,7 @@ namespace SurveyCat.Backend.UnitsOfWork.Interfaces
         Task<ActionResponse<EncuestaAutorizada>> GetAsync(long id);
 
         Task<ActionResponse<int>> BulkCreateAsync(List<EncuestaAutorizada> encuestas);
+
+        Task<ActionResponse<EncuestaAutorizada>> DeleteByLongAsync(long id);
     }
 }

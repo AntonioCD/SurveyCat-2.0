@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Shared;
@@ -7,6 +8,7 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.Auth;
 
+[Authorize(Roles = "Administrador")]
 public partial class UsersIndex
 {
     private List<User>? Users { get; set; }

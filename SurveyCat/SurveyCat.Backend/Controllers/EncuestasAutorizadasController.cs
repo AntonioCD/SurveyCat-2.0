@@ -113,4 +113,15 @@ public class EncuestasAutorizadasController : GenericController<EncuestaAutoriza
 
     //    return BadRequest(response.Message);
     //}
+
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> DeleteByLongAsync(long id)
+    {
+        var action = await _encuestasAutorizadasUnitOfWork.DeleteByLongAsync(id);
+        if (action.WasSuccess)
+        {
+            return NoContent();
+        }
+        return BadRequest(action.Message);
+    }
 }

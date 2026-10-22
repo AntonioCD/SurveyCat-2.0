@@ -28,6 +28,7 @@ namespace SurveyCat.Backend.Repositories.Implementations
         public async Task<IEnumerable<EncuestaAutorizada>> GetComboAsync()
         {
             return await _context.EncuestasAutorizadas
+                .Include(e => e.Jornada)
                 .Include(e => e.Municipio)
                     .ThenInclude(m => m!.Departamento)
                 .Include(e => e.BarrioComarca)
@@ -46,6 +47,7 @@ namespace SurveyCat.Backend.Repositories.Implementations
         public override async Task<ActionResponse<IEnumerable<EncuestaAutorizada>>> GetAsync(PaginationDTO pagination)
         {
             var queryable = _context.EncuestasAutorizadas
+                .Include(e => e.Jornada)
                 .Include(e => e.Municipio)
                 .Include(e => e.BarrioComarca)
                 .Include(e => e.Caserio)
@@ -88,6 +90,7 @@ namespace SurveyCat.Backend.Repositories.Implementations
         public async Task<ActionResponse<EncuestaAutorizada>> GetAsync(long id)
         {
             var encuestaAutorizada = await _context.EncuestasAutorizadas
+                .Include(e => e.Jornada)
                 .Include(e => e.Municipio)
                 .Include(e => e.BarrioComarca)
                 .Include(e => e.Caserio)
@@ -240,6 +243,40 @@ namespace SurveyCat.Backend.Repositories.Implementations
                 {
                     WasSuccess = false,
                     Message = $"Error al cargar las encuestas: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ActionResponse<EncuestaAutorizada>> DeleteByLongAsync(long id)
+        {
+            var encuestaAutorizada = await _context.EncuestasAutorizadas
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (encuestaAutorizada == null)
+            {
+                return new ActionResponse<EncuestaAutorizada>
+                {
+                    WasSuccess = false,
+                    Message = "Encuesta Autorizada no encontrada"
+                };
+            }
+
+            try
+            {
+                _context.EncuestasAutorizadas.Remove(encuestaAutorizada);
+                await _context.SaveChangesAsync();
+
+                return new ActionResponse<EncuestaAutorizada>
+                {
+                    WasSuccess = true,
+                };
+            }
+            catch
+            {
+                return new ActionResponse<EncuestaAutorizada>
+                {
+                    WasSuccess = false,
+                    Message = "No se puede borrar, porque tiene registros relacionados"
                 };
             }
         }

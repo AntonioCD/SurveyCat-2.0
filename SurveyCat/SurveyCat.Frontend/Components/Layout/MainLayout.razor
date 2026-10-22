@@ -5,18 +5,40 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">SurveyCat</MudText>
+    <MudAppBar Elevation="1" Style="border-bottom: none !important; box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.06) !important;">
+        <!-- Contenedor alineado al centro vertical con gap de 12px -->
+        <div class="d-flex align-center gap-3">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                           Color="Color.Inherit"
+                           Edge="Edge.Start"
+                           OnClick="@((e) => DrawerToggle())" />
+
+            <!-- Grupo de Marca (Texto e Ícono) perfectamente centrados -->
+            <div class="d-flex align-center gap-2">
+                <MudText Typo="Typo.h5" Style="font-weight: 600; letter-spacing: -0.3px; font-family: 'Segoe UI', sans-serif;">
+                    SurveyCat
+                </MudText>
+
+                <MudImage Src="favicon.png"
+                          Alt="SurveyCat Logo"
+                          Width="28"
+                          Height="28"
+                          ObjectFit="ObjectFit.Contain" />
+            </div>
+        </div>
+
         <MudSpacer />
+
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
         <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
             <AuthLinks />
         </MudMenu>
     </MudAppBar>
+
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Width="280px">
         <NavMenu />
     </MudDrawer>
+
     <MudMainContent Class="mt-16 pa-4">
         @Body
     </MudMainContent>
@@ -62,9 +84,10 @@
         Primary = "#2563EB", // Azul moderno tipo SaaS / Web App (Tailwind Blue 600)
         Black = "#110e2d",
         AppbarText = "#424242",
+        DrawerText = "#ffffff",
         Background = "#ffffff", // Fondo global de la aplicación
         AppbarBackground = "#f8f8ff",
-        DrawerBackground = "#f8f8ff",
+        DrawerBackground = "#031D44",
         Surface = "#ffffff",
         GrayLight = "#e8e8e8",
         GrayLighter = "#f9f9f9",
@@ -78,8 +101,8 @@
         Background = "#1a1a27",
         BackgroundGray = "#151521",
         AppbarText = "#92929f",
-        AppbarBackground = "rgba(26,26,39,0.8)",
-        DrawerBackground = "#1a1a27",
+        AppbarBackground = "rgba(255, 255, 255, 0.07)",
+        DrawerBackground = "rgba(10, 54, 122, 0.25)",
         ActionDefault = "#74718e",
         ActionDisabled = "#9999994d",
         ActionDisabledBackground = "#605f6d4d",

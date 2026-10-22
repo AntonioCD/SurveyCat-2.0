@@ -18,6 +18,7 @@ public partial class EncuestasAutorizadasListUpload
     private bool loading = true;
     private bool procesandoArchivo = false;
     private double progress = 0;
+    private List<Jornada>? jornadas;
     private List<Departamento>? departamentos;
     private List<Municipio>? municipios;
     private List<BarrioComarca>? barriosComarcas;
@@ -28,6 +29,7 @@ public partial class EncuestasAutorizadasListUpload
     private List<PersonalEncuesta>? listaSupervisores = new();
 
     private TipoSector tipoSectorSeleccionado;
+    private Jornada? selectedJornada;
     private Departamento? selectedDepartamento;
     private Municipio? selectedMunicipio;
     private BarrioComarca? selectedBarrioComarca;
@@ -54,6 +56,7 @@ public partial class EncuestasAutorizadasListUpload
     protected override async Task OnInitializedAsync()
     {
         await LoadUserAsync();
+        await LoadJornadasAsync();
         await LoadDepartamentosAsync();
         await LoadPersonalEncuestaAsync();
         loading = false;
@@ -124,6 +127,7 @@ public partial class EncuestasAutorizadasListUpload
     private bool IsFormValid()
     {
         return (int)tipoSectorSeleccionado > 0 &&
+               selectedJornada != null &&
                selectedDepartamento != null &&
                selectedMunicipio != null &&
                selectedBarrioComarca != null &&
@@ -331,6 +335,7 @@ public partial class EncuestasAutorizadasListUpload
                 {
                     CodEncuesta = codigo,
                     TipoSector = tipoSector,
+                    JornadaId = selectedJornada!.Id,
                     MunicipioId = selectedMunicipio!.Id,
                     BarrioComarcaId = selectedBarrioComarca!.Id,
                     CaserioId = selectedCaserio?.Id,
@@ -364,29 +369,41 @@ public partial class EncuestasAutorizadasListUpload
                     var success = jsonResponse!.Contains("success") || jsonResponse.Contains("Success");
 
                     MudDialog?.Close(DialogResult.Ok(true));
-                    Snackbar.Add($"? Se cargaron {encuestas.Count} encuestas autorizadas exitosamente", Severity.Success);
-                    NavigationManager.NavigateTo("/encuestasAutorizadas", forceLoad: true);
+                    Snackbar.Add($"Se cargaron {encuestas.Count} encuestas autorizadas exitosamente", Severity.Success);
+                    NavigationManager.NavigateTo("/encuestasAutorizadas");
                 }
                 catch
                 {
                     // Si no se puede deserializar, asumimos que fue exitoso
                     MudDialog?.Close(DialogResult.Ok(true));
-                    Snackbar.Add($"? Se cargaron {encuestas.Count} encuestas autorizadas exitosamente", Severity.Success);
-                    NavigationManager.NavigateTo("/encuestasAutorizadas", forceLoad: true);
+                    Snackbar.Add($"Se cargaron {encuestas.Count} encuestas autorizadas exitosamente", Severity.Success);
+                    NavigationManager.NavigateTo("/encuestasAutorizadas");
                 }
             }
             else
             {
                 // Si la respuesta es null pero no hubo error, asumimos éxito
                 MudDialog?.Close(DialogResult.Ok(true));
-                Snackbar.Add($"? Se cargaron {encuestas.Count} encuestas autorizadas exitosamente", Severity.Success);
-                NavigationManager.NavigateTo("/encuestasAutorizadas", forceLoad: true);
+                Snackbar.Add($"Se cargaron {encuestas.Count} encuestas autorizadas exitosamente", Severity.Success);
+                NavigationManager.NavigateTo("/encuestasAutorizadas");
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error al cargar las encuestas: {ex.Message}", Severity.Error);
         }
+    }
+
+    private async Task LoadJornadasAsync()
+    {
+        var responseHttp = await Repository.GetAsync<List<Jornada>>("/api/jornadas/combo");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            Snackbar.Add(message!, Severity.Error);
+            return;
+        }
+        jornadas = responseHttp.Response;
     }
 
     private async Task LoadDepartamentosAsync()
@@ -435,6 +452,11 @@ public partial class EncuestasAutorizadasListUpload
             return;
         }
         caserios = responseHttp.Response;
+    }
+
+    private void JornadaChanged(Jornada jornada)
+    {
+        selectedJornada = jornada;
     }
 
     private async Task DepartamentoChangedAsync(Departamento departamento)
@@ -530,6 +552,17 @@ public partial class EncuestasAutorizadasListUpload
     {
         mostrarVistaPrevia = false;
         vistaPrevia.Clear();
+    }
+
+    private async Task<IEnumerable<Jornada>> SearchJornada(string searchText, CancellationToken token)
+    {
+        await Task.Delay(5);
+        if (string.IsNullOrWhiteSpace(searchText))
+            return jornadas!;
+
+        return jornadas!
+            .Where(c => c.Nombre.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) || c.CodJornada.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
     }
 
     private async Task<IEnumerable<Departamento>> SearchDepartamento(string searchText, CancellationToken token)

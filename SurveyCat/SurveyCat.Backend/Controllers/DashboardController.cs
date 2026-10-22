@@ -36,7 +36,7 @@ public class DashboardController : ControllerBase
         // Obtenemos los datos agrupados desde la base de datos
         var dataAgrupada = await _context.Fichas
         .Where(f => f.FechaEncuesta >= fechaInicio)
-        .GroupBy(f => new { f.FechaEncuesta.Year, f.FechaEncuesta.Month })
+        .GroupBy(f => new { f.FechaEncuesta!.Value.Year, f.FechaEncuesta.Value.Month })
         .Select(g => new
         {
             Anio = g.Key.Year,
@@ -71,12 +71,11 @@ public class DashboardController : ControllerBase
                 Id = f.Id,
                 Codigo = f.CodEncuesta,
                 Departamento = f.Municipio!.Nombre,
-                FechaEncuesta = f.FechaEncuesta,
+                FechaEncuesta = f.FechaEncuesta!.Value,
                 Estado = f.Estado!.Nombre
             })
             .ToListAsync();
 
         return Ok(response);
     }
-
 }

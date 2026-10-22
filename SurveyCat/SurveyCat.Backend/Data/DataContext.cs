@@ -21,6 +21,7 @@ namespace SurveyCat.Backend.Data
         public DbSet<EncuestaAutorizada> EncuestasAutorizadas { get; set; }
         public DbSet<Ocupante> Ocupantes { get; set; }
         public DbSet<Ficha> Fichas { get; set; }
+        public DbSet<Jornada> Jornadas { get; set; }
         public DbSet<Municipio> Municipios { get; set; }
         public DbSet<Padron> Padron { get; set; }
         public DbSet<Persona> Personas { get; set; }
@@ -87,6 +88,11 @@ namespace SurveyCat.Backend.Data
             modelBuilder.Entity<Ficha>(e =>
             {
                 e.HasIndex(x => x.CodEncuesta).IsUnique();
+            });
+
+            modelBuilder.Entity<Jornada>(e =>
+            {
+                e.HasIndex(x => x.CodJornada).IsUnique();
             });
 
             modelBuilder.Entity<PersonalEncuesta>(e =>

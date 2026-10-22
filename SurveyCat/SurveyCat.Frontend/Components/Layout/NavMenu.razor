@@ -1,26 +1,29 @@
-﻿<MudNavMenu Color="Color.Primary" Class="pa-2">
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home" Class="rounded-lg mb-1">
+﻿<MudNavMenu Color="Color.Surface" Class="pa-2">
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home" IconColor="Color.Info" Class="rounded-lg mb-1">
         Inicio
     </MudNavLink>
 
     <!-- Sección: Operaciones (Disponible para Administrador y Digitador) -->
     <AuthorizeView Roles="Administrador, Digitador">
         <Authorized>
-            <MudText Typo="Typo.caption" Class="px-3 pt-3 pb-1 mud-text-secondary fw-bold" Style="font-size: 0.7rem; letter-spacing: 0.8px;">
+            <MudText Typo="Typo.caption" Class="px-3 pt-3 pb-1 mud-text-secondary fw-bold" Style="font-size: 0.7rem; letter-spacing: 0.8px; color:white">
                 OPERACIONES
             </MudText>
 
-            <MudNavGroup Title="Gestión de Encuestas" Icon="@Icons.Material.Outlined.Assignment" Expanded="true" Class="rounded-lg mb-1">
+            <MudNavGroup Title="Gestión de Encuestas" Icon="@Icons.Material.Outlined.Assignment" IconColor="Color.Info" Expanded="true" Class="rounded-lg mb-1">
                 <!-- Disponible para Administrador y Digitador -->
-                <MudNavLink Href="fichas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ReceiptLong" Class="rounded-lg">
+                <MudNavLink Href="fichas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ReceiptLong" IconColor="Color.Info" Class="rounded-lg">
                     Fichas Catastrales
                 </MudNavLink>
 
                 <!-- Exclusivo para Administrador -->
                 <AuthorizeView Roles="Administrador" Context="adminContext">
                     <Authorized>
-                        <MudNavLink Href="encuestasAutorizadas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Verified" Class="rounded-lg">
+                        <MudNavLink Href="encuestasAutorizadas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Verified" IconColor="Color.Info" Class="rounded-lg">
                             Encuestas Autorizadas
+                        </MudNavLink>
+                        <MudNavLink Href="jornadas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Timer" IconColor="Color.Info" Class="rounded-lg">
+                            Jornadas de Campo
                         </MudNavLink>
                     </Authorized>
                 </AuthorizeView>
@@ -31,24 +34,24 @@
     <!-- Sección: Configuración del Sistema (Exclusivo para Administrador) -->
     <AuthorizeView Roles="Administrador">
         <Authorized>
-            <MudText Typo="Typo.caption" Class="px-3 pt-4 pb-1 mud-text-secondary fw-bold" Style="font-size: 0.7rem; letter-spacing: 0.8px;">
+            <MudText Typo="Typo.caption" Class="px-3 pt-4 pb-1 mud-text-secondary fw-bold" Style="font-size: 0.7rem; letter-spacing: 0.8px; color:white">
                 CONFIGURACIÓN
             </MudText>
 
-            <MudNavGroup Title="Catálogos Base" Icon="@Icons.Material.Outlined.LibraryBooks" Expanded="false" Class="rounded-lg mb-1">
-                <MudNavLink Href="departamentos" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Map" Class="rounded-lg">
+            <MudNavGroup Title="Catálogos Base" Icon="@Icons.Material.Outlined.LibraryBooks" IconColor="Color.Info" Expanded="false" Class="rounded-lg mb-1">
+                <MudNavLink Href="departamentos" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Map" IconColor="Color.Info" Class="rounded-lg">
                     Departamentos
                 </MudNavLink>
-                <MudNavLink Href="diccionarios" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.MenuBook" Class="rounded-lg">
+                <MudNavLink Href="diccionarios" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.MenuBook" IconColor="Color.Info" Class="rounded-lg">
                     Diccionario
                 </MudNavLink>
             </MudNavGroup>
 
-            <MudNavGroup Title="Administración" Icon="@Icons.Material.Outlined.AdminPanelSettings" Expanded="false" Class="rounded-lg mb-1">
-                <MudNavLink Href="personalEncuestas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Badge" Class="rounded-lg">
+            <MudNavGroup Title="Administración" Icon="@Icons.Material.Outlined.AdminPanelSettings" IconColor="Color.Info" Expanded="false" Class="rounded-lg mb-1">
+                <MudNavLink Href="personalEncuestas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Badge" IconColor="Color.Info" Class="rounded-lg">
                     Personal de Campo
                 </MudNavLink>
-                <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ManageAccounts" Class="rounded-lg">
+                <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ManageAccounts" IconColor="Color.Info" Class="rounded-lg">
                     Usuarios del Sistema
                 </MudNavLink>
             </MudNavGroup>

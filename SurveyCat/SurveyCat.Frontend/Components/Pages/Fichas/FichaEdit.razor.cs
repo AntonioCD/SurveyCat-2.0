@@ -40,6 +40,7 @@ namespace SurveyCat.Frontend.Components.Pages.Fichas
         private async Task EditAsync()
         {
             ficha!.Municipio = null;
+            ficha.Jornada = null;
             ficha.Sector = null;
             ficha.Encuestador = null;
             ficha.TecnicoCatastral = null;

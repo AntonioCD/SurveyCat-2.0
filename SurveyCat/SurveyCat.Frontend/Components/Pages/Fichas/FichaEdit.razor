@@ -1,3 +1,10 @@
 ﻿@page "/fichas/edit/{Id:int}"
 
-<FichaForm Ficha="ficha" OnValidSubmit="EditAsync" ReturnAction="Return" />
+@if (ficha == null)
+{
+    <Loading />
+}
+else
+{
+    <FichaForm Ficha="ficha" OnValidSubmit="EditAsync" ReturnAction="Return" />
+}

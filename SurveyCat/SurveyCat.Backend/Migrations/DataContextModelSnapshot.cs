@@ -465,6 +465,9 @@ namespace SurveyCat.Backend.Migrations
                     b.Property<DateTime>("FechaCarga")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("JornadaId")
+                        .HasColumnType("int");
+
                     b.Property<int>("MunicipioId")
                         .HasColumnType("int");
 
@@ -494,6 +497,8 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("CoordinadorId");
 
                     b.HasIndex("EncuestadorId");
+
+                    b.HasIndex("JornadaId");
 
                     b.HasIndex("MunicipioId");
 
@@ -530,10 +535,14 @@ namespace SurveyCat.Backend.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
+                    b.Property<string>("CodSiscat")
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
                     b.Property<int>("CoordinadorId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedDate")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatorUserId")
@@ -559,6 +568,9 @@ namespace SurveyCat.Backend.Migrations
 
                     b.Property<long?>("InformanteId")
                         .HasColumnType("bigint");
+
+                    b.Property<int>("JornadaId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Lote")
                         .HasMaxLength(10)
@@ -650,6 +662,8 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasIndex("InformanteId");
 
+                    b.HasIndex("JornadaId");
+
                     b.HasIndex("MunicipioId");
 
                     b.HasIndex("OrigenTierraId");
@@ -673,6 +687,41 @@ namespace SurveyCat.Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Fichas");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Jornada", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CodJornada")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<DateTime?>("FechaFin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodJornada")
+                        .IsUnique();
+
+                    b.ToTable("Jornadas");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Municipio", b =>
@@ -1322,6 +1371,12 @@ namespace SurveyCat.Backend.Migrations
                         .HasForeignKey("EncuestadorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("SurveyCat.Shared.Entities.Jornada", "Jornada")
+                        .WithMany()
+                        .HasForeignKey("JornadaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SurveyCat.Shared.Entities.Municipio", "Municipio")
                         .WithMany()
                         .HasForeignKey("MunicipioId")
@@ -1346,6 +1401,8 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("Coordinador");
 
                     b.Navigation("Encuestador");
+
+                    b.Navigation("Jornada");
 
                     b.Navigation("Municipio");
 
@@ -1388,6 +1445,12 @@ namespace SurveyCat.Backend.Migrations
                         .WithMany("Fichas")
                         .HasForeignKey("InformanteId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SurveyCat.Shared.Entities.Jornada", "Jornada")
+                        .WithMany("Fichas")
+                        .HasForeignKey("JornadaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("SurveyCat.Shared.Entities.Municipio", "Municipio")
                         .WithMany("Fichas")
@@ -1457,6 +1520,8 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("Estado");
 
                     b.Navigation("Informante");
+
+                    b.Navigation("Jornada");
 
                     b.Navigation("Municipio");
 
@@ -1671,6 +1736,11 @@ namespace SurveyCat.Backend.Migrations
                     b.Navigation("Ocupantes");
 
                     b.Navigation("Propietarios");
+                });
+
+            modelBuilder.Entity("SurveyCat.Shared.Entities.Jornada", b =>
+                {
+                    b.Navigation("Fichas");
                 });
 
             modelBuilder.Entity("SurveyCat.Shared.Entities.Municipio", b =>

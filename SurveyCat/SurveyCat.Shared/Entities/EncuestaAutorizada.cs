@@ -19,6 +19,12 @@ namespace SurveyCat.Shared.Entities
             set => _codEncuesta = value?.Trim().ToUpper() ?? string.Empty;
         }
 
+        [Display(Name = "Jornada")]
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione una Jornada.")]
+        public int JornadaId { get; set; }
+
+        public Jornada? Jornada { get; set; }
+
         [Display(Name = "Tipo de Sector")]
         [Range(1, 2, ErrorMessage = "El tipo de sector debe ser 1 (Urbano) o 2 (Rural).")]
         public TipoSector TipoSector { get; set; }

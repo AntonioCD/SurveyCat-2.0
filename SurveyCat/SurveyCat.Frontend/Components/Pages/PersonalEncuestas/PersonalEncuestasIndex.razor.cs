@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Pages.PersonalEncuestas;
@@ -8,6 +9,7 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.PersonalEncuestas;
 
+[Authorize(Roles = "Administrador")]
 public partial class PersonalEncuestasIndex
 {
     private List<PersonalEncuesta>? PersonalEncuestas { get; set; }

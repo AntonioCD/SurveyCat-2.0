@@ -48,7 +48,7 @@
 
                 <div class="d-flex align-center gap-3">
                     @if (Ficha.Id != 0)
-                    {
+                    {                       
                         <!-- CÓDIGO DE ENCUESTA -->
                         <MudField Label="CÓDIGO DE ENCUESTA"
                                   Variant="Variant.Outlined"
@@ -168,6 +168,34 @@
                                     <MudCardContent>
                                         <MudGrid Spacing="2">
                                             <MudItem xs="12" sm="4">
+                                                <MudDatePicker Label="Fecha Encuesta"
+                                                               @bind-Date="Ficha.FechaEncuesta"
+                                                               For="@(() => Ficha.FechaEncuesta)"
+                                                               Variant="Variant.Outlined"
+                                                               Margin="Margin.Dense"
+                                                               Required="true"
+                                                               RequiredError="Fecha Encuesta es requerida."
+                                                               Editable="true" />
+                                            </MudItem>
+
+                                            <MudItem xs="12" sm="4">
+                                                <MudAutocomplete T="Jornada"
+                                                                 Label="Jornada"
+                                                                 Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
+                                                                 SearchFunc="SearchJornada"
+                                                                 Value="selectedJornada"
+                                                                 ValueChanged="JornadaChanged"
+                                                                 Variant="Variant.Outlined"
+                                                                 Margin="Margin.Dense"
+                                                                 Disabled="loading"
+                                                                 Required="true"
+                                                                 RequiredError="Jornada es requerida."
+                                                                 For="@(() => selectedJornada)"
+                                                                 ToStringFunc="@FormatJornada" />
+                                            </MudItem>
+
+
+                                            <MudItem xs="12" sm="4">
                                                 <MudSelect T="TipoSector" Label="Tipo de Sector"
                                                            @bind-Value="Ficha.TipoSector"
                                                            For="@(() => Ficha.TipoSector)"
@@ -180,7 +208,7 @@
                                                 </MudSelect>
                                             </MudItem>
 
-                                            <MudItem xs="12" sm="4">
+                                            <MudItem xs="12" sm="6">
                                                 <MudAutocomplete T="Departamento"
                                                                  Label="Departamento"
                                                                  Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
@@ -196,7 +224,7 @@
                                                                  ToStringFunc="@(e => e?.Nombre)" />
                                             </MudItem>
 
-                                            <MudItem xs="12" sm="4">
+                                            <MudItem xs="12" sm="6">
                                                 <MudAutocomplete T="Municipio"
                                                                  Label="Municipio"
                                                                  Placeholder="@(loading ? "-- Cargando... --" : "-- Seleccione --")"
@@ -300,7 +328,7 @@
 
                                     <MudCardContent>
                                         <MudGrid Spacing="2">
-                                            <MudItem xs="12" sm="6">
+                                            <MudItem xs="12" sm="4">
                                                 <MudSelect T="TipoEncuesta" Label="Tipo de Parcela"
                                                            @bind-Value="Ficha.TipoEncuesta"
                                                            For="@(() => Ficha.TipoEncuesta)"
@@ -316,7 +344,18 @@
                                                 </MudSelect>
                                             </MudItem>
 
-                                            <MudItem xs="12" sm="6">
+                                            <MudItem xs="12" sm="4">
+                                                <MudTextField Label="Código SISCAT"
+                                                              @bind-Value="Ficha.CodSiscat"
+                                                              @bind-Value:after="() => Ficha.CodSiscat = Ficha.CodSiscat?.ToUpper()"
+                                                              Immediate="true"
+                                                              For="@(() => Ficha.CodSiscat)"
+                                                              Variant="Variant.Outlined"
+                                                              Margin="Margin.Dense"
+                                                              Disabled="loading" />
+                                            </MudItem>
+
+                                            <MudItem xs="12" sm="4">
                                                 <MudTextField Label="Nombre de la Finca"
                                                               @bind-Value="Ficha.NombreFinca"
                                                               @bind-Value:after="() => Ficha.NombreFinca = Ficha.NombreFinca?.ToUpper()"

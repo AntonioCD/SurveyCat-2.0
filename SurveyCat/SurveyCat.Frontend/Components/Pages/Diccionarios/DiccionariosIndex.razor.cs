@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SurveyCat.Frontend.Components.Pages.Diccionarios;
@@ -8,6 +9,7 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.Diccionarios;
 
+[Authorize(Roles = "Administrador")]
 public partial class DiccionariosIndex
 {
     private List<Diccionario>? Diccionarios { get; set; }

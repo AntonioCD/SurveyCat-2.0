@@ -50,7 +50,7 @@
 
         <MudGrid>
             <!-- Código Encuesta -->
-            <MudItem xs="12" sm="6">
+            <MudItem xs="12" sm="4">
                 <MudTextField Label="Código Encuesta"
                               Variant="Variant.Outlined"
                               @bind-Value="EncuestaAutorizada.CodEncuesta"
@@ -60,8 +60,32 @@
                               InputStyle="text-transform: uppercase;" />
             </MudItem>
 
+            <!-- Jornada -->
+            <MudItem xs="12" sm="4">
+                <MudAutocomplete T="Jornada"
+                                 Label="Jornada"
+                                 Placeholder="@(loading ? "-- Cargando datos... --" : "-- Seleccione una Jornada --")"
+                                 SearchFunc="SearchJornada"
+                                 Value="selectedJornada"
+                                 ValueChanged="JornadaChanged"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Disabled="loading"
+                                 Required="true"
+                                 RequiredError="La jornada es requerida."
+                                 For="@(() => selectedJornada)"
+                                 ResetValueOnEmptyText="true"
+                                 CoerceText="false"
+                                 CoerceValue="false"
+                                 ToStringFunc="@(e => e == null ? null : $"{e.CodJornada + " - " + e.Nombre}")">
+                    <ItemTemplate Context="itemContext">
+                        @(itemContext.CodJornada + " - " + itemContext.Nombre)
+                    </ItemTemplate>
+                </MudAutocomplete>
+            </MudItem>
+
             <!-- Tipo de Sector -->
-            <MudItem xs="12" sm="6">
+            <MudItem xs="12" sm="4">
                 <MudSelect T="TipoSector" Label="Tipo de Sector"
                            @bind-Value="EncuestaAutorizada.TipoSector"
                            For="@(() => EncuestaAutorizada.TipoSector)"

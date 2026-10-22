@@ -19,6 +19,12 @@ public class Ficha
     // UBICACIÓN
     // =========================================
 
+    [Display(Name = "Jornada")]
+    [Range(1, int.MaxValue, ErrorMessage = "Seleccione una Jornada.")]
+    public int JornadaId { get; set; }
+
+    public Jornada? Jornada { get; set; }
+
     [Display(Name = "Tipo de Sector")]
     [Range(1, 2, ErrorMessage = "El tipo de sector debe ser 1 (Urbano) o 2 (Rural).")]
     public TipoSector TipoSector { get; set; }
@@ -116,6 +122,10 @@ public class Ficha
     [Required]
     public TipoEncuesta TipoEncuesta { get; set; }
 
+    [Display(Name = "Código SISCAT")]
+    [MaxLength(25)]
+    public string? CodSiscat { get; set; }
+
     [Display(Name = "Tipo de Uso")]
     public TipoUsoParcela? TipoUso { get; set; }
 
@@ -175,8 +185,8 @@ public class Ficha
     // =========================================
 
     [Display(Name = "Fecha de Encuesta")]
-    [Required]
-    public DateTime FechaEncuesta { get; set; } = DateTime.UtcNow;
+    [Required(ErrorMessage = "La fecha de la encuesta es obligatoria")]
+    public DateTime? FechaEncuesta { get; set; }
 
     [Display(Name = "¿Verificada por el Coordinador?")]
     public bool VerificadoCoordinador { get; set; } = false;
@@ -218,7 +228,8 @@ public class Ficha
     // =========================================
 
     [Display(Name = "Fecha Creación")]
-    public DateTime? CreatedDate { get; set; }
+    [Required]
+    public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
     [Display(Name = "Creado Por")]
     [MaxLength(450)]

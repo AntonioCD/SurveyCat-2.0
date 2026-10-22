@@ -1,4 +1,5 @@
 ﻿@page "/fichas"
+@using SurveyCat.Shared.Entities
 
 @if (loading)
 {
@@ -15,22 +16,44 @@ else
               FixedHeader="true"
               FixedFooter="true">
         <ToolBarContent>
-            <div class="d-flex justify-content-between">
-                <MudText Typo="Typo.h6" Class="me-4">FICHAS</MudText>
-                <MudButton Variant="Variant.Outlined"
-                           EndIcon="@Icons.Material.Filled.Add"
-                           Color="Color.Info" OnClick="@(() => RedirectToFichaForm())">
-                    Nuevo
-                </MudButton>
+            <!-- LADO IZQUIERDO -->
+            <MudText Typo="Typo.h6" Class="me-3">FICHAS</MudText>
+
+            <MudButton Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       Color="Color.Info"
+                       OnClick="@(() => RedirectToFichaForm())"
+                       Class="me-3">
+                Nuevo
+            </MudButton>
+
+            <div style="width: 250px;">
+                <MudAutocomplete T="Jornada"
+                                 Label="Jornada"
+                                 Placeholder="Todas las jornadas"
+                                 SearchFunc="SearchJornada"
+                                 Value="selectedJornada"
+                                 ValueChanged="JornadaFilterChangedAsync"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Clearable="true"
+                                 ResetValueOnEmptyText="false"
+                                 ToStringFunc="@FormatJornada"
+                                 Class="mt-0" />
             </div>
-            <MudSpacer />
-            <FilterComponent @bind-FilterValue="Filter" ApplyFilter="SetFilterValue" />
+
+            <!-- LADO DERECHO: ms-auto empuja el FilterComponent totalmente a la derecha -->
+            <div class="ms-auto" style="max-width: 450px;">
+                <FilterComponent @bind-FilterValue="Filter" ApplyFilter="SetFilterValue" />
+            </div>
         </ToolBarContent>
+
         <HeaderContent>
-            <MudTh Style="width: 13.5%;">Municipio</MudTh>
-            <MudTh Style="width: 13.5%;">Sector</MudTh>
-            <MudTh Style="width: 13.5%;">CodEnc</MudTh>
-            <MudTh Style="width: 13.5%;">Estado</MudTh>
+            <MudTh Style="width: 10.8%;">Jornada</MudTh>
+            <MudTh Style="width: 10.8%;">Municipio</MudTh>
+            <MudTh Style="width: 10.8%;">Sector</MudTh>
+            <MudTh Style="width: 10.8%;">CodEnc</MudTh>
+            <MudTh Style="width: 10.8%;">Estado</MudTh>
             <MudTh Style="width: 9%;"># Propietarios</MudTh>
             <MudTh Style="width: 9%;"># Ocupantes</MudTh>
             <MudTh Style="width: 9%;"># Colindantes</MudTh>
@@ -40,6 +63,7 @@ else
         </HeaderContent>
 
         <RowTemplate>
+            <MudTd DataLabel="Jornada">@(context.Jornada?.CodJornada ?? "SD")</MudTd>
             <MudTd DataLabel="Municipio">@(context.Municipio?.Nombre ?? "SD")</MudTd>
             <MudTd DataLabel="Sector">@(context.Sector?.NumeroSector ?? "SD")</MudTd>
             <MudTd DataLabel="CodEnc">@context.CodEncuesta</MudTd>
@@ -51,9 +75,7 @@ else
                                OnClick="@(() => PropietariosAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
-
                         <span>@context.PropietariosNumber</span>
-
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"
                                  Class="ml-2" />
@@ -62,14 +84,12 @@ else
             </MudTd>
             <MudTd DataLabel="Ocupantes">
                 <MudTooltip Text="Ver Ocupantes">
-                    <MudButton Variant="Variant.Outlined" 
+                    <MudButton Variant="Variant.Outlined"
                                Size="Size.Medium"
                                OnClick="@(() => OcupantesAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
-
                         <span>@context.OcupantesNumber</span>
-
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"
                                  Class="ml-2" />
@@ -83,9 +103,7 @@ else
                                OnClick="@(() => ColindantesAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
-
                         <span>@context.ColindantesNumber</span>
-
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"
                                  Class="ml-2" />
@@ -99,9 +117,7 @@ else
                                OnClick="@(() => ConflictosAction(@context))"
                                Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
-
                         <span>@context.ConflictosNumber</span>
-
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"
                                  Class="ml-2" />
@@ -113,11 +129,9 @@ else
                     <MudButton Variant="Variant.Outlined"
                                Size="Size.Medium"
                                OnClick="@(() => DocumentosAnexosAction(@context))"
-                               Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4; "
+                               Style="width: 70px; min-width: 70px; color: #4682B4; border-color: #4682B4;"
                                Class="d-flex justify-space-between px-2">
-
                         <span>@context.DocumentosAnexosNumber</span>
-
                         <MudIcon Icon="@Icons.Material.TwoTone.ArrowCircleRight"
                                  Size="Size.Small"
                                  Class="ml-2" />
@@ -145,7 +159,7 @@ else
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
-            <MudText>"No hay registros"</MudText>
+            <MudText>No hay registros</MudText>
         </NoRecordsContent>
         <PagerContent>
             <MudTablePager RowsPerPageString="Número de registros"

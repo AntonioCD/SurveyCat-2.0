@@ -9,6 +9,7 @@ using System.Net;
 
 namespace SurveyCat.Frontend.Components.Pages.EncuestasAutorizadas;
 
+[Authorize(Roles = "Administrador")]
 public partial class EncuestasAutorizadasIndex
 {
     private List<EncuestaAutorizada>? EncuestasAutorizadas { get; set; }
