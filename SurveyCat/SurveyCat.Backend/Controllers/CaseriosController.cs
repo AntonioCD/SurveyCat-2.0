@@ -21,6 +21,13 @@ public class CaseriosController : GenericController<Caserio>
     }
 
     [AllowAnonymous]
+    [HttpGet("combo")]
+    public async Task<IActionResult> GetComboAsync()
+    {
+        return Ok(await _caseriosUnitOfWork.GetComboAsync());
+    }
+
+    [AllowAnonymous]
     [HttpGet("combo/{comarcaId:int}")]
     public async Task<IActionResult> GetComboAsync(int comarcaId)
     {

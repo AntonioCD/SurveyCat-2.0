@@ -16,6 +16,13 @@ public class BarriosComarcasRepository : GenericRepository<BarrioComarca>, IBarr
         _context = context;
     }
 
+    public async Task<IEnumerable<BarrioComarca>> GetComboAsync()
+    {
+        return await _context.BarriosComarcas
+            .OrderBy(c => c.Nombre)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<BarrioComarca>> GetComboAsync(int municipioId)
     {
         return await _context.BarriosComarcas

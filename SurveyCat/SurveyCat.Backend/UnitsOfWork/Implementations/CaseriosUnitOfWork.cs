@@ -16,6 +16,8 @@ public class CaseriosUnitOfWork : GenericUnitOfWork<Caserio>, ICaseriosUnitOfWor
         _caseriosRepository = caseriosRepository;
     }
 
+    public async Task<IEnumerable<Caserio>> GetComboAsync() => await _caseriosRepository.GetComboAsync();
+
     public async Task<IEnumerable<Caserio>> GetComboAsync(int comarcaId) => await _caseriosRepository.GetComboAsync(comarcaId);
 
     public override async Task<ActionResponse<IEnumerable<Caserio>>> GetAsync(PaginationDTO pagination) => await _caseriosRepository.GetAsync(pagination);

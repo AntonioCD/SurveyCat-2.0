@@ -16,6 +16,13 @@ public class CaseriosRepository : GenericRepository<Caserio>, ICaseriosRepositor
         _context = context;
     }
 
+    public async Task<IEnumerable<Caserio>> GetComboAsync()
+    {
+        return await _context.Caserios
+            .OrderBy(c => c.Nombre)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Caserio>> GetComboAsync(int comarcaId)
     {
         return await _context.Caserios

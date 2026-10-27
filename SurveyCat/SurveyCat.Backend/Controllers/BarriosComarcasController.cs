@@ -21,6 +21,13 @@ public class BarriosComarcasController : GenericController<BarrioComarca>
     }
 
     [AllowAnonymous]
+    [HttpGet("combo")]
+    public async Task<IActionResult> GetComboAsync()
+    {
+        return Ok(await _barriosComarcasUnitOfWork.GetComboAsync());
+    }
+
+    [AllowAnonymous]
     [HttpGet("combo/{municipioId:int}")]
     public async Task<IActionResult> GetComboAsync(int municipioId)
     {

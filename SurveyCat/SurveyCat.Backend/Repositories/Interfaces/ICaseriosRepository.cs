@@ -6,6 +6,8 @@ namespace SurveyCat.Backend.Repositories.Interfaces
 {
     public interface ICaseriosRepository
     {
+        Task<IEnumerable<Caserio>> GetComboAsync();
+
         Task<IEnumerable<Caserio>> GetComboAsync(int comarcaId);
 
         Task<ActionResponse<IEnumerable<Caserio>>> GetAsync(PaginationDTO pagination);
