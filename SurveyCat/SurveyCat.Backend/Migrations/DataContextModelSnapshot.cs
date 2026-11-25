@@ -321,11 +321,11 @@ namespace SurveyCat.Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FichaId");
+                    b.HasIndex("TipoConflictoId");
 
                     b.HasIndex("ViaGestionId");
 
-                    b.HasIndex("TipoConflictoId", "ViaGestionId", "ConEstado")
+                    b.HasIndex("FichaId", "TipoConflictoId", "ViaGestionId", "ConEstado")
                         .IsUnique();
 
                     b.ToTable("Conflictos");

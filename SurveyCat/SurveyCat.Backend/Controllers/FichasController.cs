@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SurveyCat.Backend.Helpers;
 using SurveyCat.Backend.UnitsOfWork.Implementations;
 using SurveyCat.Backend.UnitsOfWork.Interfaces;
 using SurveyCat.Shared.DTOs;
@@ -14,10 +15,18 @@ namespace SurveyCat.Backend.Controllers;
 public class FichasController : GenericController<Ficha>
 {
     private readonly IFichasUnitOfWork _fichasUnitOfWork;
+    private readonly IFichasSyncHelper _fichasSyncHelper;
+    private readonly IUsersUnitOfWork _usersUnitOfWork;
 
-    public FichasController(IGenericUnitOfWork<Ficha> unitOfWork, IFichasUnitOfWork fichasUnitOfWork) : base(unitOfWork)
+    public FichasController(
+        IGenericUnitOfWork<Ficha> unitOfWork,
+        IFichasUnitOfWork fichasUnitOfWork,
+        IFichasSyncHelper fichasSyncHelper,
+        IUsersUnitOfWork usersUnitOfWork) : base(unitOfWork)
     {
         _fichasUnitOfWork = fichasUnitOfWork;
+        _fichasSyncHelper = fichasSyncHelper;
+        _usersUnitOfWork = usersUnitOfWork;
     }
 
     [HttpGet("paginated")]
@@ -62,5 +71,25 @@ public class FichasController : GenericController<Ficha>
             return NoContent();
         }
         return BadRequest(action.Message);
+    }
+
+    [HttpPost("sincronizar")]
+    public async Task<IActionResult> SincronizarFichaCompletaAsync([FromBody] FichaSyncDTO dto)
+    {
+        string? userId = null;
+        if (!string.IsNullOrWhiteSpace(User.Identity?.Name))
+        {
+            var currentUser = await _usersUnitOfWork.GetUserAsync(User.Identity!.Name!);
+            userId = currentUser?.Id;
+        }
+
+        var response = await _fichasSyncHelper.SincronizarFichaCompletaAsync(dto, userId);
+
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+
+        return BadRequest(response.Message);
     }
 }

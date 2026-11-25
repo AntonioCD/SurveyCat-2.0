@@ -66,6 +66,7 @@ public class PersonasController : GenericController<Persona>
     }
 
     [HttpGet("buscar-cedula/{cedula}")]
+    [AllowAnonymous]
     public async Task<IActionResult> BuscarPorCedulaAsync(string cedula)
     {
         var response = await _personasHelper.BuscarPorCedulaAsync(cedula);
@@ -77,6 +78,7 @@ public class PersonasController : GenericController<Persona>
     }
 
     [HttpGet("buscar-por-nombre")]
+    [AllowAnonymous]
     public async Task<IActionResult> BuscarPorNombreAsync(
     [FromQuery] string? primerNombre,
     [FromQuery] string? segundoNombre,

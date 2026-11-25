@@ -64,6 +64,7 @@ builder.Services.AddScoped<ISectoresUnitOfWork, SectoresUnitOfWork>();
 builder.Services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();
 
 builder.Services.AddScoped<IPersonasHelper, PersonasHelper>();
+builder.Services.AddScoped<IFichasSyncHelper, FichasSyncHelper>();
 
 builder.Services.AddIdentity<User, IdentityRole>(x =>
 {

@@ -72,7 +72,7 @@ namespace SurveyCat.Backend.Data
 
             modelBuilder.Entity<Conflicto>(e =>
             {
-                e.HasIndex(x => new { x.TipoConflictoId, x.ViaGestionId, x.ConEstado }).IsUnique();
+                e.HasIndex(x => new { x.FichaId, x.TipoConflictoId, x.ViaGestionId, x.ConEstado }).IsUnique();
             });
 
             modelBuilder.Entity<EncuestaAutorizada>(e =>
