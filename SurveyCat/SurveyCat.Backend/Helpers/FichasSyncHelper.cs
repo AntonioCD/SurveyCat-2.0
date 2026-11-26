@@ -18,6 +18,41 @@ public class FichasSyncHelper : IFichasSyncHelper
         _localFolderPath = configuration["StorageSettings:LocalFolderPath"] ?? @"C:\SurveyCatFiles\Adjuntos";
     }
 
+    public async Task<ActionResponse<List<FichaEstadoResponseDto>>> ConsultarEstadosAsync(List<string> codEncuestas)
+    {
+        var codigosNormalizados = codEncuestas?
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Select(c => c.Trim().ToUpper())
+            .Distinct()
+            .ToList() ?? new List<string>();
+
+        if (codigosNormalizados.Count == 0)
+        {
+            return new ActionResponse<List<FichaEstadoResponseDto>>
+            {
+                WasSuccess = true,
+                Result = new List<FichaEstadoResponseDto>()
+            };
+        }
+
+        var estados = await _context.Fichas
+            .AsNoTracking()
+            .Where(f => codigosNormalizados.Contains(f.CodEncuesta.ToUpper()))
+            .Select(f => new FichaEstadoResponseDto
+            {
+                CodEncuesta = f.CodEncuesta,
+                EstadoId = f.EstadoId,
+                EstadoNombre = f.Estado != null ? f.Estado.Nombre : null
+            })
+            .ToListAsync();
+
+        return new ActionResponse<List<FichaEstadoResponseDto>>
+        {
+            WasSuccess = true,
+            Result = estados
+        };
+    }
+
     public async Task<ActionResponse<FichaSyncResultDTO>> SincronizarFichaCompletaAsync(FichaSyncDTO dto, string? userId)
     {
         if (string.IsNullOrWhiteSpace(dto.CodEncuesta))
@@ -65,6 +100,23 @@ public class FichasSyncHelper : IFichasSyncHelper
             {
                 ficha.UpdatedDate = DateTime.UtcNow;
                 ficha.UpdaterUserId = userId;
+            }
+
+            // Lista de estados que bloquean modificaciones desde el móvil
+            // 814: Digitado | 815: En Control de Calidad | 817: Aprobado | 818: Migrado | Archivado
+            var estadosBloqueados = new HashSet<int> { 814, 815, 817, 818 };
+
+            if (ficha != null && estadosBloqueados.Contains(ficha.EstadoId))
+            {
+                var nombreEstadoActual = await _context.Diccionarios
+                    .AsNoTracking()
+                    .Where(d => d.Id == ficha.EstadoId)
+                    .Select(d => d.Nombre)
+                    .FirstOrDefaultAsync() ?? "Bloqueado";
+
+                throw new InvalidOperationException(
+                    $"La ficha '{ficha.CodEncuesta}' se encuentra en estado '{nombreEstadoActual}' en el servidor y no puede ser modificada desde la aplicación móvil."
+                );
             }
 
             //Consultar Estado "Enviado"

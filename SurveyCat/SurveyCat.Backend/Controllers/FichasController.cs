@@ -73,6 +73,17 @@ public class FichasController : GenericController<Ficha>
         return BadRequest(action.Message);
     }
 
+    [HttpPost("consultar-estados")]
+    public async Task<IActionResult> ConsultarEstados([FromBody] ConsultaEstadosRequestDto request)
+    {
+        var response = await _fichasSyncHelper.ConsultarEstadosAsync(request.CodEncuestas);
+        if (response.WasSuccess)
+        {
+            return Ok(response.Result);
+        }
+        return BadRequest(response.Message);
+    }
+
     [HttpPost("sincronizar")]
     public async Task<IActionResult> SincronizarFichaCompletaAsync([FromBody] FichaSyncDTO dto)
     {
