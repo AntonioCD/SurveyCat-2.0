@@ -30,6 +30,12 @@ public class FichaSyncDTO
     [MaxLength(10)]
     public string? Lote { get; set; }
 
+    [MaxLength(2)]
+    public string? Piso { get; set; }
+
+    [MaxLength(2)]
+    public string? Apartamento { get; set; }
+
     // Identificación
     [MaxLength(25)]
     public string? CodParcela { get; set; }

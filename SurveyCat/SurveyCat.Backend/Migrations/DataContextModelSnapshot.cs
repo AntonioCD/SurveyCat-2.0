@@ -517,6 +517,10 @@ namespace SurveyCat.Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("Apartamento")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
                     b.Property<double?>("AreaEstimada")
                         .HasColumnType("float");
 
@@ -592,6 +596,10 @@ namespace SurveyCat.Backend.Migrations
 
                     b.Property<int?>("OrigenTierraId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Piso")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
 
                     b.Property<bool>("PresentaConflicto")
                         .HasColumnType("bit");

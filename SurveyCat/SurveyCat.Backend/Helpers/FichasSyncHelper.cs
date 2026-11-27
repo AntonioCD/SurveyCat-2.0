@@ -132,6 +132,8 @@ public class FichasSyncHelper : IFichasSyncHelper
             ficha.Direccion = dto.Direccion;
             ficha.Manzana = dto.Manzana?.Trim().ToUpper();
             ficha.Lote = dto.Lote?.Trim().ToUpper();
+            ficha.Piso = dto.Piso?.Trim().ToUpper();
+            ficha.Apartamento = dto.Apartamento?.Trim().ToUpper();
 
             ficha.CodParcela = dto.CodParcela?.Trim().ToUpper();
             ficha.NombreFinca = dto.NombreFinca?.Trim().ToUpper();

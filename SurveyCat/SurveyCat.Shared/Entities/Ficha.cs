@@ -65,6 +65,12 @@ public class Ficha
     [MaxLength(10)]
     public string? Lote { get; set; }
 
+    [MaxLength(2)]
+    public string? Piso { get; set; }
+
+    [MaxLength(2)]
+    public string? Apartamento { get; set; }
+
     // =========================================
     // IDENTIFICACIÓN
     // =========================================
